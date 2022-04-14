@@ -1,0 +1,34 @@
+// swift-tools-version:5.6
+
+import PackageDescription
+
+let package = Package(
+    name: "skbd",
+    platforms: [
+        .macOS(.v12),
+    ],
+    dependencies: [
+        .package(url: "https://github.com/apple/swift-argument-parser", from: "1.1.4"),
+        .package(url: "https://github.com/starkwm/alicia", from: "2.0.2"),
+    ],
+    targets: [
+        .executableTarget(
+            name: "skbd",
+            dependencies: [
+                "skbdlib",
+                .product(name: "ArgumentParser", package: "swift-argument-parser"),
+            ],
+            exclude: ["version.swift.tmpl"]
+        ),
+        .target(
+            name: "skbdlib",
+            dependencies: [
+                .product(name: "Alicia", package: "alicia"),
+            ]
+        ),
+        .testTarget(
+            name: "skbdlibTests",
+            dependencies: ["skbdlib"]
+        ),
+    ]
+)

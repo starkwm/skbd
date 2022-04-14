@@ -1,0 +1,23 @@
+{
+  "pins" : [
+    {
+      "identity" : "alicia",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/starkwm/alicia",
+      "state" : {
+        "revision" : "86b4ca1c6a7b58a489251c9e7ea7abf472591baf",
+        "version" : "2.0.2"
+      }
+    },
+    {
+      "identity" : "swift-argument-parser",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-argument-parser",
+      "state" : {
+        "revision" : "9f39744e025c7d377987f30b03770805dcb0bcd1",
+        "version" : "1.1.4"
+      }
+    }
+  ],
+  "version" : 2
+}
