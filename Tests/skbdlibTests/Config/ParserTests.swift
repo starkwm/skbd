@@ -105,4 +105,47 @@ final class ParserTests: XCTestCase {
             XCTAssertEqual(err as? ParserError, .expectedColonFollowedByCommand)
         }
     }
+
+    func testParseCanCallHandler() {
+        do {
+            let input = "opt+ctrl-a: echo"
+            let shortcuts = try Parser(input).parse()
+
+
+            XCTAssertEqual(shortcuts.count, 1)
+            shortcuts[0].handler()
+        } catch {
+            XCTFail("expected not to throw an error")
+        }
+    }
+
+    func testParseCanCallHandlerWhenShellIsEmpty() {
+        do {
+            setenv("SHELL", "", 1)
+
+            let input = "opt+ctrl-a: echo"
+            let shortcuts = try Parser(input).parse()
+
+
+            XCTAssertEqual(shortcuts.count, 1)
+            shortcuts[0].handler()
+        } catch {
+            XCTFail("expected not to throw an error")
+        }
+    }
+
+    func testParseCanCallHandlerWhenShellIsNotSet() {
+        do {
+            unsetenv("SHELL")
+
+            let input = "opt+ctrl-a: echo"
+            let shortcuts = try Parser(input).parse()
+
+
+            XCTAssertEqual(shortcuts.count, 1)
+            shortcuts[0].handler()
+        } catch {
+            XCTFail("expected not to throw an error")
+        }
+    }
 }
