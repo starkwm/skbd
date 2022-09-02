@@ -24,6 +24,9 @@ final class LexerTests: XCTestCase {
 
             # this is a mapping with a number key
             ctrl + shift - 5: cat ~/.config/skbd/skbdrc | pbcopy
+
+            # can use key symbols
+            alt - [: echo "left bracket"
         """
 
         let expected: [TokenType] = [
@@ -39,6 +42,8 @@ final class LexerTests: XCTestCase {
             .command,
             .comment,
             .modifier, .plus, .modifier, .dash, .key, .command,
+            .comment,
+            .modifier, .dash, .key, .command,
             .endOfStream,
         ]
 
@@ -51,7 +56,7 @@ final class LexerTests: XCTestCase {
     }
 
     func testGetTokenWithUnknownToken() {
-        let lexer = Lexer(";")
+        let lexer = Lexer("@")
         let token = lexer.getToken()
 
         XCTAssertEqual(token.type, .unknown)

@@ -36,6 +36,8 @@ class Lexer {
                 let text = readIdentifier()
                 let type = resolveIdentifierType(identifier: text)
                 return Token(type: type, text: text)
+            } else if ["`", "=", "[", "]", ";", "'", "\\", ",", ".", "/"].contains(current) {
+                token = Token(type: .key, text: String(current))
             } else {
                 token = Token(type: .unknown, text: String(current))
             }

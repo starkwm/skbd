@@ -25,6 +25,9 @@ final class ParserTests: XCTestCase {
 
             # this is a mapping with a number key
             ctrl + shift - 5: cat ~/.config/skbd/skbdrc | pbcopy
+
+            # can use key symbols
+            alt - [: echo "left bracket"
         """
 
         do {
@@ -41,9 +44,10 @@ final class ParserTests: XCTestCase {
                 Expect(key: UInt32(kVK_Return), modifiers: UInt32(controlKey | optionKey)),
                 Expect(key: UInt32(kVK_F1), modifiers: UInt32(controlKey | optionKey | cmdKey | shiftKey)),
                 Expect(key: UInt32(kVK_ANSI_5), modifiers: UInt32(controlKey | shiftKey)),
+                Expect(key: UInt32(kVK_ANSI_LeftBracket), modifiers: UInt32(optionKey)),
             ]
 
-            XCTAssertEqual(shortcuts.count, 5)
+            XCTAssertEqual(shortcuts.count, 6)
 
             for (idx, expect) in expected.enumerated() {
                 XCTAssertEqual(shortcuts[idx].keyCode, expect.key)
