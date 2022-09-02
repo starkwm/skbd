@@ -1,6 +1,5 @@
 enum ParserError: Error {
     case expectedModifier
-    case expectedToken
     case expectedPlusFollowedByModifier
     case expectedModifierFollowedByDash
     case expectedDashFollowedByKey
@@ -12,8 +11,6 @@ extension ParserError: CustomStringConvertible {
         switch self {
         case .expectedModifier:
             return "expected modifier"
-        case .expectedToken:
-            return "expected token"
         case .expectedPlusFollowedByModifier:
             return "expected modifier to follow plus"
         case .expectedModifierFollowedByDash:

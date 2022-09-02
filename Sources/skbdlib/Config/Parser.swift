@@ -71,14 +71,10 @@ public class Parser {
         }
 
         if match(type: .command) {
-            guard let token = prevToken, let text = token.text else {
-                throw ParserError.expectedToken
-            }
-
             let handler: () -> Void = {
                 let proc = Process()
                 proc.executableURL = URL(fileURLWithPath: resolveShell())
-                proc.arguments = ["-c", text]
+                proc.arguments = ["-c", self.prevToken!.text!]
                 try? proc.run()
             }
 
