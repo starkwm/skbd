@@ -18,22 +18,38 @@ final class ParserTests: XCTestCase {
             # this is another comment, followed by a multiline command
             ctrl + opt - return : echo "foo bar"; \\
                 rm -fr /
+
+            # this is a comment with a hash in it # here
+            hyper - f1:
+                echo "# hello world"
+
+            # this is a mapping with a number key
+            ctrl + shift - 5: cat ~/.config/skbd/skbdrc | pbcopy
         """
 
         do {
             let shortcuts = try Parser(input).parse()
 
-            XCTAssertEqual(shortcuts[0].keyCode, UInt32(kVK_Space))
-            XCTAssertEqual(shortcuts[0].modifierFlags, UInt32(optionKey))
-            XCTAssertNotNil(shortcuts[0].handler)
+            struct Expect {
+                var key: UInt32;
+                var modifiers: UInt32
+            }
 
-            XCTAssertEqual(shortcuts[1].keyCode, UInt32(kVK_ANSI_A))
-            XCTAssertEqual(shortcuts[1].modifierFlags, UInt32(cmdKey | shiftKey))
-            XCTAssertNotNil(shortcuts[1].handler)
+            let expected: [Expect] = [
+                Expect(key: UInt32(kVK_Space), modifiers: UInt32(optionKey)),
+                Expect(key: UInt32(kVK_ANSI_A), modifiers: UInt32(cmdKey | shiftKey)),
+                Expect(key: UInt32(kVK_Return), modifiers: UInt32(controlKey | optionKey)),
+                Expect(key: UInt32(kVK_F1), modifiers: UInt32(controlKey | optionKey | cmdKey | shiftKey)),
+                Expect(key: UInt32(kVK_ANSI_5), modifiers: UInt32(controlKey | shiftKey)),
+            ]
 
-            XCTAssertEqual(shortcuts[2].keyCode, UInt32(kVK_Return))
-            XCTAssertEqual(shortcuts[2].modifierFlags, UInt32(controlKey | optionKey))
-            XCTAssertNotNil(shortcuts[2].handler)
+            XCTAssertEqual(shortcuts.count, 5)
+
+            for (idx, expect) in expected.enumerated() {
+                XCTAssertEqual(shortcuts[idx].keyCode, expect.key)
+                XCTAssertEqual(shortcuts[idx].modifierFlags, expect.modifiers)
+                XCTAssertNotNil(shortcuts[idx].handler)
+            }
         } catch {
             XCTFail("expected not to throw an error")
         }

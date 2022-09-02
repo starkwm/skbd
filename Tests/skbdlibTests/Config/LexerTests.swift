@@ -7,8 +7,8 @@ final class LexerTests: XCTestCase {
 
     func testGetToken() {
         let input = """
-            # this if the first comment
-            opt-space: open -a iTerm2.app
+            # this if the first comment, without whitespace
+            opt-space:open -a iTerm2.app
 
             # this is a comment
             # with multiple lines... + - ++
