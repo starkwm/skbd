@@ -18,9 +18,12 @@ final class LexerTests: XCTestCase {
             ctrl + opt - return : echo "foo bar"; \\
                 rm -fr /
 
-           # this is a comment with a hash in it # here
-           hyper - f1:
-               echo "# hello world"
+            # this is a comment with a hash in it # here
+            hyper - f1:
+                echo "# hello world"
+
+            # this is a mapping with a number key
+            ctrl + shift - 5: cat ~/.config/skbd/skbdrc | pbcopy
         """
 
         let expected: [TokenType] = [
@@ -34,6 +37,8 @@ final class LexerTests: XCTestCase {
             .comment,
             .modifier, .dash, .key,
             .command,
+            .comment,
+            .modifier, .plus, .modifier, .dash, .key, .command,
             .endOfStream,
         ]
 

@@ -32,7 +32,7 @@ class Lexer {
             let cmd = readCommand()
             token = Token(type: .command, text: cmd)
         default:
-            if current.isLetter {
+            if current.isLetter || current.isNumber {
                 let text = readIdentifier()
                 let type = resolveIdentifierType(identifier: text)
                 return Token(type: type, text: text)
