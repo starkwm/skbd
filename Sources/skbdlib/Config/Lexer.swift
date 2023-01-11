@@ -31,6 +31,8 @@ class Lexer {
             skipWhitespace()
             let cmd = readCommand()
             token = Token(type: .command, text: cmd)
+        case "⌃", "⇧", "⌥", "⌘":
+            token = Token(type: .modifier, text: String(current))
         default:
             if current.isLetter || current.isNumber {
                 let text = readIdentifier()
