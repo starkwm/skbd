@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/starkwm/alicia",
       "state" : {
-        "revision" : "725a30c1f2403788c23e95df04ae90b0f6555356",
-        "version" : "2.0.3"
+        "revision" : "f7c5791f1126204b247324fd13b8630ad1543d26",
+        "version" : "2.0.4"
       }
     },
     {
@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-argument-parser",
       "state" : {
-        "revision" : "9f39744e025c7d377987f30b03770805dcb0bcd1",
-        "version" : "1.1.4"
+        "revision" : "fee6933f37fde9a5e12a1e4aeaa93fe60116ff2a",
+        "version" : "1.2.2"
       }
     }
   ],
