@@ -1,5 +1,5 @@
-import Foundation
 import Alicia
+import Foundation
 
 private func resolveShell() -> String {
     if let shell = ProcessInfo.processInfo.environment["SHELL"] {
