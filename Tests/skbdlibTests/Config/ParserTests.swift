@@ -34,7 +34,7 @@ final class ParserTests: XCTestCase {
             let shortcuts = try Parser(input).parse()
 
             struct Expect {
-                var key: UInt32;
+                var key: UInt32
                 var modifiers: UInt32
             }
 
@@ -115,7 +115,6 @@ final class ParserTests: XCTestCase {
             let input = "opt+ctrl-a: echo"
             let shortcuts = try Parser(input).parse()
 
-
             XCTAssertEqual(shortcuts.count, 1)
             shortcuts[0].handler()
         } catch {
@@ -130,7 +129,6 @@ final class ParserTests: XCTestCase {
             let input = "opt+ctrl-a: echo"
             let shortcuts = try Parser(input).parse()
 
-
             XCTAssertEqual(shortcuts.count, 1)
             shortcuts[0].handler()
         } catch {
@@ -144,7 +142,6 @@ final class ParserTests: XCTestCase {
 
             let input = "opt+ctrl-a: echo"
             let shortcuts = try Parser(input).parse()
-
 
             XCTAssertEqual(shortcuts.count, 1)
             shortcuts[0].handler()
