@@ -14,7 +14,7 @@ final class LockFileTests: XCTestCase {
     override func tearDown() {
         super.tearDown()
 
-        try? FileManager.default.removeItem(atPath: try LockFile.path())
+        try? FileManager.default.removeItem(atPath: LockFile.path())
 
         LockFile.open = defaultOpen
         LockFile.fcntl = defaultFcntl
@@ -27,7 +27,7 @@ final class LockFileTests: XCTestCase {
 
     func testAcquire() {
         XCTAssertNoThrow(try LockFile.acquire())
-        XCTAssertTrue(FileManager.default.fileExists(atPath: try LockFile.path()))
+        XCTAssertTrue(try FileManager.default.fileExists(atPath: LockFile.path()))
     }
 
     func testAcquireWithOpenFail() {
