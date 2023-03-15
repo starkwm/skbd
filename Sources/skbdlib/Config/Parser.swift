@@ -71,10 +71,12 @@ public class Parser {
         }
 
         if match(type: .command) {
+            let command = self.prevToken!.text!
+
             let handler: () -> Void = {
                 let proc = Process()
                 proc.executableURL = URL(fileURLWithPath: resolveShell())
-                proc.arguments = ["-c", self.prevToken!.text!]
+                proc.arguments = ["-c", command]
                 try? proc.run()
             }
 
