@@ -8,8 +8,8 @@ let package = Package(
         .macOS(.v12),
     ],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-argument-parser", from: "1.1.4"),
-        .package(url: "https://github.com/starkwm/alicia", from: "2.0.2"),
+        .package(url: "https://github.com/apple/swift-argument-parser", from: "1.2.2"),
+        .package(url: "https://github.com/starkwm/alicia", from: "2.0.4"),
     ],
     targets: [
         .executableTarget(
