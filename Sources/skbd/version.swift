@@ -4,5 +4,5 @@ struct Version {
     let value: String
 
     /// The current version of skbd.
-    static let current = Self(value: "0.0.0")
+    static let current = Self(value: "v0.0.1")
 }
