@@ -9,3 +9,9 @@ adheres to [Semantic Versioning][semver].
 [semver]: https://semver.org/spec/v2.0.0.html
 
 ## [Unreleased]
+
+## [0.0.1] - 2023-03-15
+
+### Added
+
+- Added the initial release, with feature parity to the old `skbd`
