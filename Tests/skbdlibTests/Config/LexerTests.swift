@@ -7,26 +7,28 @@ final class LexerTests: XCTestCase {
 
     func testGetToken() {
         let input = """
-            # this if the first comment, without whitespace
-            opt-space:open -a iTerm2.app
+            # this if the first comment
+            opt-space: open -a iTerm2.app
 
             # this is a comment
             # with multiple lines... + - ++
             cmd + shift - a : echo "Hello world"
 
             # this is another comment, followed by a multiline command
-            ctrl + opt - return : echo "foo bar"; \\
+            ctrl + opt - return : echo "foo bar"; \
                 rm -fr /
 
-            # this is a comment with a hash in it # here
-            hyper - f1:
-                echo "# hello world"
+            # this is a key mapping with a number
+            cmd + opt - 5: cat ~/.config/skbd/skbdrc | pbcopy
 
-            # this is a mapping with a number key
-            ctrl + shift - 5: cat ~/.config/skbd/skbdrc | pbcopy
+            # this is a key mapping with a non-alphanumeric key
+            hyper - `: echo "backtick"
 
-            # can use key symbols
-            alt - [: echo "left bracket"
+            # this makes sure we allow - as a key
+            cmd + shift + opt - -: echo "hyphen!"
+
+            # this uses the modifier symbols
+            ⌃ + ⇧ + ⌥ + ⌘ - A: echo "symbols"
         """
 
         let expected: [TokenType] = [
@@ -38,12 +40,13 @@ final class LexerTests: XCTestCase {
             .comment,
             .modifier, .plus, .modifier, .dash, .key, .command,
             .comment,
-            .modifier, .dash, .key,
-            .command,
-            .comment,
             .modifier, .plus, .modifier, .dash, .key, .command,
             .comment,
             .modifier, .dash, .key, .command,
+            .comment,
+            .modifier, .plus, .modifier, .plus, .modifier, .dash, .dash, .command,
+            .comment,
+            .modifier, .plus, .modifier, .plus, .modifier, .plus, .modifier, .dash, .key, .command,
             .endOfStream,
         ]
 
