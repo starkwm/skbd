@@ -44,7 +44,7 @@ final class ParserTests: XCTestCase {
                 Expect(key: UInt32(kVK_Return), modifiers: UInt32(controlKey | optionKey)),
                 Expect(key: UInt32(kVK_F1), modifiers: UInt32(controlKey | optionKey | cmdKey | shiftKey)),
                 Expect(key: UInt32(kVK_ANSI_5), modifiers: UInt32(controlKey | shiftKey)),
-                Expect(key: UInt32(kVK_ANSI_LeftBracket), modifiers: UInt32(optionKey)),
+                Expect(key: UInt32(kVK_ANSI_LeftBracket), modifiers: UInt32(optionKey))
             ]
 
             XCTAssertEqual(shortcuts.count, 6)

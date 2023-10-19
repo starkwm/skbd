@@ -47,7 +47,7 @@ final class LexerTests: XCTestCase {
             .modifier, .plus, .modifier, .plus, .modifier, .dash, .dash, .command,
             .comment,
             .modifier, .plus, .modifier, .plus, .modifier, .plus, .modifier, .dash, .key, .command,
-            .endOfStream,
+            .endOfStream
         ]
 
         let lexer = Lexer(input)
@@ -69,7 +69,7 @@ final class LexerTests: XCTestCase {
         let lexer = Lexer("cmd - f100: ls")
 
         let expected: [TokenType] = [
-            .modifier, .dash, .unknown, .command,
+            .modifier, .dash, .unknown, .command
         ]
 
         for type in expected {
