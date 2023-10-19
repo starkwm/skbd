@@ -5,7 +5,7 @@ import PackageDescription
 let package = Package(
     name: "skbd",
     platforms: [
-        .macOS(.v12),
+        .macOS(.v13),
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.2.2"),
