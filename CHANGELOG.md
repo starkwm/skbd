@@ -10,6 +10,12 @@ adheres to [Semantic Versioning][semver].
 
 ## [Unreleased]
 
+## [0.0.2] - 2024-02-29
+
+### Changed
+
+- Updated the minimum required macOS version to 13
+
 ## [0.0.1] - 2023-03-15
 
 ### Added
