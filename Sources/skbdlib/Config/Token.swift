@@ -1,8 +1,8 @@
 struct Token {
-    var type: TokenType
-    var text: String?
+  var type: TokenType
+  var text: String?
 
-    var description: String {
-        "Token {type: \(type), text: \(text ?? "nil")}"
-    }
+  var description: String {
+    "Token {type: \(type), text: \(text ?? "nil")}"
+  }
 }
