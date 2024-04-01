@@ -4,10 +4,10 @@ VERSION_TMPL=Sources/skbd/version.swift.tmpl
 VERSION_FILE=Sources/skbd/version.swift
 
 format:
-	@swift-format format -r -i Sources
+	@swift-format format -r -i Sources Tests Package.swift
 
 lint:
-	@swift-format lint -r Sources
+	@swift-format lint -r Sources Tests Package.swift
 
 test:
 	@swift test --parallel --enable-code-coverage
