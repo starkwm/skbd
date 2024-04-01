@@ -1,13 +1,13 @@
 {
-  "originHash" : "1c88ce88bc421c54c708bbefabc9685dc8a07d62af05933ef35977435c3a70ad",
+  "originHash" : "63d336a6fc651aac208e53bd2db65ed5134cd84e06721972e2be35ecbfca208b",
   "pins" : [
     {
       "identity" : "alicia",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/starkwm/alicia",
       "state" : {
-        "revision" : "f5305dfd9bafffaa5cfe3cfc099eea87a539e6ee",
-        "version" : "2.0.5"
+        "revision" : "afca73f31de96dcfe1e43f2d047ede59833a8c62",
+        "version" : "3.0.0"
       }
     },
     {
