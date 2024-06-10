@@ -10,6 +10,11 @@ adheres to [Semantic Versioning][semver].
 
 ## [Unreleased]
 
+### Changed
+
+- Updated `starkwm/alicia` dependency
+- Updated `apple/swift-argument-parser` dependency
+
 ## [0.0.2] - 2024-02-29
 
 ### Changed
