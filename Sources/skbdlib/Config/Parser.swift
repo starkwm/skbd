@@ -77,6 +77,7 @@ public class Parser {
         let proc = Process()
         proc.executableURL = URL(fileURLWithPath: resolveShell())
         proc.arguments = ["-c", command]
+        proc.environment = ProcessInfo.processInfo.environment
         try? proc.run()
       }
 
