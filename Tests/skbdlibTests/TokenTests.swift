@@ -8,12 +8,12 @@ final class TokenTests: XCTestCase {
   func testDescription() {
     let token = Token(type: .plus)
 
-    XCTAssertEqual(token.description, "Token {type: plus, text: nil}")
+    XCTAssertEqual(token.description, "Token {type: TokenType {+}, text: nil}")
   }
 
   func testDescriptionWithText() {
     let token = Token(type: .command, text: "echo \"Hello World\"")
 
-    XCTAssertEqual(token.description, "Token {type: command, text: echo \"Hello World\"}")
+    XCTAssertEqual(token.description, "Token {type: TokenType {Command}, text: echo \"Hello World\"}")
   }
 }
