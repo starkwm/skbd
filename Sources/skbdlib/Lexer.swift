@@ -1,5 +1,3 @@
-import Alicia
-
 class Lexer {
   private var buffer = ""
   private var current = Character("\0")
@@ -96,11 +94,11 @@ class Lexer {
   }
 
   private func resolveIdentifierType(identifier: String) -> TokenType {
-    if identifier.count == 1 || keyToCode.keys.contains(identifier) {
+    if Key.valid(identifier) {
       return .key
     }
 
-    if modifierIdentifiers.contains(identifier) {
+    if Modifier.valid(identifier) {
       return .modifier
     }
 
