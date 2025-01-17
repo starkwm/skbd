@@ -1,4 +1,3 @@
-import Alicia
 import Foundation
 
 private func resolveShell() -> String {
@@ -89,13 +88,7 @@ public class Parser {
   }
 
   private func parseModifier() throws -> [String] {
-    let text = prevToken!.text!
-
-    var modifiers = [String]()
-
-    if modifierIdentifiers.contains(text) {
-      modifiers.append(text)
-    }
+    var modifiers = [prevToken!.text!]
 
     if match(type: .plus) {
       if match(type: .modifier) {
