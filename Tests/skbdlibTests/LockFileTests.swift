@@ -1,19 +1,15 @@
-import XCTest
+import Foundation
+import Testing
 
 @testable import skbdlib
 
-final class LockFileTests: XCTestCase {
-  // MARK: Lifecycle
-
-  override func setUp() {
-    super.setUp()
-
-    setenv("USER", String(Int.random(in: 1000...9999)), 1)
+@Suite("LockFile", .serialized)
+class LockFileTests {
+  init() {
+    setenv("USER", String(Int.random(in: 10000...99999)), 1)
   }
 
-  override func tearDown() {
-    super.tearDown()
-
+  deinit {
     try? FileManager.default.removeItem(atPath: LockFile.path())
 
     LockFile.open = defaultOpen
@@ -25,86 +21,107 @@ final class LockFileTests: XCTestCase {
 
   // MARK: LockFile.acquire
 
-  func testAcquire() {
-    XCTAssertNoThrow(try LockFile.acquire())
-    XCTAssertTrue(try FileManager.default.fileExists(atPath: LockFile.path()))
+  @Test("LockFile.acquire() (with no errors)")
+  func acquireWithNoErrors() async throws {
+    #expect(throws: Never.self) {
+      try LockFile.acquire()
+
+      #expect(FileManager.default.fileExists(atPath: try LockFile.path()))
+    }
   }
 
-  func testAcquireWithOpenFail() {
+  @Test("LockFile.acquire() (when open call fails)")
+  func acquireWhenOpenFails() async throws {
     LockFile.open = { _, _, _ in -1 }
 
-    XCTAssertThrowsError(try LockFile.acquire()) { err in
-      XCTAssertTrue(err is LockFileError)
-      XCTAssertEqual(err as? LockFileError, .failedToOpenFile)
+    #expect(throws: LockFileError.failedToOpenFile) {
+      try LockFile.acquire()
     }
   }
 
-  func testAcquireWithFcntlFail() {
+  @Test("LockFile.acquire() (when fcntl call fails)")
+  func acquireWhenFcntlFails() async throws {
     LockFile.fcntl = { _ in -1 }
 
-    XCTAssertThrowsError(try LockFile.acquire()) { err in
-      XCTAssertTrue(err is LockFileError)
-      XCTAssertEqual(err as? LockFileError, .failedToLockFile)
+    #expect(throws: LockFileError.failedToLockFile) {
+      try LockFile.acquire()
     }
   }
 
-  func testAcquireWithWriteFail() throws {
+  @Test("LockFile.acquire() (when write call fails)")
+  func acquireWhenWriteFails() async throws {
     LockFile.write = { _ in -1 }
 
-    XCTAssertThrowsError(try LockFile.acquire()) { err in
-      XCTAssertTrue(err is LockFileError)
-      XCTAssertEqual(err as? LockFileError, .failedToWriteFile)
+    #expect(throws: LockFileError.failedToWriteFile) {
+      try LockFile.acquire()
     }
   }
 
   // MARK: LockFile.readPid
 
-  func testReadPid() {
-    XCTAssertNoThrow(try LockFile.acquire())
-    XCTAssertEqual(try LockFile.readPid(), getpid())
+  @Test("LockFile.readPid() (with no errors)")
+  func readPidWithNoErrors() async throws {
+    #expect(throws: Never.self) {
+      try LockFile.acquire()
+
+      #expect(try LockFile.readPid() == getpid())
+    }
   }
 
-  func testReadPidWithOpenFail() {
-    XCTAssertNoThrow(try LockFile.acquire())
+  @Test("LockFile.readPid() (when open call fails)")
+  func readPidWhenOpenFails() async throws {
+    #expect(throws: Never.self) {
+      try LockFile.acquire()
+    }
 
     LockFile.open = { _, _, _ in -1 }
 
-    XCTAssertThrowsError(try LockFile.readPid()) { err in
-      XCTAssertTrue(err is LockFileError)
-      XCTAssertEqual(err as? LockFileError, .failedToOpenFile)
+    #expect(throws: LockFileError.failedToOpenFile) {
+      try LockFile.readPid()
     }
   }
 
-  func testReadPidWithLockFail() {
-    XCTAssertNoThrow(try LockFile.acquire())
+  @Test("LockFile.readPid() (when flock call fails)")
+  func readPidWhenFlockFails() async throws {
+    #expect(throws: Never.self) {
+      try LockFile.acquire()
+    }
 
     LockFile.flock = { _ in 0 }
 
-    XCTAssertThrowsError(try LockFile.readPid()) { err in
-      XCTAssertTrue(err is LockFileError)
-      XCTAssertEqual(err as? LockFileError, .failedToLockFile)
+    #expect(throws: LockFileError.failedToLockFile) {
+      try LockFile.readPid()
     }
   }
 
-  func testReadPidWithReadFail() {
-    XCTAssertNoThrow(try LockFile.acquire())
+  @Test("LockFile.readPid() (when read call fails)")
+  func readPidWhenReadFails() async throws {
+    #expect(throws: Never.self) {
+      try LockFile.acquire()
+    }
 
     LockFile.read = { _ in (Int(-1), Int32(0)) }
 
-    XCTAssertThrowsError(try LockFile.readPid()) { err in
-      XCTAssertTrue(err is LockFileError)
-      XCTAssertEqual(err as? LockFileError, .failedToReadFile)
+    #expect(throws: LockFileError.failedToReadFile) {
+      try LockFile.readPid()
     }
   }
 
   // MARK: LockFile.path
 
-  func testPathWithNoUser() {
+  @Test("LockFile.path() (with no errors)")
+  func pathWithNoErrors() async throws {
+    #expect(throws: Never.self) {
+      try LockFile.path()
+    }
+  }
+
+  @Test("LockFile.path() (when no USER enviornment variable set)")
+  func pathWithNoUserEnvVar() async throws {
     unsetenv("USER")
 
-    XCTAssertThrowsError(try LockFile.path()) { err in
-      XCTAssertTrue(err is LockFileError)
-      XCTAssertEqual(err as? LockFileError, .userEnvVarMissing)
+    #expect(throws: LockFileError.userEnvVarMissing) {
+      try LockFile.path()
     }
   }
 }
