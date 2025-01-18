@@ -1,5 +1,6 @@
-import XCTest
+import Testing
 
 @testable import skbdlib
 
-final class ParserErrorTests: XCTestCase {}
+@Suite("ParserError")
+struct ParserErrorTests {}
