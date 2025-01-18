@@ -1,15 +1,6 @@
 {
-  "originHash" : "63d336a6fc651aac208e53bd2db65ed5134cd84e06721972e2be35ecbfca208b",
+  "originHash" : "ec30703ef3e62250991ebb49edbf30c398b4a9b7198f62574294e3869563ba76",
   "pins" : [
-    {
-      "identity" : "alicia",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/starkwm/alicia",
-      "state" : {
-        "revision" : "6b63935e556fb91f848b66905e822fe21ccd1ce4",
-        "version" : "3.0.1"
-      }
-    },
     {
       "identity" : "swift-argument-parser",
       "kind" : "remoteSourceControl",

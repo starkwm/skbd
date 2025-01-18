@@ -8,8 +8,7 @@ let package = Package(
     .macOS(.v14)
   ],
   dependencies: [
-    .package(url: "https://github.com/apple/swift-argument-parser", from: "1.0.0"),
-    .package(url: "https://github.com/starkwm/alicia", from: "3.0.0"),
+    .package(url: "https://github.com/apple/swift-argument-parser", from: "1.0.0")
   ],
   targets: [
     .executableTarget(
@@ -21,10 +20,7 @@ let package = Package(
       exclude: ["version.swift.tmpl"]
     ),
     .target(
-      name: "skbdlib",
-      dependencies: [
-        .product(name: "Alicia", package: "alicia")
-      ]
+      name: "skbdlib"
     ),
     .testTarget(
       name: "skbdlibTests",
