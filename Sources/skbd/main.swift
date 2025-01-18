@@ -9,7 +9,7 @@ func main() -> Int32 {
 
   if arguments.reload {
     do {
-      let pid = try LockFile.readPid()
+      let pid = try LockFile.readPID()
       kill(pid, SIGUSR1)
       return EXIT_SUCCESS
     } catch {
