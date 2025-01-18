@@ -1,19 +1,21 @@
-import XCTest
+import Testing
 
 @testable import skbdlib
 
-final class TokenTests: XCTestCase {
-  // MARK: Token#description
+@Suite("Token")
+struct TokenTests {
+  // MARK: #description
 
-  func testDescription() {
-    let token = Token(type: .plus)
+  @Test("Token#description")
+  func description() async throws {
+    let tests: [Token: String] = [
+      Token(type: .plus): "Token {type: TokenType {+}, text: nil}",
+      Token(type: .command, text: "echo \"Hello World\""):
+        "Token {type: TokenType {Command}, text: echo \"Hello World\"}",
+    ]
 
-    XCTAssertEqual(token.description, "Token {type: TokenType {+}, text: nil}")
-  }
-
-  func testDescriptionWithText() {
-    let token = Token(type: .command, text: "echo \"Hello World\"")
-
-    XCTAssertEqual(token.description, "Token {type: TokenType {Command}, text: echo \"Hello World\"}")
+    for (token, expected) in tests {
+      #expect(token.description == expected)
+    }
   }
 }
