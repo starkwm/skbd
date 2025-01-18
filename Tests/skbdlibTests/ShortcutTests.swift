@@ -1,14 +1,16 @@
-import XCTest
+import Testing
 
 @testable import skbdlib
 
-final class ShortcutTests: XCTestCase {
+@Suite("Shortcut")
+struct ShortcutTests {
   // MARK: Shortcut#identifier
 
-  func testIdentifierIsUnique() {
+  @Test("Shortcut#identifier (identifiers are unique)")
+  func identifier() async throws {
     let shortcut1 = Shortcut(1, 2)
     let shortcut2 = Shortcut(1, 2)
 
-    XCTAssertNotEqual(shortcut1.identifier, shortcut2.identifier)
+    #expect(shortcut1.identifier != shortcut2.identifier)
   }
 }
