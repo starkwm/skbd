@@ -10,7 +10,7 @@ lint:
 	@swift-format lint -r Sources Tests Package.swift
 
 test:
-	@swift test --parallel --enable-code-coverage
+	@swift test -q --parallel --enable-code-coverage
 
 coverage:
 	$(eval BIN_PATH := $(shell swift build --show-bin-path))
