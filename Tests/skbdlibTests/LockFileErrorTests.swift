@@ -1,5 +1,6 @@
-import XCTest
+import Testing
 
 @testable import skbdlib
 
-final class LockFileErrorTests: XCTestCase {}
+@Suite("LockFileError")
+struct LockFileErrorTests {}
