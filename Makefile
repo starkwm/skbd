@@ -1,7 +1,7 @@
 SRC=$(wildcard Sources/skbd/*.swift)
 
-VERSION_TMPL=Sources/skbd/version.swift.tmpl
-VERSION_FILE=Sources/skbd/version.swift
+VERSION_TMPL=Sources/skbd/Version.swift.tmpl
+VERSION_FILE=Sources/skbd/Version.swift
 
 format:
 	@swift-format format -r -i Sources Tests Package.swift

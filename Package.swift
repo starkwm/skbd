@@ -17,7 +17,7 @@ let package = Package(
         "skbdlib",
         .product(name: "ArgumentParser", package: "swift-argument-parser"),
       ],
-      exclude: ["version.swift.tmpl"]
+      exclude: ["Version.swift.tmpl"]
     ),
     .target(
       name: "skbdlib"
