@@ -1,5 +1,3 @@
-SRC=$(wildcard Sources/skbd/*.swift)
-
 VERSION_TMPL=Sources/skbd/Version.swift.tmpl
 VERSION_FILE=Sources/skbd/Version.swift
 
@@ -27,7 +25,7 @@ coverage:
 clean:
 	@swift package clean
 
-build: $(SRC)
+build:
 	@swift build
 
 release: clean
