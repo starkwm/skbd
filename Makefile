@@ -3,6 +3,8 @@ SRC=$(wildcard Sources/skbd/*.swift)
 VERSION_TMPL=Sources/skbd/Version.swift.tmpl
 VERSION_FILE=Sources/skbd/Version.swift
 
+all: build
+
 format:
 	@swift-format format -r -i Sources Tests Package.swift
 
@@ -43,4 +45,4 @@ endif
 	git push origin $(NEW_VERSION)
 
 .DEFAULT_GOAL := build
-.PHONY: format lint test coverage clean build release bump_version
+.PHONY: all format lint test coverage clean build release bump_version
