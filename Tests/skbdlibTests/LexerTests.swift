@@ -1,11 +1,13 @@
-import XCTest
+import Testing
 
 @testable import skbdlib
 
-final class LexerTests: XCTestCase {
+@Suite("Lexer")
+struct LexerTests {
   // MARK: Lexer#getToken
 
-  func testGetToken() {
+  @Test("Lexer#getToken() (with valid input)")
+  func getTokenWithValidInput() async throws {
     let input = """
           # this if the first comment
           opt-space: open -a iTerm2.app
@@ -54,18 +56,20 @@ final class LexerTests: XCTestCase {
 
     for type in expected {
       let token = lexer.getToken()
-      XCTAssertEqual(token.type, type)
+      #expect(token.type == type)
     }
   }
 
-  func testGetTokenWithUnknownToken() {
+  @Test("Lexer#getToken() (with unknown token in input)")
+  func getTokenWithUnknownToken() async throws {
     let lexer = Lexer("@")
     let token = lexer.getToken()
 
-    XCTAssertEqual(token.type, .unknown)
+    #expect(token.type == .unknown)
   }
 
-  func testGetTokenWithUnknownIdentifier() {
+  @Test("Lexer#getToken() (with unknown identifier token in input")
+  func getTokenWithUnknownIdentifierToken() async throws {
     let lexer = Lexer("cmd - f100: ls")
 
     let expected: [TokenType] = [
@@ -74,7 +78,7 @@ final class LexerTests: XCTestCase {
 
     for type in expected {
       let token = lexer.getToken()
-      XCTAssertEqual(token.type, type)
+      #expect(token.type == type)
     }
   }
 }
