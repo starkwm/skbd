@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Changed `Token` to conform with `Hashable` protocol
+
 ## [0.0.5] - 2025-01-18
 
 ### Added
