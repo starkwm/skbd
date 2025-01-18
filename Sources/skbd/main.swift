@@ -1,4 +1,3 @@
-import Alicia
 import AppKit
 import skbdlib
 
@@ -31,8 +30,14 @@ func main() -> Int32 {
     let parser = Parser(config)
     let shortcuts = try parser.parse()
 
-    Alicia.register(shortcuts: shortcuts)
-    Alicia.start()
+    for shortcut in shortcuts {
+      ShortcutManager.register(shortcut: shortcut)
+    }
+
+    if !ShortcutManager.start() {
+      fputs("error starting the shortcut manager", stderr)
+      return EXIT_FAILURE
+    }
   } catch {
     fputs("error parsing configuration file: \(error)\n", stderr)
     return EXIT_FAILURE
@@ -46,8 +51,11 @@ func main() -> Int32 {
       let parser = Parser(config)
       let shortcuts = try parser.parse()
 
-      Alicia.reset()
-      Alicia.register(shortcuts: shortcuts)
+      ShortcutManager.reset()
+
+      for shortcut in shortcuts {
+        ShortcutManager.register(shortcut: shortcut)
+      }
     } catch {
       fputs("error parsing configuration file: \(error)\n", stderr)
     }
@@ -55,7 +63,7 @@ func main() -> Int32 {
 
   signal(SIGINT) { _ in
     fputs("received SIGINT - terminating...\n", stdout)
-    Alicia.stop()
+    ShortcutManager.stop()
     exit(EXIT_SUCCESS)
   }
 
