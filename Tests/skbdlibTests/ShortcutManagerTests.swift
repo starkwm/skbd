@@ -1,223 +1,242 @@
 import Carbon
-import XCTest
+import Testing
 
 @testable import skbdlib
 
-class ShortcutManagerTests: XCTestCase {
-  override func tearDown() {
+@Suite("ShortcutManager", .serialized)
+class ShortcutManagerTests {
+  deinit {
     ShortcutManager.stop()
     ShortcutManager.reset()
-    ShortcutManager.registerEventHotKeyFunc = RegisterEventHotKey
 
-    super.tearDown()
+    ShortcutManager.registerEventHotKeyFunc = RegisterEventHotKey
   }
 
   // MARK: shortcutEventHandler
 
-  func testShortcutEventHandler() throws {
-    let expectation = expectation(description: "handler executed")
+  @Test("shortcutEventHandler() (processes event and calls shortcut handler)")
+  func shortcutEventHandler() async throws {
+    var called = false
 
-    let shortcut = Shortcut(123, 456) { expectation.fulfill() }
+    let shortcut = Shortcut(123, 456) { called = true }
 
     ShortcutManager.register(shortcut: shortcut)
-    let box = try XCTUnwrap(ShortcutManager.box(for: shortcut))
+    let box = try #require(ShortcutManager.box(for: shortcut))
 
     let event = createEventRef(signature: skbdEventHotKeySignature, id: box.eventHotKeyID)
-    let status = shortcutEventHandler(nil, event: event, nil)
+    let status = skbdlib.shortcutEventHandler(nil, event: event, nil)
 
-    XCTAssertEqual(status, noErr)
-
-    waitForExpectations(timeout: 1.0, handler: nil)
+    #expect(status == noErr)
+    #expect(called)
   }
 
   // MARK: ShortcutManager.register
 
-  func testRegisterShortcut() {
+  @Test("ShortcutManager.register(shortcut:) (with valid shortcut)")
+  func registerValidShortcut() async throws {
     let shortcut = Shortcut(123, 456)
 
     ShortcutManager.register(shortcut: shortcut)
 
-    XCTAssertNotNil(ShortcutManager.box(for: shortcut))
+    #expect(ShortcutManager.box(for: shortcut) != nil)
   }
 
-  func testRegisterSameShortcut() {
+  @Test("ShortcutManager.register(shortcut:) (with already registered shortcut)")
+  func registerWithAlreadyRegisteredShortcut() async throws {
     let shortcut = Shortcut(123, 456)
 
     ShortcutManager.register(shortcut: shortcut)
     ShortcutManager.register(shortcut: shortcut)
 
-    XCTAssertNotNil(ShortcutManager.box(for: shortcut))
+    #expect(ShortcutManager.box(for: shortcut) != nil)
   }
 
-  func testRegisterShortcutWithoutKeyCode() {
+  @Test("ShortcutManager.register(shortcut:) (with shortcut missing keycode)")
+  func registerWithShortcutMissingKeyCode() async throws {
     var shortcut = Shortcut()
     shortcut.modifierFlags = 456
 
     ShortcutManager.register(shortcut: shortcut)
 
-    XCTAssertNil(ShortcutManager.box(for: shortcut))
+    #expect(ShortcutManager.box(for: shortcut) == nil)
   }
 
-  func testRegisterShortcutWithouModifierFlags() {
+  @Test("ShortcutManager.register(shortcut:) (with shortcut missing modifier flags)")
+  func registerWithShortcutMissingModifierFlags() async throws {
     var shortcut = Shortcut()
     shortcut.keyCode = 123
 
     ShortcutManager.register(shortcut: shortcut)
 
-    XCTAssertNil(ShortcutManager.box(for: shortcut))
+    #expect(ShortcutManager.box(for: shortcut) == nil)
   }
 
-  func testRegisterWhenRegisterEventHotKeyFails() throws {
+  @Test("ShortcutManager.register(shortcut:) (when RegisterEventHotKey fails)")
+  func registerWhenRegisterEventHotKeyFails() async throws {
     ShortcutManager.registerEventHotKeyFunc = { (_, _, _, _, _, _) in OSStatus(eventHotKeyInvalidErr) }
 
     let shortcut = Shortcut(123, 456)
 
     ShortcutManager.register(shortcut: shortcut)
 
-    XCTAssertNil(ShortcutManager.box(for: shortcut))
+    #expect(ShortcutManager.box(for: shortcut) == nil)
   }
 
   // MARK: ShortcutManager.unregister
 
-  func testUnregisterShortcut() {
+  @Test("ShortcutManager.unregister(shortcut:) (with registered shortcut)")
+  func unregisterWithRegisteredShortcut() async throws {
     let shortcut = Shortcut(123, 456)
 
     ShortcutManager.register(shortcut: shortcut)
 
-    XCTAssertNotNil(ShortcutManager.box(for: shortcut))
+    #expect(ShortcutManager.box(for: shortcut) != nil)
 
     ShortcutManager.unregister(shortcut: shortcut)
 
-    XCTAssertNil(ShortcutManager.box(for: shortcut))
+    #expect(ShortcutManager.box(for: shortcut) == nil)
   }
 
-  func testUnregisterShortcutWithNeverRegisteredShortcut() {
+  @Test("ShortcutManager.unregister(shortcut:) (with unregistered shortcut)")
+  func unregisterWithUnregisteredShortcut() async throws {
     let shortcut = Shortcut(123, 456)
 
     ShortcutManager.unregister(shortcut: shortcut)
 
-    XCTAssertNil(ShortcutManager.box(for: shortcut))
+    #expect(ShortcutManager.box(for: shortcut) == nil)
   }
 
   // MARK: ShortcutManager.start
 
-  func testStart() {
+  @Test("ShortcutManager.start() (when shortcuts registered)")
+  func startWhenShortcutsRegistered() async throws {
     let shortcut = Shortcut(123, 456)
 
     ShortcutManager.register(shortcut: shortcut)
 
-    XCTAssertTrue(ShortcutManager.start())
+    #expect(ShortcutManager.start())
   }
 
-  func testStartWithNoRegisteredShortcuts() {
-    XCTAssertFalse(ShortcutManager.start())
+  @Test("ShortcutManager.start() (when no shortcuts registered)")
+  func startWhenNoShortcutsRegistered() async throws {
+    #expect(!ShortcutManager.start())
   }
 
-  func testStartWhenAlreadyStarted() {
+  @Test("ShortcutManager.start() (when already started)")
+  func startWhenAlreadyStarted() async throws {
     let shortcut = Shortcut(123, 456)
 
     ShortcutManager.register(shortcut: shortcut)
 
-    XCTAssertTrue(ShortcutManager.start())
-    XCTAssertFalse(ShortcutManager.start())
+    #expect(ShortcutManager.start())
+    #expect(!ShortcutManager.start())
   }
 
   // MARK: ShortcutManager.stop
 
-  func testStop() {
+  @Test("ShortcutManager.stop() (when shortcuts registered)")
+  func stopWhenShortcutsRegistered() async throws {
     let shortcut = Shortcut(123, 456)
 
     ShortcutManager.register(shortcut: shortcut)
 
-    XCTAssertTrue(ShortcutManager.start())
-    XCTAssertTrue(ShortcutManager.stop())
+    #expect(ShortcutManager.start())
+    #expect(ShortcutManager.stop())
   }
 
-  func testStopWhenNotStarted() {
-    XCTAssertFalse(ShortcutManager.stop())
+  @Test("ShortcutManager.stop() (when not started)")
+  func stopWhenNotStarted() async throws {
+    #expect(!ShortcutManager.stop())
   }
 
   // MARK: ShortcutManager.reset
 
-  func testReset() {
+  @Test("ShortcutManager.reset() (when shortcuts registered)")
+  func resetWhenShortcutsRegistered() async throws {
     let shortcut1 = Shortcut(123, 456)
     let shortcut2 = Shortcut(321, 654)
 
     ShortcutManager.register(shortcut: shortcut1)
     ShortcutManager.register(shortcut: shortcut2)
 
-    XCTAssertNotNil(ShortcutManager.box(for: shortcut1))
-    XCTAssertNotNil(ShortcutManager.box(for: shortcut2))
+    #expect(ShortcutManager.box(for: shortcut1) != nil)
+    #expect(ShortcutManager.box(for: shortcut2) != nil)
 
     ShortcutManager.reset()
 
-    XCTAssertNil(ShortcutManager.box(for: shortcut1))
-    XCTAssertNil(ShortcutManager.box(for: shortcut2))
+    #expect(ShortcutManager.box(for: shortcut1) == nil)
+    #expect(ShortcutManager.box(for: shortcut2) == nil)
   }
 
   // MARK: ShortcutManager.box
 
-  func testBox() {
+  @Test("ShortcutManager.box(for:) (with registered shortcut)")
+  func boxWithRegisteredShortcut() async throws {
     let shortcut = Shortcut(123, 456)
 
     ShortcutManager.register(shortcut: shortcut)
 
-    XCTAssertNotNil(ShortcutManager.box(for: shortcut))
+    #expect(ShortcutManager.box(for: shortcut) != nil)
   }
 
-  func testBoxWithUnregisteredShortcut() {
+  @Test("ShortcutManager.box(for:) (with unregistered shortcut)")
+  func boxWithUnregisteredShortcut() async throws {
     let shortcut = Shortcut(123, 456)
 
-    XCTAssertNil(ShortcutManager.box(for: shortcut))
+    #expect(ShortcutManager.box(for: shortcut) == nil)
   }
 
   // MARK: ShortcutManager.handleCarbonEvent
 
-  func testHandleCarbonEvent() throws {
-    let expectation = expectation(description: "handler executed")
+  @Test("ShortcutManager.handleCarbonEvent() (with valid event)")
+  func handleCarbonEventWithValidEvent() async throws {
+    var called = false
 
-    let shortcut = Shortcut(123, 456) { expectation.fulfill() }
+    let shortcut = Shortcut(123, 456) { called = true }
 
     ShortcutManager.register(shortcut: shortcut)
-    let box = try XCTUnwrap(ShortcutManager.box(for: shortcut))
+    let box = try #require(ShortcutManager.box(for: shortcut))
 
     let event = createEventRef(signature: skbdEventHotKeySignature, id: box.eventHotKeyID)
     let status = ShortcutManager.handleCarbonEvent(event)
 
-    XCTAssertEqual(status, noErr)
-
-    waitForExpectations(timeout: 1.0, handler: nil)
+    #expect(status == noErr)
+    #expect(called)
   }
 
-  func testHandleCarbonEventWithNilEvent() {
+  @Test("ShortcutManager.handleCarbonEvent() (with nil event)")
+  func handleCarbonEventWithNilEvent() async throws {
     let status = ShortcutManager.handleCarbonEvent(nil)
 
-    XCTAssertEqual(status, OSStatus(eventNotHandledErr))
+    #expect(status == OSStatus(eventNotHandledErr))
   }
 
-  func testHandleCarbonEventWithNoEventParamter() {
+  @Test("ShortcutManager.handleCarbonEvent() (with no event parameter)")
+  func handleCarbonEventWithNoEventParamter() async throws {
     let event = createEventRefWithNoEventParameter()
     let status = ShortcutManager.handleCarbonEvent(event)
 
-    XCTAssertEqual(status, OSStatus(eventParameterNotFoundErr))
+    #expect(status == OSStatus(eventParameterNotFoundErr))
   }
 
-  func testHandleCarbonEventWithInvalidSignature() throws {
+  @Test("ShortcutManager.handleCarbonEvent() (with invalid signature)")
+  func handleCarbonEventWithInvalidSignature() async throws {
     let shortcut = Shortcut(123, 456)
 
     ShortcutManager.register(shortcut: shortcut)
-    let box = try XCTUnwrap(ShortcutManager.box(for: shortcut))
+    let box = try #require(ShortcutManager.box(for: shortcut))
 
     let event = createEventRefWithInvalidEventHotKeySignature(eventHotKeyID: box.eventHotKeyID)
     let status = ShortcutManager.handleCarbonEvent(event)
 
-    XCTAssertEqual(status, OSStatus(eventNotHandledErr))
+    #expect(status == OSStatus(eventNotHandledErr))
   }
 
-  func testHandleCarbonEventWithInvalidShortcutID() {
+  @Test("ShortcutManager.handleCarbonEvent() (with invalid shortcut ID)")
+  func handleCarbonEventWithInvalidShortcutID() async throws {
     let event = createEventRefWithInvalidEventHotKeyID()
     let status = ShortcutManager.handleCarbonEvent(event)
 
-    XCTAssertEqual(status, OSStatus(eventNotHandledErr))
+    #expect(status == OSStatus(eventNotHandledErr))
   }
 }
