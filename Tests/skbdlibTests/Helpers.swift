@@ -1,5 +1,5 @@
 import Carbon
-import XCTest
+import Testing
 
 func createEventRef(signature: OSType, id: UInt32) -> EventRef? {
   var event: EventRef?
@@ -14,7 +14,7 @@ func createEventRef(signature: OSType, id: UInt32) -> EventRef? {
   )
 
   guard createStatus == noErr, let eventRef = event else {
-    XCTFail("Failed to create event: \(createStatus)")
+    Issue.record("Failed to create event: \(createStatus)")
     return nil
   }
 
@@ -29,7 +29,7 @@ func createEventRef(signature: OSType, id: UInt32) -> EventRef? {
   )
 
   guard setStatus == noErr else {
-    XCTFail("Failed to set event parameter: \(setStatus)")
+    Issue.record("Failed to set event parameter: \(setStatus)")
     return nil
   }
 
@@ -49,7 +49,7 @@ func createEventRefWithNoEventParameter() -> EventRef? {
   )
 
   guard createStatus == noErr, let eventRef = event else {
-    XCTFail("Failed to create event: \(createStatus)")
+    Issue.record("Failed to create event: \(createStatus)")
     return nil
   }
 
@@ -69,7 +69,7 @@ func createEventRefWithInvalidEventHotKeySignature(eventHotKeyID: UInt32) -> Eve
   )
 
   guard createStatus == noErr, let eventRef = event else {
-    XCTFail("Failed to create event: \(createStatus)")
+    Issue.record("Failed to create event: \(createStatus)")
     return nil
   }
 
@@ -84,7 +84,7 @@ func createEventRefWithInvalidEventHotKeySignature(eventHotKeyID: UInt32) -> Eve
   )
 
   guard setStatus == noErr else {
-    XCTFail("Failed to set event parameter: \(setStatus)")
+    Issue.record("Failed to set event parameter: \(setStatus)")
     return nil
   }
 
@@ -104,7 +104,7 @@ func createEventRefWithInvalidEventHotKeyID() -> EventRef? {
   )
 
   guard createStatus == noErr, let eventRef = event else {
-    XCTFail("Failed to create event: \(createStatus)")
+    Issue.record("Failed to create event: \(createStatus)")
     return nil
   }
 
@@ -119,7 +119,7 @@ func createEventRefWithInvalidEventHotKeyID() -> EventRef? {
   )
 
   guard setStatus == noErr else {
-    XCTFail("Failed to set event parameter: \(setStatus)")
+    Issue.record("Failed to set event parameter: \(setStatus)")
     return nil
   }
 
