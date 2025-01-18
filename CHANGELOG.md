@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Added `ShortcutManager` for managing shortcuts
+
+### Removed
+
+- Removed `starkwm/alicia` dependency
+
 ### Changed
 
 - Updated `apple/swift-argument-parser` dependency
