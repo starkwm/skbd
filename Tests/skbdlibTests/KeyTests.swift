@@ -1,22 +1,26 @@
 import Carbon
-import XCTest
+import Testing
 
 @testable import skbdlib
 
-final class KeyTests: XCTestCase {
+@Suite("Key")
+struct KeyTests {
   // MARK: Key.valid
 
-  func testValid() {
-    XCTAssertTrue(Key.valid("A"))
+  @Test("Key.valid() (with valid key identifier)")
+  func validWithValidKeyIdentifier() async throws {
+    #expect(Key.valid("A"))
   }
 
-  func testValidWithInvalidKey() {
-    XCTAssertFalse(Key.valid("XYZ"))
+  @Test("Key.valid() (with invalid key identifier)")
+  func validWithInvalidKeyIdentifier() async throws {
+    #expect(Key.valid("XYZ") == false)
   }
 
   // MARK: Key.code
 
-  func testCodeWithRelocatableAlphas() {
+  @Test("Key.code(for:) (with relocatable alpha key identifiers)")
+  func codeWithRelocatableAlphaKeyIdentifiers() async throws {
     let tests = [
       "a": kVK_ANSI_A,
       "b": kVK_ANSI_B,
@@ -47,11 +51,12 @@ final class KeyTests: XCTestCase {
     ]
 
     for (key, val) in tests {
-      XCTAssertEqual(Key.code(for: key), UInt32(val))
+      #expect(Key.code(for: key) == UInt32(val))
     }
   }
 
-  func testCodeWithRelocatableNumerics() {
+  @Test("Key.code(for:) (with relocatable numerical key identifiers)")
+  func codeWithRelocatableNumericalKeyIdentifiers() async throws {
     let tests = [
       "0": kVK_ANSI_0,
       "1": kVK_ANSI_1,
@@ -66,11 +71,12 @@ final class KeyTests: XCTestCase {
     ]
 
     for (key, val) in tests {
-      XCTAssertEqual(Key.code(for: key), UInt32(val))
+      #expect(Key.code(for: key) == UInt32(val))
     }
   }
 
-  func testCodeWithRelocatableSymbols() {
+  @Test("Key.code(for:) (with relocatable symbol key identifiers)")
+  func codeWithRelocatableSymbolKeyIdentifiers() async throws {
     let tests = [
       "`": kVK_ANSI_Grave,
       "-": kVK_ANSI_Minus,
@@ -86,11 +92,12 @@ final class KeyTests: XCTestCase {
     ]
 
     for (key, val) in tests {
-      XCTAssertEqual(Key.code(for: key), UInt32(val))
+      #expect(Key.code(for: key) == UInt32(val))
     }
   }
 
-  func testCodeWithNonRelocatable() {
+  @Test("Key.code(for:) (with non-relocatable key identifiers)")
+  func codeWithNonRelocatableKeyIdentifiers() async throws {
     let tests = [
       "space": kVK_Space,
       "tab": kVK_Tab,
@@ -98,6 +105,7 @@ final class KeyTests: XCTestCase {
       "enter": kVK_Return,
 
       "capslock": kVK_CapsLock,
+      "caps": kVK_CapsLock,
 
       "pageup": kVK_PageUp,
       "pagedown": kVK_PageDown,
@@ -132,6 +140,7 @@ final class KeyTests: XCTestCase {
       "escape": kVK_Escape,
       "esc": kVK_Escape,
       "delete": kVK_Delete,
+      "del": kVK_Delete,
 
       "grave": kVK_ANSI_Grave,
       "backtick": kVK_ANSI_Grave,
@@ -152,11 +161,12 @@ final class KeyTests: XCTestCase {
     ]
 
     for (key, val) in tests {
-      XCTAssertEqual(Key.code(for: key), UInt32(val))
+      #expect(Key.code(for: key) == UInt32(val))
     }
   }
 
-  func testCodeCaseInsensitivity() {
+  @Test("Key.code(for:) (with mixed casing key identifiers)")
+  func codeWithMixedCasingKeyIdentifiers() async throws {
     let tests = [
       "spACe": UInt32(kVK_Space),
       "TAB": UInt32(kVK_Tab),
@@ -164,11 +174,12 @@ final class KeyTests: XCTestCase {
     ]
 
     for (key, val) in tests {
-      XCTAssertEqual(Key.code(for: key), val)
+      #expect(Key.code(for: key) == UInt32(val))
     }
   }
 
-  func testCodeWithUnknownKeyCde() {
-    XCTAssertEqual(Key.code(for: "asdf"), 0)
+  @Test("Key.code(for:) (with unknown key identifiers)")
+  func codeWithUnknownKeyIdentifier() async throws {
+    #expect(Key.code(for: "asdf") == 0)
   }
 }
