@@ -57,19 +57,19 @@ class LockFileTests {
     }
   }
 
-  // MARK: LockFile.readPid
+  // MARK: LockFile.readPID
 
-  @Test("LockFile.readPid() (with no errors)")
-  func readPidWithNoErrors() async throws {
+  @Test("LockFile.readPID() (with no errors)")
+  func readPIDWithNoErrors() async throws {
     #expect(throws: Never.self) {
       try LockFile.acquire()
 
-      #expect(try LockFile.readPid() == getpid())
+      #expect(try LockFile.readPID() == getpid())
     }
   }
 
-  @Test("LockFile.readPid() (when open call fails)")
-  func readPidWhenOpenFails() async throws {
+  @Test("LockFile.readPID() (when open call fails)")
+  func readPIDWhenOpenFails() async throws {
     #expect(throws: Never.self) {
       try LockFile.acquire()
     }
@@ -77,12 +77,12 @@ class LockFileTests {
     LockFile.open = { _, _, _ in -1 }
 
     #expect(throws: LockFileError.failedToOpenFile) {
-      try LockFile.readPid()
+      try LockFile.readPID()
     }
   }
 
-  @Test("LockFile.readPid() (when flock call fails)")
-  func readPidWhenFlockFails() async throws {
+  @Test("LockFile.readPID() (when flock call fails)")
+  func readPIDWhenFlockFails() async throws {
     #expect(throws: Never.self) {
       try LockFile.acquire()
     }
@@ -90,12 +90,12 @@ class LockFileTests {
     LockFile.flock = { _ in 0 }
 
     #expect(throws: LockFileError.failedToLockFile) {
-      try LockFile.readPid()
+      try LockFile.readPID()
     }
   }
 
-  @Test("LockFile.readPid() (when read call fails)")
-  func readPidWhenReadFails() async throws {
+  @Test("LockFile.readPID() (when read call fails)")
+  func readPIDWhenReadFails() async throws {
     #expect(throws: Never.self) {
       try LockFile.acquire()
     }
@@ -103,7 +103,7 @@ class LockFileTests {
     LockFile.read = { _ in (Int(-1), Int32(0)) }
 
     #expect(throws: LockFileError.failedToReadFile) {
-      try LockFile.readPid()
+      try LockFile.readPID()
     }
   }
 

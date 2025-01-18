@@ -48,7 +48,7 @@ public enum LockFile {
     }
   }
 
-  public static func readPid() throws -> pid_t {
+  public static func readPID() throws -> pid_t {
     let handle = open(try path(), O_RDONLY, 0x600)
 
     if handle == -1 {
