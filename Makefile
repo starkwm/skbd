@@ -7,7 +7,7 @@ format:
 	@swift-format format --in-place --recursive --parallel Sources Tests Package.swift
 
 lint:
-	@swift-format lint -r Sources Tests Package.swift
+	@swift-format lint --recursive Sources Tests Package.swift
 
 test:
 	@swift test -q --parallel --enable-code-coverage
