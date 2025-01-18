@@ -92,7 +92,26 @@ enum Key {
 
     if let data = getKeyboardLayoutData() {
       for keyCode in relocatableKeyCodes {
-        if let key = getKeyString(from: data, keyCode: keyCode) {
+        var deadKeyState: UInt32 = 0
+        let maxLength = 255
+        var length = 0
+        var chars = [UniChar](repeating: 0, count: maxLength)
+
+        UCKeyTranslate(
+          data,
+          UInt16(keyCode),
+          UInt16(kUCKeyActionDisplay),
+          0,
+          UInt32(LMGetKbdType()),
+          OptionBits(kUCKeyTranslateNoDeadKeysBit),
+          &deadKeyState,
+          maxLength,
+          &length,
+          &chars
+        )
+
+        if length > 0 {
+          let key = String(utf16CodeUnits: &chars, count: length)
           keys[key.lowercased()] = keyCode
         }
       }
@@ -116,37 +135,8 @@ enum Key {
   private static func getKeyboardLayoutData() -> UnsafePointer<UCKeyboardLayout>? {
     let source = TISCopyCurrentASCIICapableKeyboardLayoutInputSource().takeUnretainedValue()
     let dataRefPtr = TISGetInputSourceProperty(source, kTISPropertyUnicodeKeyLayoutData)
-
-    guard let dataRef = unsafeBitCast(dataRefPtr, to: CFData?.self) else {
-      return nil
-    }
+    let dataRef = unsafeBitCast(dataRefPtr, to: CFData?.self)
 
     return unsafeBitCast(CFDataGetBytePtr(dataRef), to: UnsafePointer<UCKeyboardLayout>.self)
-  }
-
-  private static func getKeyString(from data: UnsafePointer<UCKeyboardLayout>, keyCode: Int) -> String? {
-    var deadKeyState: UInt32 = 0
-    let maxLength = 255
-    var length = 0
-    var chars = [UniChar](repeating: 0, count: maxLength)
-
-    UCKeyTranslate(
-      data,
-      UInt16(keyCode),
-      UInt16(kUCKeyActionDisplay),
-      0,
-      UInt32(LMGetKbdType()),
-      OptionBits(kUCKeyTranslateNoDeadKeysBit),
-      &deadKeyState,
-      maxLength,
-      &length,
-      &chars
-    )
-
-    guard length > 0 else {
-      return nil
-    }
-
-    return String(utf16CodeUnits: &chars, count: length)
   }
 }
