@@ -1,12 +1,14 @@
 import Carbon
-import XCTest
+import Testing
 
 @testable import skbdlib
 
-final class ParserTests: XCTestCase {
+@Suite("Parser")
+struct ParserTests {
   // MARK: Parser#parse
 
-  func testParse() {
+  @Test("Parser#parse() (with valid input)")
+  func parseWithValidInput() async throws {
     let input = """
           # this if the first comment, without whitespace
           opt-space:open -a iTerm2.app
@@ -30,7 +32,7 @@ final class ParserTests: XCTestCase {
           alt - [: echo "left bracket"
       """
 
-    do {
+    #expect(throws: Never.self) {
       let shortcuts = try Parser(input).parse()
 
       struct Expect {
@@ -38,7 +40,7 @@ final class ParserTests: XCTestCase {
         var modifiers: UInt32
       }
 
-      let expected: [Expect] = [
+      let expected = [
         Expect(key: UInt32(kVK_Space), modifiers: UInt32(optionKey)),
         Expect(key: UInt32(kVK_ANSI_A), modifiers: UInt32(cmdKey | shiftKey)),
         Expect(key: UInt32(kVK_Return), modifiers: UInt32(controlKey | optionKey)),
@@ -47,106 +49,99 @@ final class ParserTests: XCTestCase {
         Expect(key: UInt32(kVK_ANSI_LeftBracket), modifiers: UInt32(optionKey)),
       ]
 
-      XCTAssertEqual(shortcuts.count, 6)
+      #expect(shortcuts.count == 6)
 
       for (idx, expect) in expected.enumerated() {
-        XCTAssertEqual(shortcuts[idx].keyCode, expect.key)
-        XCTAssertEqual(shortcuts[idx].modifierFlags, expect.modifiers)
-        XCTAssertNotNil(shortcuts[idx].handler)
+        #expect(shortcuts[idx].keyCode == expect.key)
+        #expect(shortcuts[idx].modifierFlags == expect.modifiers)
+        #expect(shortcuts[idx].handler != nil)
       }
-    } catch {
-      XCTFail("expected not to throw an error")
     }
   }
 
-  func testParseWithComment() {
-    let input = "# this is just a comment"
-
-    XCTAssertNoThrow(try Parser(input).parse())
-  }
-
-  func testParseWithMissingModifier() {
-    let input = "space: open -a iTerm2.app"
-
-    XCTAssertThrowsError(try Parser(input).parse()) { err in
-      XCTAssertTrue(err is ParserError)
-      XCTAssertEqual(err as? ParserError, .expectedModifier)
+  @Test("Parser#parse() (with comment in input)")
+  func parseWithComment() async throws {
+    #expect(throws: Never.self) {
+      try Parser("# this is just a comment").parse()
     }
   }
 
-  func testParseWithMissingModiferFollowingPlus() {
-    let input = "opt + : open -a iTerm2.app"
-
-    XCTAssertThrowsError(try Parser(input).parse()) { err in
-      XCTAssertTrue(err is ParserError)
-      XCTAssertEqual(err as? ParserError, .expectedPlusFollowedByModifier)
+  @Test("Parser#parse() (with no modifiers in input)")
+  func parseWithNoModifiers() async throws {
+    #expect(throws: ParserError.expectedModifier) {
+      try Parser("space: open -a iTerm2.app").parse()
     }
   }
 
-  func testParseWithMissingDashFollowingModifier() {
-    let input = "opt + ctrl : open -a iTerm2.app"
-
-    XCTAssertThrowsError(try Parser(input).parse()) { err in
-      XCTAssertTrue(err is ParserError)
-      XCTAssertEqual(err as? ParserError, .expectedModifierFollowedByDash)
+  @Test("Parser#parse() (with no additional modifier in input)")
+  func parseWithNoAdditionalModifier() async throws {
+    #expect(throws: ParserError.expectedPlusFollowedByModifier) {
+      try Parser("opt + : open -a iTerm2.app").parse()
     }
   }
 
-  func testParseWithMissingKeyFollowingDash() {
-    let input = "opt+ctrl-: open -a iTerm2.app"
-
-    XCTAssertThrowsError(try Parser(input).parse()) { err in
-      XCTAssertTrue(err is ParserError)
-      XCTAssertEqual(err as? ParserError, .expectedDashFollowedByKey)
+  @Test("Parser#parse() (with no dash after modifier in input)")
+  func parseWithNoDashAfterModifier() async throws {
+    #expect(throws: ParserError.expectedModifierFollowedByDash) {
+      try Parser("opt + ctrl : open -a iTerm2.app").parse()
     }
   }
 
-  func testParseWithMissingCommand() {
-    let input = "opt+ctrl-a+opt"
-
-    XCTAssertThrowsError(try Parser(input).parse()) { err in
-      XCTAssertTrue(err is ParserError)
-      XCTAssertEqual(err as? ParserError, .expectedColonFollowedByCommand)
+  @Test("Parser#parse() (with no key after dash in input)")
+  func parseWithNoKeyAfterDash() async throws {
+    #expect(throws: ParserError.expectedDashFollowedByKey) {
+      try Parser("opt + ctrl - : open -a iTerm2.app").parse()
     }
   }
 
-  func testParseCanCallHandler() {
-    do {
-      let input = "opt+ctrl-a: echo"
-      let shortcuts = try Parser(input).parse()
+  @Test("Parser#parse() (with no command in input)")
+  func parseWithNoCommand() async throws {
+    #expect(throws: ParserError.expectedColonFollowedByCommand) {
+      try Parser("opt+ctrl-a+opt").parse()
+    }
+  }
+}
 
-      XCTAssertEqual(shortcuts.count, 1)
+@Suite("Parser (Shortcut#handler())", .serialized)
+struct ParserHandlerTests {
+  // MARK: Parser#parse
+
+  @Test("Parser#parse() (shortcut.handler() callable with SHELL set)")
+  func parseShortcutHandlerCallable() async throws {
+    setenv("SHELL", "/bin/bash", 1)
+
+    #expect(throws: Never.self) {
+      let shortcuts = try Parser("opt+ctrl-a: echo").parse()
+
+      #expect(shortcuts.count == 1)
+
       shortcuts[0].handler()
-    } catch {
-      XCTFail("expected not to throw an error")
     }
   }
 
-  func testParseCanCallHandlerWhenShellIsEmpty() {
-    do {
-      setenv("SHELL", "", 1)
+  @Test("Parser#parse() (shortcut.handler() callable with empty SHELL)")
+  func parseShortcutHandlerCallableWithEmptyShell() async throws {
+    setenv("SHELL", "", 1)
 
-      let input = "opt+ctrl-a: echo"
-      let shortcuts = try Parser(input).parse()
+    #expect(throws: Never.self) {
+      let shortcuts = try Parser("opt+ctrl-a: echo").parse()
 
-      XCTAssertEqual(shortcuts.count, 1)
+      #expect(shortcuts.count == 1)
+
       shortcuts[0].handler()
-    } catch {
-      XCTFail("expected not to throw an error")
     }
   }
 
-  func testParseCanCallHandlerWhenShellIsNotSet() {
-    do {
-      unsetenv("SHELL")
+  @Test("Parser#parse() (shortcut.handler() callable with no SHELL set)")
+  func parseShortcutHandlerCallableWithNoShell() async throws {
+    unsetenv("SHELL")
 
-      let input = "opt+ctrl-a: echo"
-      let shortcuts = try Parser(input).parse()
+    #expect(throws: Never.self) {
+      let shortcuts = try Parser("opt+ctrl-a: echo").parse()
 
-      XCTAssertEqual(shortcuts.count, 1)
+      #expect(shortcuts.count == 1)
+
       shortcuts[0].handler()
-    } catch {
-      XCTFail("expected not to throw an error")
     }
   }
 }
