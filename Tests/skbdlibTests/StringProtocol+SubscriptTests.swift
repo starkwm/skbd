@@ -1,24 +1,27 @@
-import XCTest
+import Testing
 
 @testable import skbdlib
 
-final class StringProtocolTests: XCTestCase {
+@Suite("StringProtocol+Subscript")
+struct StringProtocolSubscriptTests {
   // MARK: StringProtocol#subscript
 
-  func testSubscriptWithIndex() {
+  @Test("String[] (with indices)")
+  func subscriptWithIndices() async throws {
     let str = "Hello world 😍"
 
-    XCTAssertEqual(str[1], "e")
-    XCTAssertEqual(str[5], " ")
-    XCTAssertEqual(str[8], "r")
-    XCTAssertEqual(str[12], "😍")
+    #expect(str[1] == "e")
+    #expect(str[5] == " ")
+    #expect(str[8] == "r")
+    #expect(str[12] == "😍")
   }
 
-  func testSubscriptWithRange() {
+  @Test("String[] (with range)")
+  func subscriptWithRange() async throws {
     let str = "Hello world 🤦🏻‍♂️"
 
-    XCTAssertEqual(str[0..<5], "Hello")
-    XCTAssertEqual(str[6..<11], "world")
-    XCTAssertEqual(str[12..<13], "🤦🏻‍♂️")
+    #expect(str[0..<5] == "Hello")
+    #expect(str[6..<11] == "world")
+    #expect(str[12..<13] == "🤦🏻‍♂️")
   }
 }
