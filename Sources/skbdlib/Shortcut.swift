@@ -1,15 +1,18 @@
 import Carbon
 import Foundation
 
+public typealias CommandHandler = () throws -> Void
+
 public struct Shortcut {
-  public static func handler(for command: String) -> (() -> Void) {
+  public static func handler(for command: String) -> CommandHandler {
     let shell = ProcessInfo.processInfo.environment["SHELL"].flatMap { $0.isEmpty ? nil : $0 } ?? "/bin/bash"
 
-    let handler: (() -> Void) = {
-      let process = Process()
-      process.executableURL = URL(fileURLWithPath: shell)
-      process.arguments = ["-c", command]
-      try? process.run()
+    let handler: CommandHandler = {
+      if command.isEmpty {
+        return
+      }
+
+      try Process.run(URL(fileURLWithPath: shell), arguments: ["-c", command])
     }
 
     return handler
@@ -20,7 +23,7 @@ public struct Shortcut {
   public var keyCode: UInt32?
   public var modifierFlags: UInt32?
 
-  public var handler: (() -> Void)!
+  public var handler: CommandHandler!
 
   public init() {}
 

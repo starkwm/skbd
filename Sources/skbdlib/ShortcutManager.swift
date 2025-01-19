@@ -128,12 +128,18 @@ public enum ShortcutManager {
       return err
     }
 
-    guard eventHotKeyID.signature == skbdEventHotKeySignature, let shortcut = shortcuts[eventHotKeyID.id]?.shortcut
+    guard
+      eventHotKeyID.signature == skbdEventHotKeySignature,
+      let shortcut = shortcuts[eventHotKeyID.id]?.shortcut
     else {
       return OSStatus(eventNotHandledErr)
     }
 
-    shortcut.handler()
+    do {
+      try shortcut.handler()
+    } catch {
+      return OSStatus(eventInternalErr)
+    }
 
     return noErr
   }
