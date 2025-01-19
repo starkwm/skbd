@@ -23,6 +23,6 @@ jobs:
           swift-version: ${{ matrix.swift }}
       - uses: actions/checkout@v4
       - name: Build
-        run: make build
+        run: swift build
       - name: Run tests
-        run: make test
+        run: swift test --disable-xctest 2>&1 | xcbeautify
