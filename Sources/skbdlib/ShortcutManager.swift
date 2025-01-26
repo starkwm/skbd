@@ -133,7 +133,11 @@ public enum ShortcutManager {
       return OSStatus(eventNotHandledErr)
     }
 
-    shortcut.handler()
+    do {
+      try shortcut.handler()
+    } catch {
+      return OSStatus(eventInternalErr)
+    }
 
     return noErr
   }
