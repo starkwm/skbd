@@ -239,4 +239,20 @@ class ShortcutManagerTests {
 
     #expect(status == OSStatus(eventNotHandledErr))
   }
+
+  @Test("ShortcutManager.handleCarbonEvent() (with broken shortcut handler)")
+  func handleCarbonEventWithBrokenShortcutHandler() async throws {
+    setenv("SHELL", "/bin/invalid", 1)
+
+    let handler = Shortcut.handler(for: "true")
+    let shortcut = Shortcut(123, 456, handler)
+
+    ShortcutManager.register(shortcut: shortcut)
+    let box = try #require(ShortcutManager.box(for: shortcut))
+
+    let event = createEventRef(signature: skbdEventHotKeySignature, id: box.eventHotKeyID)
+    let status = ShortcutManager.handleCarbonEvent(event)
+
+    #expect(status == OSStatus(eventInternalErr))
+  }
 }
