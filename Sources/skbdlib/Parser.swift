@@ -1,15 +1,5 @@
 import Foundation
 
-private func resolveShell() -> String {
-  if let shell = ProcessInfo.processInfo.environment["SHELL"] {
-    if !shell.isEmpty {
-      return shell
-    }
-  }
-
-  return "/bin/bash"
-}
-
 public class Parser {
   private var lexer: Lexer
 
@@ -70,16 +60,7 @@ public class Parser {
     }
 
     if match(type: .command) {
-      let command = self.prevToken!.text!
-
-      let handler: () -> Void = {
-        let proc = Process()
-        proc.executableURL = URL(fileURLWithPath: resolveShell())
-        proc.arguments = ["-c", command]
-        try? proc.run()
-      }
-
-      shortcut.handler = handler
+      shortcut.handler = Shortcut.handler(for: prevToken!.text!)
     } else {
       throw ParserError.expectedColonFollowedByCommand
     }
