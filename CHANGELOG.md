@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Changed `Token` to conform with `Hashable` protocol
+- Refactored where handlers for `Shortcut` instances are created
 
 ## [0.0.5] - 2025-01-18
 
