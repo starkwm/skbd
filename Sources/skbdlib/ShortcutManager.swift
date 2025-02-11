@@ -2,33 +2,34 @@ import Carbon
 
 let skbdEventHotKeySignature = "skbd".utf16.reduce(0) { ($0 << 8) + OSType($1) }
 
-func shortcutEventHandler(_: EventHandlerCallRef?, event: EventRef?, _: UnsafeMutableRawPointer?) -> OSStatus {
-  ShortcutManager.handleCarbonEvent(event)
+func shortcutEventHandler(_: EventHandlerCallRef?, event: EventRef?, userData: UnsafeMutableRawPointer?) -> OSStatus {
+  let instance = Unmanaged<ShortcutManager>.fromOpaque(userData!).takeUnretainedValue()
+  return instance.handleCarbonEvent(event)
 }
 
-public enum ShortcutManager {
-  final class ShortcutBox {
+public class ShortcutManager {
+  struct ShortcutBox {
     let shortcut: Shortcut
-
     let eventHotKeyID: UInt32
     let eventHotKey: EventHotKeyRef
-
-    init(shortcut: Shortcut, eventHotKeyID: UInt32, eventHotKey: EventHotKeyRef) {
-      self.shortcut = shortcut
-      self.eventHotKeyID = eventHotKeyID
-      self.eventHotKey = eventHotKey
-    }
   }
 
-  static var registerEventHotKeyFunc = RegisterEventHotKey
+  public var registerEventHotKeyFunc = RegisterEventHotKey
 
-  private static var shortcuts = [UInt32: ShortcutBox]()
+  private var shortcuts = [UInt32: ShortcutBox]()
 
-  private static var shortcutsCount: UInt32 = 0
+  private var shortcutsCount: UInt32 = 0
 
-  private static var eventHandler: EventHandlerRef?
+  private var eventHandler: EventHandlerRef?
 
-  public static func register(shortcut: Shortcut) {
+  public init() {}
+
+  deinit {
+    stop()
+    reset()
+  }
+
+  public func register(shortcut: Shortcut) {
     if shortcuts.values.contains(where: { $0.shortcut.identifier == shortcut.identifier }) {
       return
     }
@@ -58,7 +59,7 @@ public enum ShortcutManager {
     shortcuts[box.eventHotKeyID] = box
   }
 
-  public static func unregister(shortcut: Shortcut) {
+  public func unregister(shortcut: Shortcut) {
     guard let box = box(for: shortcut) else {
       return
     }
@@ -68,22 +69,31 @@ public enum ShortcutManager {
     shortcuts.removeValue(forKey: box.eventHotKeyID)
   }
 
-  public static func start() -> Bool {
+  public func start() -> Bool {
     if shortcuts.count == 0 || eventHandler != nil {
       return false
     }
+
+    let ptr = Unmanaged.passUnretained(self).toOpaque()
 
     let eventSpec = [
       EventTypeSpec(eventClass: OSType(kEventClassKeyboard), eventKind: UInt32(kEventHotKeyPressed))
     ]
 
-    InstallEventHandler(GetEventDispatcherTarget(), shortcutEventHandler, 1, eventSpec, nil, &eventHandler)
+    InstallEventHandler(
+      GetEventDispatcherTarget(),
+      shortcutEventHandler,
+      1,
+      eventSpec,
+      ptr,
+      &eventHandler
+    )
 
     return true
   }
 
   @discardableResult
-  public static func stop() -> Bool {
+  public func stop() -> Bool {
     if eventHandler != nil {
       RemoveEventHandler(eventHandler)
       eventHandler = nil
@@ -93,13 +103,13 @@ public enum ShortcutManager {
     return false
   }
 
-  public static func reset() {
+  public func reset() {
     for box in shortcuts.values {
       self.unregister(shortcut: box.shortcut)
     }
   }
 
-  static func box(for shortcut: Shortcut) -> ShortcutBox? {
+  func box(for shortcut: Shortcut) -> ShortcutBox? {
     for box in shortcuts.values where box.shortcut.identifier == shortcut.identifier {
       return box
     }
@@ -107,7 +117,7 @@ public enum ShortcutManager {
     return nil
   }
 
-  static func handleCarbonEvent(_ event: EventRef?) -> OSStatus {
+  func handleCarbonEvent(_ event: EventRef?) -> OSStatus {
     guard let event = event else {
       return OSStatus(eventNotHandledErr)
     }
