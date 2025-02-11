@@ -1,7 +1,7 @@
 import Foundation
 
 public class ConfigManager {
-  private var shortcutManager: ShortcutManager
+  public var shortcutManager: ShortcutManager
 
   private var configPath: URL
 
