@@ -1,6 +1,8 @@
 import AppKit
 import skbdlib
 
+let shortcutManager = ShortcutManager()
+
 func main() -> Int32 {
   if arguments.version {
     fputs("skbd version \(Version.current.value)\n", stdout)
@@ -31,10 +33,10 @@ func main() -> Int32 {
     let shortcuts = try parser.parse()
 
     for shortcut in shortcuts {
-      ShortcutManager.register(shortcut: shortcut)
+      shortcutManager.register(shortcut: shortcut)
     }
 
-    if !ShortcutManager.start() {
+    if !shortcutManager.start() {
       fputs("error starting the shortcut manager", stderr)
       return EXIT_FAILURE
     }
@@ -45,16 +47,17 @@ func main() -> Int32 {
 
   signal(SIGUSR1) { _ in
     do {
+
       fputs("received SIGUSR1 - reloading configuration...\n", stdout)
 
       let config = try String(contentsOfFile: arguments.config)
       let parser = Parser(config)
       let shortcuts = try parser.parse()
 
-      ShortcutManager.reset()
+      shortcutManager.reset()
 
       for shortcut in shortcuts {
-        ShortcutManager.register(shortcut: shortcut)
+        shortcutManager.register(shortcut: shortcut)
       }
     } catch {
       fputs("error parsing configuration file: \(error)\n", stderr)
@@ -63,7 +66,7 @@ func main() -> Int32 {
 
   signal(SIGINT) { _ in
     fputs("received SIGINT - terminating...\n", stdout)
-    ShortcutManager.stop()
+    shortcutManager.stop()
     exit(EXIT_SUCCESS)
   }
 

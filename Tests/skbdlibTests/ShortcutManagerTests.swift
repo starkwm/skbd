@@ -5,12 +5,7 @@ import Testing
 
 @Suite("ShortcutManager", .serialized)
 class ShortcutManagerTests {
-  deinit {
-    ShortcutManager.stop()
-    ShortcutManager.reset()
-
-    ShortcutManager.registerEventHotKeyFunc = RegisterEventHotKey
-  }
+  let shortcutManager = ShortcutManager()
 
   // MARK: shortcutEventHandler
 
@@ -18,13 +13,14 @@ class ShortcutManagerTests {
   func shortcutEventHandler() async throws {
     var called = false
 
-    let shortcut = Shortcut(123, 456) { called = true }
+    let shortcut = Shortcut(1, 456) { called = true }
 
-    ShortcutManager.register(shortcut: shortcut)
-    let box = try #require(ShortcutManager.box(for: shortcut))
+    shortcutManager.register(shortcut: shortcut)
+    let box = try #require(shortcutManager.box(for: shortcut))
 
     let event = createEventRef(signature: skbdEventHotKeySignature, id: box.eventHotKeyID)
-    let status = skbdlib.shortcutEventHandler(nil, event: event, nil)
+    let userData = Unmanaged.passUnretained(shortcutManager).toOpaque()
+    let status = skbdlib.shortcutEventHandler(nil, event: event, userData: userData)
 
     #expect(status == noErr)
     #expect(called)
@@ -34,21 +30,21 @@ class ShortcutManagerTests {
 
   @Test("ShortcutManager.register(shortcut:) (with valid shortcut)")
   func registerValidShortcut() async throws {
-    let shortcut = Shortcut(123, 456)
+    let shortcut = Shortcut(2, 456)
 
-    ShortcutManager.register(shortcut: shortcut)
+    shortcutManager.register(shortcut: shortcut)
 
-    #expect(ShortcutManager.box(for: shortcut) != nil)
+    #expect(shortcutManager.box(for: shortcut) != nil)
   }
 
   @Test("ShortcutManager.register(shortcut:) (with already registered shortcut)")
   func registerWithAlreadyRegisteredShortcut() async throws {
-    let shortcut = Shortcut(123, 456)
+    let shortcut = Shortcut(3, 456)
 
-    ShortcutManager.register(shortcut: shortcut)
-    ShortcutManager.register(shortcut: shortcut)
+    shortcutManager.register(shortcut: shortcut)
+    shortcutManager.register(shortcut: shortcut)
 
-    #expect(ShortcutManager.box(for: shortcut) != nil)
+    #expect(shortcutManager.box(for: shortcut) != nil)
   }
 
   @Test("ShortcutManager.register(shortcut:) (with shortcut missing keycode)")
@@ -56,134 +52,134 @@ class ShortcutManagerTests {
     var shortcut = Shortcut()
     shortcut.modifierFlags = 456
 
-    ShortcutManager.register(shortcut: shortcut)
+    shortcutManager.register(shortcut: shortcut)
 
-    #expect(ShortcutManager.box(for: shortcut) == nil)
+    #expect(shortcutManager.box(for: shortcut) == nil)
   }
 
   @Test("ShortcutManager.register(shortcut:) (with shortcut missing modifier flags)")
   func registerWithShortcutMissingModifierFlags() async throws {
     var shortcut = Shortcut()
-    shortcut.keyCode = 123
+    shortcut.keyCode = 5
 
-    ShortcutManager.register(shortcut: shortcut)
+    shortcutManager.register(shortcut: shortcut)
 
-    #expect(ShortcutManager.box(for: shortcut) == nil)
+    #expect(shortcutManager.box(for: shortcut) == nil)
   }
 
   @Test("ShortcutManager.register(shortcut:) (when RegisterEventHotKey fails)")
   func registerWhenRegisterEventHotKeyFails() async throws {
-    ShortcutManager.registerEventHotKeyFunc = { (_, _, _, _, _, _) in OSStatus(eventHotKeyInvalidErr) }
+    shortcutManager.registerEventHotKeyFunc = { (_, _, _, _, _, _) in OSStatus(eventHotKeyInvalidErr) }
 
-    let shortcut = Shortcut(123, 456)
+    let shortcut = Shortcut(6, 456)
 
-    ShortcutManager.register(shortcut: shortcut)
+    shortcutManager.register(shortcut: shortcut)
 
-    #expect(ShortcutManager.box(for: shortcut) == nil)
+    #expect(shortcutManager.box(for: shortcut) == nil)
   }
 
   // MARK: ShortcutManager.unregister
 
   @Test("ShortcutManager.unregister(shortcut:) (with registered shortcut)")
   func unregisterWithRegisteredShortcut() async throws {
-    let shortcut = Shortcut(123, 456)
+    let shortcut = Shortcut(7, 456)
 
-    ShortcutManager.register(shortcut: shortcut)
+    shortcutManager.register(shortcut: shortcut)
 
-    #expect(ShortcutManager.box(for: shortcut) != nil)
+    #expect(shortcutManager.box(for: shortcut) != nil)
 
-    ShortcutManager.unregister(shortcut: shortcut)
+    shortcutManager.unregister(shortcut: shortcut)
 
-    #expect(ShortcutManager.box(for: shortcut) == nil)
+    #expect(shortcutManager.box(for: shortcut) == nil)
   }
 
   @Test("ShortcutManager.unregister(shortcut:) (with unregistered shortcut)")
   func unregisterWithUnregisteredShortcut() async throws {
-    let shortcut = Shortcut(123, 456)
+    let shortcut = Shortcut(8, 456)
 
-    ShortcutManager.unregister(shortcut: shortcut)
+    shortcutManager.unregister(shortcut: shortcut)
 
-    #expect(ShortcutManager.box(for: shortcut) == nil)
+    #expect(shortcutManager.box(for: shortcut) == nil)
   }
 
   // MARK: ShortcutManager.start
 
   @Test("ShortcutManager.start() (when shortcuts registered)")
   func startWhenShortcutsRegistered() async throws {
-    let shortcut = Shortcut(123, 456)
+    let shortcut = Shortcut(9, 456)
 
-    ShortcutManager.register(shortcut: shortcut)
+    shortcutManager.register(shortcut: shortcut)
 
-    #expect(ShortcutManager.start())
+    #expect(shortcutManager.start())
   }
 
   @Test("ShortcutManager.start() (when no shortcuts registered)")
   func startWhenNoShortcutsRegistered() async throws {
-    #expect(!ShortcutManager.start())
+    #expect(!shortcutManager.start())
   }
 
   @Test("ShortcutManager.start() (when already started)")
   func startWhenAlreadyStarted() async throws {
-    let shortcut = Shortcut(123, 456)
+    let shortcut = Shortcut(11, 456)
 
-    ShortcutManager.register(shortcut: shortcut)
+    shortcutManager.register(shortcut: shortcut)
 
-    #expect(ShortcutManager.start())
-    #expect(!ShortcutManager.start())
+    #expect(shortcutManager.start())
+    #expect(!shortcutManager.start())
   }
 
   // MARK: ShortcutManager.stop
 
   @Test("ShortcutManager.stop() (when shortcuts registered)")
   func stopWhenShortcutsRegistered() async throws {
-    let shortcut = Shortcut(123, 456)
+    let shortcut = Shortcut(12, 456)
 
-    ShortcutManager.register(shortcut: shortcut)
+    shortcutManager.register(shortcut: shortcut)
 
-    #expect(ShortcutManager.start())
-    #expect(ShortcutManager.stop())
+    #expect(shortcutManager.start())
+    #expect(shortcutManager.stop())
   }
 
   @Test("ShortcutManager.stop() (when not started)")
   func stopWhenNotStarted() async throws {
-    #expect(!ShortcutManager.stop())
+    #expect(!shortcutManager.stop())
   }
 
   // MARK: ShortcutManager.reset
 
   @Test("ShortcutManager.reset() (when shortcuts registered)")
   func resetWhenShortcutsRegistered() async throws {
-    let shortcut1 = Shortcut(123, 456)
-    let shortcut2 = Shortcut(321, 654)
+    let shortcut1 = Shortcut(14, 456)
+    let shortcut2 = Shortcut(15, 654)
 
-    ShortcutManager.register(shortcut: shortcut1)
-    ShortcutManager.register(shortcut: shortcut2)
+    shortcutManager.register(shortcut: shortcut1)
+    shortcutManager.register(shortcut: shortcut2)
 
-    #expect(ShortcutManager.box(for: shortcut1) != nil)
-    #expect(ShortcutManager.box(for: shortcut2) != nil)
+    #expect(shortcutManager.box(for: shortcut1) != nil)
+    #expect(shortcutManager.box(for: shortcut2) != nil)
 
-    ShortcutManager.reset()
+    shortcutManager.reset()
 
-    #expect(ShortcutManager.box(for: shortcut1) == nil)
-    #expect(ShortcutManager.box(for: shortcut2) == nil)
+    #expect(shortcutManager.box(for: shortcut1) == nil)
+    #expect(shortcutManager.box(for: shortcut2) == nil)
   }
 
   // MARK: ShortcutManager.box
 
   @Test("ShortcutManager.box(for:) (with registered shortcut)")
   func boxWithRegisteredShortcut() async throws {
-    let shortcut = Shortcut(123, 456)
+    let shortcut = Shortcut(16, 456)
 
-    ShortcutManager.register(shortcut: shortcut)
+    shortcutManager.register(shortcut: shortcut)
 
-    #expect(ShortcutManager.box(for: shortcut) != nil)
+    #expect(shortcutManager.box(for: shortcut) != nil)
   }
 
   @Test("ShortcutManager.box(for:) (with unregistered shortcut)")
   func boxWithUnregisteredShortcut() async throws {
-    let shortcut = Shortcut(123, 456)
+    let shortcut = Shortcut(17, 456)
 
-    #expect(ShortcutManager.box(for: shortcut) == nil)
+    #expect(shortcutManager.box(for: shortcut) == nil)
   }
 
   // MARK: ShortcutManager.handleCarbonEvent
@@ -192,13 +188,13 @@ class ShortcutManagerTests {
   func handleCarbonEventWithValidEvent() async throws {
     var called = false
 
-    let shortcut = Shortcut(123, 456) { called = true }
+    let shortcut = Shortcut(18, 456) { called = true }
 
-    ShortcutManager.register(shortcut: shortcut)
-    let box = try #require(ShortcutManager.box(for: shortcut))
+    shortcutManager.register(shortcut: shortcut)
+    let box = try #require(shortcutManager.box(for: shortcut))
 
     let event = createEventRef(signature: skbdEventHotKeySignature, id: box.eventHotKeyID)
-    let status = ShortcutManager.handleCarbonEvent(event)
+    let status = shortcutManager.handleCarbonEvent(event)
 
     #expect(status == noErr)
     #expect(called)
@@ -206,7 +202,7 @@ class ShortcutManagerTests {
 
   @Test("ShortcutManager.handleCarbonEvent() (with nil event)")
   func handleCarbonEventWithNilEvent() async throws {
-    let status = ShortcutManager.handleCarbonEvent(nil)
+    let status = shortcutManager.handleCarbonEvent(nil)
 
     #expect(status == OSStatus(eventNotHandledErr))
   }
@@ -214,20 +210,20 @@ class ShortcutManagerTests {
   @Test("ShortcutManager.handleCarbonEvent() (with no event parameter)")
   func handleCarbonEventWithNoEventParamter() async throws {
     let event = createEventRefWithNoEventParameter()
-    let status = ShortcutManager.handleCarbonEvent(event)
+    let status = shortcutManager.handleCarbonEvent(event)
 
     #expect(status == OSStatus(eventParameterNotFoundErr))
   }
 
   @Test("ShortcutManager.handleCarbonEvent() (with invalid signature)")
   func handleCarbonEventWithInvalidSignature() async throws {
-    let shortcut = Shortcut(123, 456)
+    let shortcut = Shortcut(21, 456)
 
-    ShortcutManager.register(shortcut: shortcut)
-    let box = try #require(ShortcutManager.box(for: shortcut))
+    shortcutManager.register(shortcut: shortcut)
+    let box = try #require(shortcutManager.box(for: shortcut))
 
     let event = createEventRefWithInvalidEventHotKeySignature(eventHotKeyID: box.eventHotKeyID)
-    let status = ShortcutManager.handleCarbonEvent(event)
+    let status = shortcutManager.handleCarbonEvent(event)
 
     #expect(status == OSStatus(eventNotHandledErr))
   }
@@ -235,7 +231,7 @@ class ShortcutManagerTests {
   @Test("ShortcutManager.handleCarbonEvent() (with invalid shortcut ID)")
   func handleCarbonEventWithInvalidShortcutID() async throws {
     let event = createEventRefWithInvalidEventHotKeyID()
-    let status = ShortcutManager.handleCarbonEvent(event)
+    let status = shortcutManager.handleCarbonEvent(event)
 
     #expect(status == OSStatus(eventNotHandledErr))
   }
@@ -245,13 +241,13 @@ class ShortcutManagerTests {
     setenv("SHELL", "/bin/invalid", 1)
 
     let handler = Shortcut.handler(for: "true")
-    let shortcut = Shortcut(123, 456, handler)
+    let shortcut = Shortcut(23, 456, handler)
 
-    ShortcutManager.register(shortcut: shortcut)
-    let box = try #require(ShortcutManager.box(for: shortcut))
+    shortcutManager.register(shortcut: shortcut)
+    let box = try #require(shortcutManager.box(for: shortcut))
 
     let event = createEventRef(signature: skbdEventHotKeySignature, id: box.eventHotKeyID)
-    let status = ShortcutManager.handleCarbonEvent(event)
+    let status = shortcutManager.handleCarbonEvent(event)
 
     #expect(status == OSStatus(eventInternalErr))
   }
