@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Changed `Token` to conform with `Hashable` protocol
 - Refactored where handlers for `Shortcut` instances are created
 
+### Fixed
+
+- Fixed logging to standard out not flushing the buffer
+
 ## [0.0.5] - 2025-01-18
 
 ### Added
