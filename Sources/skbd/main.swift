@@ -6,6 +6,7 @@ let shortcutManager = ShortcutManager()
 func main() -> Int32 {
   if arguments.version {
     fputs("skbd version \(Version.current.value)\n", stdout)
+    fflush(stdout)
     return EXIT_SUCCESS
   }
 
@@ -49,6 +50,7 @@ func main() -> Int32 {
     do {
 
       fputs("received SIGUSR1 - reloading configuration...\n", stdout)
+      fflush(stdout)
 
       let config = try String(contentsOfFile: arguments.config)
       let parser = Parser(config)
@@ -66,6 +68,7 @@ func main() -> Int32 {
 
   signal(SIGINT) { _ in
     fputs("received SIGINT - terminating...\n", stdout)
+    fflush(stdout)
     shortcutManager.stop()
     exit(EXIT_SUCCESS)
   }
