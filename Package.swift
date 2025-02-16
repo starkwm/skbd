@@ -24,7 +24,10 @@ let package = Package(
     ),
     .testTarget(
       name: "skbdlibTests",
-      dependencies: ["skbdlib"]
+      dependencies: ["skbdlib"],
+      resources: [
+        .copy("Resources")
+      ]
     ),
   ]
 )
