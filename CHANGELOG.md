@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Changed `Token` to conform with `Hashable` protocol
 - Refactored where handlers for `Shortcut` instances are created
+- Changed the `config` argument to allow for a file or directory of files
 
 ### Fixed
 
