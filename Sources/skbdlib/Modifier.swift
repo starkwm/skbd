@@ -5,6 +5,7 @@ private let modifiersToCode: [String: Int] = [
   "ctrl": controlKey, "control": controlKey,
   "alt": optionKey, "opt": optionKey, "option": optionKey,
   "cmd": cmdKey, "command": cmdKey,
+  "meh": optionKey | shiftKey | controlKey,
   "hyper": cmdKey | optionKey | shiftKey | controlKey,
 ]
 

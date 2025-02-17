@@ -43,6 +43,11 @@ struct ModifierTests {
     #expect(Modifier.flags(for: ["command"]) == UInt32(cmdKey))
   }
 
+  @Test("Modifier.flags(for:) (with meh modifier identifiers)")
+  func flagsWithMehModifieirIdentifiers() async throws {
+    #expect(Modifier.flags(for: ["meh"]) == UInt32(optionKey | shiftKey | controlKey))
+  }
+
   @Test("Modifier.flags(for:) (with hyper modifier identifiers)")
   func flagsWithHyperModifieirIdentifiers() async throws {
     #expect(Modifier.flags(for: ["hyper"]) == UInt32(cmdKey | optionKey | shiftKey | controlKey))

@@ -21,6 +21,8 @@ struct ParserTests {
           ctrl + opt - return : echo "foo bar"; \\
               rm -fr /
 
+          meh - space: echo 'foo bar'
+
           # this is a comment with a hash in it # here
           hyper - f1:
               echo "# hello world"
@@ -44,12 +46,13 @@ struct ParserTests {
         Expect(key: UInt32(kVK_Space), modifiers: UInt32(optionKey)),
         Expect(key: UInt32(kVK_ANSI_A), modifiers: UInt32(cmdKey | shiftKey)),
         Expect(key: UInt32(kVK_Return), modifiers: UInt32(controlKey | optionKey)),
+        Expect(key: UInt32(kVK_Space), modifiers: UInt32(controlKey | optionKey | shiftKey)),
         Expect(key: UInt32(kVK_F1), modifiers: UInt32(controlKey | optionKey | cmdKey | shiftKey)),
         Expect(key: UInt32(kVK_ANSI_5), modifiers: UInt32(controlKey | shiftKey)),
         Expect(key: UInt32(kVK_ANSI_LeftBracket), modifiers: UInt32(optionKey)),
       ]
 
-      #expect(shortcuts.count == 6)
+      #expect(shortcuts.count == 7)
 
       for (idx, expect) in expected.enumerated() {
         #expect(shortcuts[idx].keyCode == expect.key)
