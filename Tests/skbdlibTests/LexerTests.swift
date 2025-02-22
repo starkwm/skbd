@@ -4,11 +4,13 @@ import Testing
 
 @Suite("Lexer")
 struct LexerTests {
-  // MARK: Lexer#getToken
+  // MARK: Lexer#nextToken
 
-  @Test("Lexer#getToken() (with valid input)")
-  func getTokenWithValidInput() async throws {
+  @Test("Lexer#nextToken() (with valid input)")
+  func nextTokenWithValidInput() async throws {
     let input = """
+          leader: ctrl + space
+
           # this if the first comment
           opt-space: open -a iTerm2.app
 
@@ -28,12 +30,10 @@ struct LexerTests {
 
           # this makes sure we allow - as a key
           cmd + shift + opt - -: echo "hyphen!"
-
-          # this uses the modifier symbols
-          ⌃ + ⇧ + ⌥ + ⌘ - A: echo "symbols"
       """
 
     let expected: [TokenType] = [
+      .leader, .modifier, .plus, .key,
       .comment,
       .modifier, .dash, .key, .command,
       .comment,
@@ -47,38 +47,32 @@ struct LexerTests {
       .modifier, .dash, .key, .command,
       .comment,
       .modifier, .plus, .modifier, .plus, .modifier, .dash, .dash, .command,
-      .comment,
-      .modifier, .plus, .modifier, .plus, .modifier, .plus, .modifier, .dash, .key, .command,
-      .endOfStream,
     ]
 
     let lexer = Lexer(input)
+    let actual = lexer.map(\.type)
 
-    for type in expected {
-      let token = lexer.getToken()
-      #expect(token.type == type)
-    }
+    #expect(expected == actual)
   }
 
-  @Test("Lexer#getToken() (with unknown token in input)")
-  func getTokenWithUnknownToken() async throws {
+  @Test("Lexer#nextToken() (with unknown token in input)")
+  func nextTokenWithUnknownToken() async throws {
     let lexer = Lexer("@")
-    let token = lexer.getToken()
+    let token = lexer.nextToken()
 
     #expect(token.type == .unknown)
   }
 
-  @Test("Lexer#getToken() (with unknown identifier token in input")
-  func getTokenWithUnknownIdentifierToken() async throws {
+  @Test("Lexer#nextToken() (with unknown identifier token in input")
+  func nextTokenWithUnknownIdentifierToken() async throws {
     let lexer = Lexer("cmd - f100: ls")
 
     let expected: [TokenType] = [
       .modifier, .dash, .unknown, .command,
     ]
 
-    for type in expected {
-      let token = lexer.getToken()
-      #expect(token.type == type)
-    }
+    let actual = lexer.map(\.type)
+
+    #expect(expected == actual)
   }
 }

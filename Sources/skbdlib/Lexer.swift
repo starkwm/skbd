@@ -1,107 +1,146 @@
 class Lexer {
-  private var buffer = ""
-  private var current = Character("\0")
-  private var readPos = 0
+  private enum Special {
+    static let null = Character("\0")
+    static let backslash = Character("\\")
+    static let comment = Character("#")
+    static let plus = Character("+")
+    static let dash = Character("-")
+    static let colon = Character(":")
+
+    static let singleCharKeys: Set<Character> = ["`", "=", "[", "]", ";", "'", "\\", ",", ".", "/"]
+  }
+
+  private var buffer: String
+  private var currentIndex: String.Index
+  private var current: Character
+
+  private var isAtEnd: Bool { currentIndex >= buffer.endIndex }
 
   init(_ buffer: String) {
     self.buffer = buffer
-
-    advance()
+    self.currentIndex = buffer.startIndex
+    self.current = buffer.isEmpty ? Special.null : buffer[currentIndex]
   }
 
-  func getToken() -> Token {
+  func nextToken(prevToken: Token? = nil) -> Token {
     skipWhitespace()
 
-    var token: Token
-
-    switch current {
-    case "\0":
-      token = Token(type: .endOfStream)
-    case "+":
-      token = Token(type: .plus)
-    case "-":
-      token = Token(type: .dash)
-    case "#":
-      skipComment()
-      token = Token(type: .comment)
-    case ":":
-      advance()
-      skipWhitespace()
-      let cmd = readCommand()
-      token = Token(type: .command, text: cmd)
-    case "⌃", "⇧", "⌥", "⌘":
-      token = Token(type: .modifier, text: String(current))
-    default:
-      if current.isLetter || current.isNumber {
-        let text = readIdentifier()
-        let type = resolveIdentifierType(identifier: text)
-        return Token(type: type, text: text)
-      } else if ["`", "=", "[", "]", ";", "'", "\\", ",", ".", "/"].contains(current) {
-        token = Token(type: .key, text: String(current))
-      } else {
-        token = Token(type: .unknown, text: String(current))
-      }
+    guard current != Special.null else {
+      return Token(type: .endOfStream)
     }
 
-    advance()
+    return getToken(prevToken: prevToken)
+  }
 
-    return token
+  private func getToken(prevToken: Token?) -> Token {
+    switch current {
+    case Special.comment:
+      skipComment()
+      return Token(type: .comment)
+
+    case Special.colon:
+      return handleColon(prevToken: prevToken)
+
+    case Special.plus:
+      advance()
+      return Token(type: .plus)
+
+    case Special.dash:
+      advance()
+      return Token(type: .dash)
+
+    case _ where Special.singleCharKeys.contains(current):
+      return handleSingleCharKey()
+
+    case _ where current.isLetter || current.isNumber:
+      return handleIdentifier()
+
+    default:
+      return Token(type: .unknown, text: String(current))
+    }
   }
 
   private func advance() {
-    current = readPos >= buffer.count ? Character("\0") : buffer[readPos]
-    readPos += 1
+    currentIndex = buffer.index(after: currentIndex)
+    current = currentIndex < buffer.endIndex ? buffer[currentIndex] : Special.null
   }
 
   private func skipWhitespace() {
-    while current.isWhitespace {
+    while !isAtEnd && current.isWhitespace {
       advance()
     }
   }
 
   private func skipComment() {
-    while !current.isNewline, current != "\0" {
+    while !isAtEnd && !current.isNewline {
       advance()
     }
   }
 
-  private func readCommand() -> String {
-    let start = readPos - 1
+  private func handleColon(prevToken: Token?) -> Token {
+    advance()
+    skipWhitespace()
 
-    while !current.isNewline, current != "\0" {
-      if current == "\\" {
+    if prevToken?.type == .leader {
+      return getToken(prevToken: prevToken)
+    }
+
+    let cmd = readCommand()
+    return Token(type: .command, text: cmd)
+  }
+
+  private func handleSingleCharKey() -> Token {
+    let key = String(current)
+    advance()
+    return Token(type: .key, text: key)
+  }
+
+  private func handleIdentifier() -> Token {
+    let text = readIdentifier()
+    let type = resolveIdentifierType(identifier: text)
+    return Token(type: type, text: text)
+  }
+
+  private func readCommand() -> String {
+    let start = currentIndex
+
+    while !isAtEnd && !current.isNewline {
+      if current == Special.backslash {
         advance()
       }
 
       advance()
     }
 
-    return buffer[start..<readPos - 1]
+    return String(buffer[start..<currentIndex])
   }
 
   private func readIdentifier() -> String {
-    let start = readPos - 1
+    let start = currentIndex
 
-    while current.isLetter || current == "_" {
+    while !isAtEnd && (current.isLetter || current.isNumber || current == "_") {
       advance()
     }
 
-    while current.isNumber {
-      advance()
-    }
-
-    return buffer[start..<readPos - 1]
+    return String(buffer[start..<currentIndex])
   }
 
   private func resolveIdentifierType(identifier: String) -> TokenType {
-    if Key.valid(identifier) {
+    switch identifier {
+    case _ where Key.valid(identifier):
       return .key
-    }
-
-    if Modifier.valid(identifier) {
+    case _ where Modifier.valid(identifier):
       return .modifier
+    case "leader":
+      return .leader
+    default:
+      return .unknown
     }
+  }
+}
 
-    return .unknown
+extension Lexer: Sequence {
+  func makeIterator() -> LexerIterator {
+    LexerIterator(lexer: self)
   }
 }
