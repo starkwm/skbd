@@ -1,5 +1,8 @@
 enum TokenType {
   case comment
+
+  case leader
+
   case modifier
   case key
   case command
@@ -16,6 +19,8 @@ extension TokenType: CustomStringConvertible {
     switch self {
     case .comment:
       return "TokenType {Comment}"
+    case .leader:
+      return "TokenType {Leader}"
     case .modifier:
       return "TokenType {Modifier}"
     case .key:
