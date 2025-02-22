@@ -93,7 +93,7 @@ public class Parser {
   private func advance() {
     if !isEndOfFile() {
       prevToken = currToken
-      currToken = lexer.getToken()
+      currToken = lexer.nextToken(prevToken: prevToken)
     }
   }
 
