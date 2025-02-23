@@ -29,6 +29,9 @@ struct ParserTests {
 
           # this is a mapping with a number key
           ctrl + shift - 5: cat ~/.config/skbd/skbdrc | pbcopy
+      
+          # this is a leader mappign
+          leader: ctrl - space
 
           # can use key symbols
           alt - [: echo "left bracket"
@@ -40,24 +43,28 @@ struct ParserTests {
       struct Expect {
         var key: UInt32
         var modifiers: UInt32
+        var leader: Bool
+        var handler: Bool
       }
 
       let expected = [
-        Expect(key: UInt32(kVK_Space), modifiers: UInt32(optionKey)),
-        Expect(key: UInt32(kVK_ANSI_A), modifiers: UInt32(cmdKey | shiftKey)),
-        Expect(key: UInt32(kVK_Return), modifiers: UInt32(controlKey | optionKey)),
-        Expect(key: UInt32(kVK_Space), modifiers: UInt32(controlKey | optionKey | shiftKey)),
-        Expect(key: UInt32(kVK_F1), modifiers: UInt32(controlKey | optionKey | cmdKey | shiftKey)),
-        Expect(key: UInt32(kVK_ANSI_5), modifiers: UInt32(controlKey | shiftKey)),
-        Expect(key: UInt32(kVK_ANSI_LeftBracket), modifiers: UInt32(optionKey)),
+        Expect(key: UInt32(kVK_Space), modifiers: UInt32(optionKey), leader: false, handler: true),
+        Expect(key: UInt32(kVK_ANSI_A), modifiers: UInt32(cmdKey | shiftKey), leader: false, handler: true),
+        Expect(key: UInt32(kVK_Return), modifiers: UInt32(controlKey | optionKey), leader: false, handler: true),
+        Expect(key: UInt32(kVK_Space), modifiers: UInt32(controlKey | optionKey | shiftKey), leader: false, handler: true),
+        Expect(key: UInt32(kVK_F1), modifiers: UInt32(controlKey | optionKey | cmdKey | shiftKey), leader: false, handler: true),
+        Expect(key: UInt32(kVK_ANSI_5), modifiers: UInt32(controlKey | shiftKey), leader: false, handler: true),
+        Expect(key: UInt32(kVK_Space), modifiers: UInt32(controlKey), leader: true, handler: false),
+        Expect(key: UInt32(kVK_ANSI_LeftBracket), modifiers: UInt32(optionKey), leader: false, handler: true),
       ]
 
-      #expect(shortcuts.count == 7)
+      #expect(shortcuts.count == 8)
 
       for (idx, expect) in expected.enumerated() {
         #expect(shortcuts[idx].keyCode == expect.key)
         #expect(shortcuts[idx].modifierFlags == expect.modifiers)
-        #expect(shortcuts[idx].handler != nil)
+        #expect(shortcuts[idx].isLeader == expect.leader)
+        #expect((shortcuts[idx].handler != nil) == expect.handler)
       }
     }
   }
@@ -69,9 +76,9 @@ struct ParserTests {
     }
   }
 
-  @Test("Parser#parse() (with no modifiers in input)")
+  @Test("Parser#parse() (with no modifier or leader directive in input)")
   func parseWithNoModifiers() async throws {
-    #expect(throws: ParserError.expectedModifier) {
+    #expect(throws: ParserError.expectedModifierOrLeader) {
       try Parser("space: open -a iTerm2.app").parse()
     }
   }
@@ -101,6 +108,18 @@ struct ParserTests {
   func parseWithNoCommand() async throws {
     #expect(throws: ParserError.expectedColonFollowedByCommand) {
       try Parser("opt+ctrl-a+opt").parse()
+    }
+  }
+
+  @Test("Parser#parse() (with multiple leader directives)")
+  func parseWithMultipleLeaders() async throws {
+    #expect(throws: ParserError.leaderKeyAlreadySet) {
+      let input = """
+        leader: ctrl - space
+        leader: cmd - space
+      """
+
+      _ = try Parser(input).parse()
     }
   }
 }
