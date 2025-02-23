@@ -9,12 +9,12 @@ private let modifiersToCode: [String: Int] = [
   "hyper": cmdKey | optionKey | shiftKey | controlKey,
 ]
 
-enum Modifier {
+public enum Modifier {
   static func valid(_ modifier: String) -> Bool {
     modifiersToCode.keys.contains(modifier.lowercased())
   }
 
-  static func flags(for modifiers: [String]) -> UInt32 {
+  public static func flags(for modifiers: [String]) -> UInt32 {
     let mods = Set(modifiers.map { $0.lowercased() })
 
     var flags = 0

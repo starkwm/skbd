@@ -3,6 +3,8 @@ import skbdlib
 
 var config: ConfigManager!
 
+let delegate = AppDelegate()
+
 func main() -> Int32 {
   if arguments.version {
     fputs("skbd version \(Version.current.value)\n", stdout)
@@ -33,6 +35,18 @@ func main() -> Int32 {
 
     try config.load()
 
+    // TODO: expose shortcutManager on configManager to test this
+
+    let shortcut1 = Shortcut(Key.code(for: "space"), Modifier.flags(for: ["control"])) {
+      if delegate.isVisible() {
+        delegate.hide()
+      } else {
+        delegate.show()
+      }
+    }
+
+    config.shortcutManager.register(shortcut: shortcut1)
+
     if !config.start() {
       fputs("failed to start configuration manager", stderr)
       return EXIT_FAILURE
@@ -61,7 +75,9 @@ func main() -> Int32 {
     exit(EXIT_SUCCESS)
   }
 
-  NSApplication.shared.run()
+  let app = NSApplication.shared
+  app.delegate = delegate
+  app.run()
 
   return EXIT_SUCCESS
 }
