@@ -90,19 +90,16 @@ public class Parser {
   }
 
   private func check(type: TokenType) -> Bool {
-    if isAtEnd {
-      return false
-    }
+    guard !isAtEnd else { return false }
 
     return currToken?.type == type
   }
 
   private func match(type: TokenType) -> Bool {
-    if check(type: type) {
-      advance()
-      return true
-    }
+    guard check(type: type) else { return false }
 
-    return false
+    advance()
+
+    return true
   }
 }
