@@ -1,13 +1,13 @@
 import Carbon
 import Foundation
 
-public typealias CommandHandler = () throws -> Void
+public typealias HandlerFunc = () throws -> Void
 
 public struct Shortcut {
-  public static func handler(for command: String) -> CommandHandler {
+  public static func handler(for command: String) -> HandlerFunc {
     let shell = ProcessInfo.processInfo.environment["SHELL"].flatMap { $0.isEmpty ? nil : $0 } ?? "/bin/bash"
 
-    let handler: CommandHandler = {
+    let handler: HandlerFunc = {
       if command.isEmpty {
         return
       }
@@ -23,7 +23,7 @@ public struct Shortcut {
   public var keyCode: UInt32?
   public var modifierFlags: UInt32?
 
-  public var handler: CommandHandler!
+  public var handler: HandlerFunc!
 
   public init() {}
 
@@ -32,7 +32,7 @@ public struct Shortcut {
     self.modifierFlags = modifierFlags
   }
 
-  public init(_ keyCode: UInt32, _ modifierFlags: UInt32, _ handler: @escaping CommandHandler) {
+  public init(_ keyCode: UInt32, _ modifierFlags: UInt32, _ handler: @escaping HandlerFunc) {
     self.keyCode = keyCode
     self.modifierFlags = modifierFlags
     self.handler = handler
