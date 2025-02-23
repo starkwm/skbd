@@ -9,7 +9,7 @@ struct LexerTests {
   @Test("Lexer#nextToken() (with valid input)")
   func nextTokenWithValidInput() async throws {
     let input = """
-          leader: ctrl + space
+          leader: ctrl - space
 
           # this if the first comment
           opt-space: open -a iTerm2.app
@@ -33,7 +33,7 @@ struct LexerTests {
       """
 
     let expected: [TokenType] = [
-      .leader, .modifier, .plus, .key,
+      .leader, .modifier, .dash, .key,
       .comment,
       .modifier, .dash, .key, .command,
       .comment,
