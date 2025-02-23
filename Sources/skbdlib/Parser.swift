@@ -27,7 +27,7 @@ public class Parser {
       if check(type: .modifier) {
         shortcuts.append(try parseShortcut())
       } else {
-        throw ParserError.expectedModifier
+        throw ParserError.expectedModifierOrLeader
       }
     }
 
