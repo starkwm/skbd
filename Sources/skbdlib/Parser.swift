@@ -22,12 +22,10 @@ public class Parser {
         advance()
       }
 
-      if isAtEnd {
-        break
-      }
+      guard !isAtEnd else { break }
 
       if check(type: .modifier) {
-        shortcuts.append(try parseShortcuts())
+        shortcuts.append(try parseShortcut())
       } else {
         throw ParserError.expectedModifier
       }
@@ -36,50 +34,45 @@ public class Parser {
     return shortcuts
   }
 
-  private func parseShortcuts() throws -> Shortcut {
-    var shortcut = Shortcut()
+  private func parseShortcut() throws -> Shortcut {
+    let modifierFlags = try parseModifiers()
 
-    let modifier = match(type: .modifier)
-
-    if modifier {
-      let modifiers = try parseModifier()
-      shortcut.modifierFlags = Modifier.flags(for: modifiers)
+    guard match(type: .dash) else {
+      throw ParserError.expectedModifierFollowedByDash
     }
 
-    if modifier {
-      if !match(type: .dash) {
-        throw ParserError.expectedModifierFollowedByDash
-      }
-    }
-
-    if match(type: .key) {
-      let key = prevToken!.text!
-      shortcut.keyCode = Key.code(for: key)
-    } else {
+    guard match(type: .key), let key = prevToken?.text else {
       throw ParserError.expectedDashFollowedByKey
     }
 
-    if match(type: .command) {
-      shortcut.handler = Shortcut.handler(for: prevToken!.text!)
-    } else {
+    let keyCode = Key.code(for: key)
+
+    guard match(type: .command), let cmd = prevToken?.text else {
       throw ParserError.expectedColonFollowedByCommand
     }
 
-    return shortcut
+    let handler = Shortcut.handler(for: cmd)
+
+    return Shortcut(keyCode, modifierFlags, handler)
   }
 
-  private func parseModifier() throws -> [String] {
-    var modifiers = [prevToken!.text!]
+  private func parseModifiers() throws -> UInt32 {
+    var modifiers = [getModifier()]
 
-    if match(type: .plus) {
-      if match(type: .modifier) {
-        modifiers.append(contentsOf: try parseModifier())
-      } else {
+    while match(type: .plus) {
+      guard check(type: .modifier) else {
         throw ParserError.expectedPlusFollowedByModifier
       }
+
+      modifiers.append(getModifier())
     }
 
-    return modifiers
+    return Modifier.flags(for: modifiers.compactMap { $0 })
+  }
+
+  private func getModifier() -> String? {
+    advance()
+    return prevToken?.text
   }
 
   private func advance() {
