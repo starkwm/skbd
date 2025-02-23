@@ -4,6 +4,7 @@ enum ParserError: Error {
   case expectedModifierFollowedByDash
   case expectedDashFollowedByKey
   case expectedColonFollowedByCommand
+  case leaderKeyAlreadySet
 }
 
 extension ParserError: CustomStringConvertible {
@@ -19,6 +20,8 @@ extension ParserError: CustomStringConvertible {
       return "expected key to follow dash"
     case .expectedColonFollowedByCommand:
       return "expected command to follow colon"
+    case .leaderKeyAlreadySet:
+      return "leader key has already been set"
     }
   }
 }
