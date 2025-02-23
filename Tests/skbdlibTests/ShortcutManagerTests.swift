@@ -7,7 +7,7 @@ import Testing
 class ShortcutManagerTests {
   let shortcutManager = ShortcutManager()
 
-  // MARK: shortcutEventHandler
+  // MARK: - shortcutEventHandler
 
   @Test("shortcutEventHandler() (processes event and calls shortcut handler)")
   func shortcutEventHandler() async throws {
@@ -26,7 +26,7 @@ class ShortcutManagerTests {
     #expect(called)
   }
 
-  // MARK: ShortcutManager#register
+  // MARK: - ShortcutManager#register
 
   @Test("ShortcutManager#register(shortcut:) (with valid shortcut)")
   func registerValidShortcut() async throws {
@@ -78,7 +78,7 @@ class ShortcutManagerTests {
     #expect(shortcutManager.box(for: shortcut) == nil)
   }
 
-  // MARK: ShortcutManager#unregister
+  // MARK: - ShortcutManager#unregister
 
   @Test("ShortcutManager#unregister(shortcut:) (with registered shortcut)")
   func unregisterWithRegisteredShortcut() async throws {
@@ -102,7 +102,7 @@ class ShortcutManagerTests {
     #expect(shortcutManager.box(for: shortcut) == nil)
   }
 
-  // MARK: ShortcutManager#start
+  // MARK: - ShortcutManager#start
 
   @Test("ShortcutManager#start() (when shortcuts registered)")
   func startWhenShortcutsRegistered() async throws {
@@ -128,7 +128,7 @@ class ShortcutManagerTests {
     #expect(!shortcutManager.start())
   }
 
-  // MARK: ShortcutManager#stop
+  // MARK: - ShortcutManager#stop
 
   @Test("ShortcutManager#stop() (when shortcuts registered)")
   func stopWhenShortcutsRegistered() async throws {
@@ -145,7 +145,7 @@ class ShortcutManagerTests {
     #expect(!shortcutManager.stop())
   }
 
-  // MARK: ShortcutManager#reset
+  // MARK: - ShortcutManager#reset
 
   @Test("ShortcutManager#reset() (when shortcuts registered)")
   func resetWhenShortcutsRegistered() async throws {
@@ -164,7 +164,7 @@ class ShortcutManagerTests {
     #expect(shortcutManager.box(for: shortcut2) == nil)
   }
 
-  // MARK: ShortcutManager#box
+  // MARK: - ShortcutManager#box
 
   @Test("ShortcutManager#box(for:) (with registered shortcut)")
   func boxWithRegisteredShortcut() async throws {
@@ -182,7 +182,7 @@ class ShortcutManagerTests {
     #expect(shortcutManager.box(for: shortcut) == nil)
   }
 
-  // MARK: ShortcutManager.handleCarbonEvent
+  // MARK: - ShortcutManager.handleCarbonEvent
 
   @Test("ShortcutManager#handleCarbonEvent() (with valid event)")
   func handleCarbonEventWithValidEvent() async throws {

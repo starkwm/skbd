@@ -5,7 +5,7 @@ import Testing
 
 @Suite("Key")
 struct KeyTests {
-  // MARK: Key.valid
+  // MARK: - Key.valid
 
   @Test("Key.valid() (with valid key identifier)")
   func validWithValidKeyIdentifier() async throws {
@@ -17,7 +17,7 @@ struct KeyTests {
     #expect(Key.valid("XYZ") == false)
   }
 
-  // MARK: Key.code
+  // MARK: - Key.code
 
   @Test("Key.code(for:) (with relocatable alpha key identifiers)")
   func codeWithRelocatableAlphaKeyIdentifiers() async throws {

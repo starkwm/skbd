@@ -5,7 +5,7 @@ import Testing
 
 @Suite("Modifier")
 struct ModifierTests {
-  // MARK: Modifier.valid
+  // MARK: - Modifier.valid
 
   @Test("Modifier.valid() (with valid modifier identifier)")
   func validWithValidModifierIdentifier() async throws {
@@ -17,7 +17,7 @@ struct ModifierTests {
     #expect(!Modifier.valid("super-duper-modifier"))
   }
 
-  // MARK: Modifier.flags
+  // MARK: - Modifier.flags
 
   @Test("Modifier.flags(for:) (with shift modifier identifiers)")
   func flagsWithShiftModifierIdentifiers() async throws {

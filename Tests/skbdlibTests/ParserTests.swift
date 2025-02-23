@@ -5,7 +5,7 @@ import Testing
 
 @Suite("Parser")
 struct ParserTests {
-  // MARK: Parser#parse
+  // MARK: - Parser#parse
 
   @Test("Parser#parse() (with valid input)")
   func parseWithValidInput() async throws {

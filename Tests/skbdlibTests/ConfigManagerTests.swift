@@ -6,7 +6,7 @@ import Testing
 
 @Suite("ConfigManager")
 class ConfigManagerTests {
-  // MARK: ConfigManager#read
+  // MARK: - ConfigManager#read
 
   @Test("ConfigManager#read (with config file)")
   func readWithConfigFile() async throws {
@@ -66,7 +66,7 @@ class ConfigManagerTests {
     }
   }
 
-  // MARK: ConfigManager#start
+  // MARK: - ConfigManager#start
 
   @Test("ConfigManager#start (with shortcuts)")
   func startWithShortcuts() async throws {
@@ -92,7 +92,7 @@ class ConfigManagerTests {
     }
   }
 
-  // MARK: ConfigManager#stop
+  // MARK: - ConfigManager#stop
 
   @Test("ConfigManager#stop")
   func stop() async throws {

@@ -19,7 +19,7 @@ class LockFileTests {
     LockFile.read = defaultRead
   }
 
-  // MARK: LockFile.acquire
+  // MARK: - LockFile.acquire
 
   @Test("LockFile.acquire() (with no errors)")
   func acquireWithNoErrors() async throws {
@@ -57,7 +57,7 @@ class LockFileTests {
     }
   }
 
-  // MARK: LockFile.readPID
+  // MARK: - LockFile.readPID
 
   @Test("LockFile.readPID() (with no errors)")
   func readPIDWithNoErrors() async throws {
@@ -107,7 +107,7 @@ class LockFileTests {
     }
   }
 
-  // MARK: LockFile.path
+  // MARK: - LockFile.path
 
   @Test("LockFile.path() (with no errors)")
   func pathWithNoErrors() async throws {

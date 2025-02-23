@@ -4,7 +4,7 @@ import Testing
 
 @Suite("Lexer")
 struct LexerTests {
-  // MARK: Lexer#nextToken
+  // MARK: - Lexer#nextToken
 
   @Test("Lexer#nextToken() (with valid input)")
   func nextTokenWithValidInput() async throws {

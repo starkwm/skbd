@@ -5,7 +5,7 @@ import Testing
 
 @Suite("Shortcut", .serialized)
 struct ShortcutSerializedTests {
-  // MARK: Shortcut.handler(for:)
+  // MARK: - Shortcut.handler(for:)
 
   @Test("Shortcut.handler(for:) (with SHELL set)")
   func handlerWithShell() async throws {
@@ -63,7 +63,7 @@ struct ShortcutSerializedTests {
 
 @Suite("Shortcut")
 struct ShortcutTests {
-  // MARK: Shortcut#identifier
+  // MARK: - Shortcut#identifier
 
   @Test("Shortcut#identifier (identifiers are unique)")
   func identifier() async throws {
