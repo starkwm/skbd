@@ -6,13 +6,17 @@ private let keyToCode: [String: Int] = [
   "return": kVK_Return,
   "enter": kVK_Return,
 
+  "caps_lock": kVK_CapsLock,
   "capslock": kVK_CapsLock,
   "caps": kVK_CapsLock,
 
+  "page_up": kVK_PageUp,
   "pageup": kVK_PageUp,
+  "page_down": kVK_PageDown,
   "pagedown": kVK_PageDown,
   "home": kVK_Home,
   "end": kVK_End,
+
   "up": kVK_UpArrow,
   "right": kVK_RightArrow,
   "down": kVK_DownArrow,
@@ -50,15 +54,19 @@ private let keyToCode: [String: Int] = [
   "dash": kVK_ANSI_Minus,
   "equal": kVK_ANSI_Equal,
   "equals": kVK_ANSI_Equal,
+  "left_bracket": kVK_ANSI_LeftBracket,
   "leftbracket": kVK_ANSI_LeftBracket,
+  "right_bracket": kVK_ANSI_RightBracket,
   "rightbracket": kVK_ANSI_RightBracket,
   "semicolon": kVK_ANSI_Semicolon,
   "quote": kVK_ANSI_Quote,
+  "single_quote": kVK_ANSI_Quote,
   "singlequote": kVK_ANSI_Quote,
-  "backslash": kVK_ANSI_Backslash,
   "period": kVK_ANSI_Period,
   "comma": kVK_ANSI_Comma,
+  "backslash": kVK_ANSI_Backslash,
   "slash": kVK_ANSI_Slash,
+  "forward_slash": kVK_ANSI_Slash,
   "forwardslash": kVK_ANSI_Slash,
 ]
 
