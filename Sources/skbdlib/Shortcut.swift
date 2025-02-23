@@ -20,6 +20,8 @@ public struct Shortcut {
 
   public let identifier = UUID()
 
+  public var isLeader: Bool = false
+
   public var keyCode: UInt32?
   public var modifierFlags: UInt32?
 
