@@ -8,14 +8,16 @@ public class Parser {
 
   private var isAtEnd: Bool { currToken?.type == .endOfStream }
 
+  private var hasLeader: Bool = false
+
   public init(_ buffer: String) {
     lexer = Lexer(buffer)
+
+    advance()
   }
 
   public func parse() throws -> [Shortcut] {
     var shortcuts = [Shortcut]()
-
-    advance()
 
     while !isAtEnd {
       while check(type: .comment) {
@@ -24,8 +26,15 @@ public class Parser {
 
       guard !isAtEnd else { break }
 
-      if check(type: .modifier) {
-        shortcuts.append(try parseShortcut())
+      if match(type: .leader) {
+        if hasLeader {
+          throw ParserError.leaderKeyAlreadySet
+        }
+
+        shortcuts.append(try parseLeaderShortcut())
+        hasLeader = true
+      } else if check(type: .modifier) {
+        shortcuts.append(try parseCommandShortcut())
       } else {
         throw ParserError.expectedModifierOrLeader
       }
@@ -34,7 +43,28 @@ public class Parser {
     return shortcuts
   }
 
-  private func parseShortcut() throws -> Shortcut {
+  private func parseLeaderShortcut() throws -> Shortcut {
+    let (modifierFlags, keyCode) = try parseModifiersAndKey()
+
+    var shortcut = Shortcut(keyCode, modifierFlags)
+    shortcut.isLeader = true
+
+    return shortcut
+  }
+
+  private func parseCommandShortcut() throws -> Shortcut {
+    let (modifierFlags, keyCode) = try parseModifiersAndKey()
+
+    guard match(type: .command), let cmd = prevToken?.text else {
+      throw ParserError.expectedColonFollowedByCommand
+    }
+
+    let handler = Shortcut.handler(for: cmd)
+
+    return Shortcut(keyCode, modifierFlags, handler)
+  }
+
+  private func parseModifiersAndKey() throws -> (modifiers: UInt32, key: UInt32) {
     let modifierFlags = try parseModifiers()
 
     guard match(type: .dash) else {
@@ -47,32 +77,23 @@ public class Parser {
 
     let keyCode = Key.code(for: key)
 
-    guard match(type: .command), let cmd = prevToken?.text else {
-      throw ParserError.expectedColonFollowedByCommand
-    }
-
-    let handler = Shortcut.handler(for: cmd)
-
-    return Shortcut(keyCode, modifierFlags, handler)
+    return (modifiers: modifierFlags, key: keyCode)
   }
 
   private func parseModifiers() throws -> UInt32 {
-    var modifiers = [getModifier()]
+    var modifiers = [currToken?.text]
+    advance()
 
     while match(type: .plus) {
       guard check(type: .modifier) else {
         throw ParserError.expectedPlusFollowedByModifier
       }
 
-      modifiers.append(getModifier())
+      modifiers.append(currToken?.text)
+      advance()
     }
 
     return Modifier.flags(for: modifiers.compactMap { $0 })
-  }
-
-  private func getModifier() -> String? {
-    advance()
-    return prevToken?.text
   }
 
   private func advance() {
