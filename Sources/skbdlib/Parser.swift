@@ -6,8 +6,6 @@ public class Parser {
   private var currToken: Token?
   private var prevToken: Token?
 
-  private var shortcuts = [Shortcut]()
-
   private var isAtEnd: Bool { currToken?.type == .endOfStream }
 
   public init(_ buffer: String) {
@@ -15,7 +13,7 @@ public class Parser {
   }
 
   public func parse() throws -> [Shortcut] {
-    shortcuts.removeAll()
+    var shortcuts = [Shortcut]()
 
     advance()
 
