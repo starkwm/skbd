@@ -83,10 +83,8 @@ public class Parser {
   }
 
   private func advance() {
-    if !isAtEnd {
-      prevToken = currToken
-      currToken = lexer.nextToken(prevToken: prevToken)
-    }
+    prevToken = currToken
+    currToken = lexer.nextToken(prevToken: prevToken)
   }
 
   private func check(type: TokenType) -> Bool {
