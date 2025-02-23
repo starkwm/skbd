@@ -8,6 +8,8 @@ public class Parser {
 
   private var shortcuts = [Shortcut]()
 
+  private var isAtEnd: Bool { currToken?.type == .endOfStream }
+
   public init(_ buffer: String) {
     lexer = Lexer(buffer)
   }
@@ -17,12 +19,12 @@ public class Parser {
 
     advance()
 
-    while !isEndOfFile() {
+    while !isAtEnd {
       while check(type: .comment) {
         advance()
       }
 
-      if isEndOfFile() {
+      if isAtEnd {
         break
       }
 
@@ -82,23 +84,15 @@ public class Parser {
     return modifiers
   }
 
-  private func isEndOfFile() -> Bool {
-    guard let token = currToken else {
-      return false
-    }
-
-    return token.type == .endOfStream
-  }
-
   private func advance() {
-    if !isEndOfFile() {
+    if !isAtEnd {
       prevToken = currToken
       currToken = lexer.nextToken(prevToken: prevToken)
     }
   }
 
   private func check(type: TokenType) -> Bool {
-    if isEndOfFile() {
+    if isAtEnd {
       return false
     }
 
