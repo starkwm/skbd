@@ -61,7 +61,18 @@ public class ConfigManager {
     let shortcuts = try parser.parse()
 
     for shortcut in shortcuts {
-      shortcutManager.register(shortcut: shortcut)
+      switch shortcut {
+      case let leaderShortcut as LeaderShortcut:
+        // TODO: handle leader shortcut
+        continue
+      case let modifierShortcut as ModifierShortcut:
+        shortcutManager.register(shortcut: modifierShortcut)
+      case let sequenceShortcut as SequenceShortcut:
+        // TODO: handle sequence shortcuts
+        continue
+      default:
+        continue
+      }
     }
   }
 }

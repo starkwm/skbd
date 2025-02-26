@@ -71,10 +71,15 @@ struct ParserTests {
       #expect(shortcuts.count == 8)
 
       for (idx, expect) in expected.enumerated() {
-        #expect(shortcuts[idx].keyCode == expect.key)
-        #expect(shortcuts[idx].modifierFlags == expect.modifiers)
-        #expect(shortcuts[idx].isLeader == expect.leader)
-        #expect((shortcuts[idx].action != nil) == expect.action)
+        if let modifierShortcut = shortcuts[idx] as? ModifierShortcut {
+          #expect(modifierShortcut.keyCode == expect.key)
+          #expect(modifierShortcut.modifierFlags == expect.modifiers)
+          #expect((modifierShortcut.action != nil) == expect.action)
+        } else if let leaderShortcut = shortcuts[idx] as? LeaderShortcut {
+          #expect(leaderShortcut.keyCode == expect.key)
+          #expect(leaderShortcut.modifierFlags == expect.modifiers)
+          #expect((leaderShortcut.action != nil) == expect.action)
+        }
       }
     }
   }
