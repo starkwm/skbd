@@ -29,7 +29,7 @@ struct ParserTests {
 
           # this is a mapping with a number key
           ctrl + shift - 5: cat ~/.config/skbd/skbdrc | pbcopy
-      
+
           # this is a leader mappign
           leader: ctrl - space
 
@@ -51,8 +51,18 @@ struct ParserTests {
         Expect(key: UInt32(kVK_Space), modifiers: UInt32(optionKey), leader: false, handler: true),
         Expect(key: UInt32(kVK_ANSI_A), modifiers: UInt32(cmdKey | shiftKey), leader: false, handler: true),
         Expect(key: UInt32(kVK_Return), modifiers: UInt32(controlKey | optionKey), leader: false, handler: true),
-        Expect(key: UInt32(kVK_Space), modifiers: UInt32(controlKey | optionKey | shiftKey), leader: false, handler: true),
-        Expect(key: UInt32(kVK_F1), modifiers: UInt32(controlKey | optionKey | cmdKey | shiftKey), leader: false, handler: true),
+        Expect(
+          key: UInt32(kVK_Space),
+          modifiers: UInt32(controlKey | optionKey | shiftKey),
+          leader: false,
+          handler: true
+        ),
+        Expect(
+          key: UInt32(kVK_F1),
+          modifiers: UInt32(controlKey | optionKey | cmdKey | shiftKey),
+          leader: false,
+          handler: true
+        ),
         Expect(key: UInt32(kVK_ANSI_5), modifiers: UInt32(controlKey | shiftKey), leader: false, handler: true),
         Expect(key: UInt32(kVK_Space), modifiers: UInt32(controlKey), leader: true, handler: false),
         Expect(key: UInt32(kVK_ANSI_LeftBracket), modifiers: UInt32(optionKey), leader: false, handler: true),
@@ -115,9 +125,9 @@ struct ParserTests {
   func parseWithMultipleLeaders() async throws {
     #expect(throws: ParserError.leaderKeyAlreadySet) {
       let input = """
-        leader: ctrl - space
-        leader: cmd - space
-      """
+          leader: ctrl - space
+          leader: cmd - space
+        """
 
       _ = try Parser(input).parse()
     }
