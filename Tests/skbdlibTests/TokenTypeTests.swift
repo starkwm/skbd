@@ -4,7 +4,7 @@ import Testing
 
 @Suite("TokenType")
 struct TokenTypeTests {
-  x: - TokenType#description
+  // MARK: - TokenType#description
 
   @Test("TokenType#description")
   func description() async throws {
