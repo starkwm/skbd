@@ -16,8 +16,8 @@ public class Parser {
     advance()
   }
 
-  public func parse() throws -> [Shortcut] {
-    var shortcuts = [Shortcut]()
+  public func parse() throws -> [ModifierShortcut] {
+    var shortcuts = [ModifierShortcut]()
 
     while !isAtEnd {
       while check(type: .comment) {
@@ -43,25 +43,25 @@ public class Parser {
     return shortcuts
   }
 
-  private func parseLeaderShortcut() throws -> Shortcut {
+  private func parseLeaderShortcut() throws -> ModifierShortcut {
     let (modifierFlags, keyCode) = try parseModifiersAndKey()
 
-    var shortcut = Shortcut(keyCode, modifierFlags)
+    var shortcut = ModifierShortcut(keyCode, modifierFlags)
     shortcut.isLeader = true
 
     return shortcut
   }
 
-  private func parseCommandShortcut() throws -> Shortcut {
+  private func parseCommandShortcut() throws -> ModifierShortcut {
     let (modifierFlags, keyCode) = try parseModifiersAndKey()
 
     guard match(type: .command), let cmd = prevToken?.text else {
       throw ParserError.expectedColonFollowedByCommand
     }
 
-    let handler = Shortcut.handler(for: cmd)
+    let handler = ModifierShortcut.handler(for: cmd)
 
-    return Shortcut(keyCode, modifierFlags, handler)
+    return ModifierShortcut(keyCode, modifierFlags, handler)
   }
 
   private func parseModifiersAndKey() throws -> (modifiers: UInt32, key: UInt32) {
