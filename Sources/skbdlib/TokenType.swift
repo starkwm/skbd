@@ -3,6 +3,9 @@ enum TokenType {
 
   case leader
 
+  case keywordStart
+  case keywordEnd
+
   case modifier
   case key
   case command
@@ -21,6 +24,10 @@ extension TokenType: CustomStringConvertible {
       return "TokenType {Comment}"
     case .leader:
       return "TokenType {Leader}"
+    case .keywordStart:
+      return "TokenType {Keyword Start}"
+    case .keywordEnd:
+      return "TokenType {Keyword End}"
     case .modifier:
       return "TokenType {Modifier}"
     case .key:
