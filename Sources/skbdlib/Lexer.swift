@@ -5,6 +5,8 @@ class Lexer {
     static let comment = Character("#")
     static let plus = Character("+")
     static let dash = Character("-")
+    static let keywordStart = Character("<")
+    static let keywordEnd = Character(">")
     static let colon = Character(":")
 
     static let singleCharKeys: Set<Character> = ["`", "=", "[", "]", ";", "'", "\\", ",", ".", "/"]
@@ -48,6 +50,14 @@ class Lexer {
     case Special.dash:
       advance()
       return Token(type: .dash)
+
+    case Special.keywordStart:
+      advance()
+      return Token(type: .keywordStart)
+
+    case Special.keywordEnd:
+      advance()
+      return Token(type: .keywordEnd)
 
     case _ where Special.singleCharKeys.contains(current):
       return handleSingleCharKey()
