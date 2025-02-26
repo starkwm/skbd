@@ -1,6 +1,6 @@
 import Foundation
 
-public class Parser {
+class Parser {
   private var lexer: Lexer
 
   private var currToken: Token?
@@ -10,13 +10,13 @@ public class Parser {
 
   private var hasLeader: Bool = false
 
-  public init(_ buffer: String) {
+  init(_ buffer: String) {
     lexer = Lexer(buffer)
 
     advance()
   }
 
-  public func parse() throws -> [ModifierShortcut] {
+  func parse() throws -> [ModifierShortcut] {
     var shortcuts = [ModifierShortcut]()
 
     while !isAtEnd {

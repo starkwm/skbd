@@ -1,6 +1,6 @@
 import Foundation
 
-public typealias Action = () throws -> Void
+typealias Action = () throws -> Void
 
 protocol Shortcut {}
 

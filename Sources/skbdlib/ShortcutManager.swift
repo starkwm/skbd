@@ -7,14 +7,14 @@ func shortcutEventHandler(_: EventHandlerCallRef?, event: EventRef?, userData: U
   return instance.handleCarbonEvent(event)
 }
 
-public class ShortcutManager {
+class ShortcutManager {
   struct ShortcutBox {
     let shortcut: ModifierShortcut
     let eventHotKeyID: UInt32
     let eventHotKey: EventHotKeyRef
   }
 
-  public var registerEventHotKeyFunc = RegisterEventHotKey
+  var registerEventHotKeyFunc = RegisterEventHotKey
 
   private var shortcuts = [UInt32: ShortcutBox]()
 
@@ -22,14 +22,12 @@ public class ShortcutManager {
 
   private var eventHandler: EventHandlerRef?
 
-  public init() {}
-
   deinit {
     stop()
     reset()
   }
 
-  public func register(shortcut: ModifierShortcut) {
+  func register(shortcut: ModifierShortcut) {
     if shortcuts.values.contains(where: { $0.shortcut.identifier == shortcut.identifier }) {
       return
     }
@@ -59,7 +57,7 @@ public class ShortcutManager {
     shortcuts[box.eventHotKeyID] = box
   }
 
-  public func unregister(shortcut: ModifierShortcut) {
+  func unregister(shortcut: ModifierShortcut) {
     guard let box = box(for: shortcut) else {
       return
     }
@@ -69,7 +67,7 @@ public class ShortcutManager {
     shortcuts.removeValue(forKey: box.eventHotKeyID)
   }
 
-  public func start() -> Bool {
+  func start() -> Bool {
     if shortcuts.count == 0 || eventHandler != nil {
       return false
     }
@@ -93,7 +91,7 @@ public class ShortcutManager {
   }
 
   @discardableResult
-  public func stop() -> Bool {
+  func stop() -> Bool {
     if eventHandler != nil {
       RemoveEventHandler(eventHandler)
       eventHandler = nil
@@ -103,7 +101,7 @@ public class ShortcutManager {
     return false
   }
 
-  public func reset() {
+  func reset() {
     for box in shortcuts.values {
       self.unregister(shortcut: box.shortcut)
     }

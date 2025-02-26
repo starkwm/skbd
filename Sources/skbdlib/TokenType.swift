@@ -15,7 +15,7 @@ enum TokenType {
 }
 
 extension TokenType: CustomStringConvertible {
-  public var description: String {
+  var description: String {
     switch self {
     case .comment:
       return "TokenType {Comment}"
