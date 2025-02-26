@@ -240,7 +240,7 @@ class ShortcutManagerTests {
   func handleCarbonEventWithBrokenShortcutHandler() async throws {
     setenv("SHELL", "/bin/invalid", 1)
 
-    let handler = ModifierShortcut.handler(for: "true")
+    let handler = ModifierShortcut.action(for: "true")
     let shortcut = ModifierShortcut(23, 456, handler)
 
     shortcutManager.register(shortcut: shortcut)
