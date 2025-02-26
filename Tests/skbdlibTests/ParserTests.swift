@@ -44,28 +44,28 @@ struct ParserTests {
         var key: UInt32
         var modifiers: UInt32
         var leader: Bool
-        var handler: Bool
+        var action: Bool
       }
 
       let expected = [
-        Expect(key: UInt32(kVK_Space), modifiers: UInt32(optionKey), leader: false, handler: true),
-        Expect(key: UInt32(kVK_ANSI_A), modifiers: UInt32(cmdKey | shiftKey), leader: false, handler: true),
-        Expect(key: UInt32(kVK_Return), modifiers: UInt32(controlKey | optionKey), leader: false, handler: true),
+        Expect(key: UInt32(kVK_Space), modifiers: UInt32(optionKey), leader: false, action: true),
+        Expect(key: UInt32(kVK_ANSI_A), modifiers: UInt32(cmdKey | shiftKey), leader: false, action: true),
+        Expect(key: UInt32(kVK_Return), modifiers: UInt32(controlKey | optionKey), leader: false, action: true),
         Expect(
           key: UInt32(kVK_Space),
           modifiers: UInt32(controlKey | optionKey | shiftKey),
           leader: false,
-          handler: true
+          action: true
         ),
         Expect(
           key: UInt32(kVK_F1),
           modifiers: UInt32(controlKey | optionKey | cmdKey | shiftKey),
           leader: false,
-          handler: true
+          action: true
         ),
-        Expect(key: UInt32(kVK_ANSI_5), modifiers: UInt32(controlKey | shiftKey), leader: false, handler: true),
-        Expect(key: UInt32(kVK_Space), modifiers: UInt32(controlKey), leader: true, handler: false),
-        Expect(key: UInt32(kVK_ANSI_LeftBracket), modifiers: UInt32(optionKey), leader: false, handler: true),
+        Expect(key: UInt32(kVK_ANSI_5), modifiers: UInt32(controlKey | shiftKey), leader: false, action: true),
+        Expect(key: UInt32(kVK_Space), modifiers: UInt32(controlKey), leader: true, action: false),
+        Expect(key: UInt32(kVK_ANSI_LeftBracket), modifiers: UInt32(optionKey), leader: false, action: true),
       ]
 
       #expect(shortcuts.count == 8)
@@ -74,7 +74,7 @@ struct ParserTests {
         #expect(shortcuts[idx].keyCode == expect.key)
         #expect(shortcuts[idx].modifierFlags == expect.modifiers)
         #expect(shortcuts[idx].isLeader == expect.leader)
-        #expect((shortcuts[idx].handler != nil) == expect.handler)
+        #expect((shortcuts[idx].action != nil) == expect.action)
       }
     }
   }

@@ -8,7 +8,7 @@ extension Shortcut {
   static func action(for command: String) -> Action {
     let shell = ProcessInfo.processInfo.environment["SHELL"].flatMap { $0.isEmpty ? nil : $0 } ?? "/bin/bash"
 
-    let handler: Action = {
+    let action: Action = {
       if command.isEmpty {
         return
       }
@@ -16,6 +16,6 @@ extension Shortcut {
       try Process.run(URL(fileURLWithPath: shell), arguments: ["-c", command])
     }
 
-    return handler
+    return action
   }
 }

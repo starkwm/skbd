@@ -12,9 +12,9 @@ struct ModifierShortcutSerializedTests {
     setenv("SHELL", "/bin/bash", 1)
 
     #expect(throws: Never.self) {
-      let handler = ModifierShortcut.action(for: "true")
+      let action = ModifierShortcut.action(for: "true")
 
-      try handler()
+      try action()
     }
   }
 
@@ -23,9 +23,9 @@ struct ModifierShortcutSerializedTests {
     setenv("SHELL", "", 1)
 
     #expect(throws: Never.self) {
-      let handler = ModifierShortcut.action(for: "true")
+      let action = ModifierShortcut.action(for: "true")
 
-      try handler()
+      try action()
     }
   }
 
@@ -34,9 +34,9 @@ struct ModifierShortcutSerializedTests {
     unsetenv("SHELL")
 
     #expect(throws: Never.self) {
-      let handler = ModifierShortcut.action(for: "true")
+      let action = ModifierShortcut.action(for: "true")
 
-      try handler()
+      try action()
     }
   }
 
@@ -45,18 +45,18 @@ struct ModifierShortcutSerializedTests {
     setenv("SHELL", "/bin/invalid", 1)
 
     #expect(throws: Error.self) {
-      let handler = ModifierShortcut.action(for: "true")
+      let action = ModifierShortcut.action(for: "true")
 
-      try handler()
+      try action()
     }
   }
 
   @Test("ModifierShortcut.action(for:) (with empty command)")
   func actionWithEmptyCommand() async throws {
     #expect(throws: Never.self) {
-      let handler = ModifierShortcut.action(for: "")
+      let action = ModifierShortcut.action(for: "")
 
-      try handler()
+      try action()
     }
   }
 }

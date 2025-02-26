@@ -59,9 +59,9 @@ public class Parser {
       throw ParserError.expectedColonFollowedByCommand
     }
 
-    let handler = ModifierShortcut.action(for: cmd)
+    let action = ModifierShortcut.action(for: cmd)
 
-    return ModifierShortcut(keyCode, modifierFlags, handler)
+    return ModifierShortcut(keyCode, modifierFlags, action)
   }
 
   private func parseModifiersAndKey() throws -> (modifiers: UInt32, key: UInt32) {

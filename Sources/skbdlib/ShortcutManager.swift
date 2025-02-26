@@ -144,7 +144,7 @@ public class ShortcutManager {
     }
 
     do {
-      try shortcut.handler()
+      try shortcut.action()
     } catch {
       return OSStatus(eventInternalErr)
     }
