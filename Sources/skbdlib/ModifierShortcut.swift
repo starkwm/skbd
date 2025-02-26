@@ -2,7 +2,7 @@ import Carbon
 import Foundation
 
 public struct ModifierShortcut: Shortcut {
-  public var handler: Action!
+  public var action: Action!
 
   public let identifier = UUID()
 
@@ -18,9 +18,9 @@ public struct ModifierShortcut: Shortcut {
     self.modifierFlags = modifierFlags
   }
 
-  public init(_ keyCode: UInt32, _ modifierFlags: UInt32, _ handler: @escaping Action) {
+  public init(_ keyCode: UInt32, _ modifierFlags: UInt32, _ action: @escaping Action) {
     self.keyCode = keyCode
     self.modifierFlags = modifierFlags
-    self.handler = handler
+    self.action = action
   }
 }
