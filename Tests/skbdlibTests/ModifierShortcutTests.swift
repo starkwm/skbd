@@ -5,56 +5,56 @@ import Testing
 
 @Suite("ModifierShortcut", .serialized)
 struct ModifierShortcutSerializedTests {
-  // MARK: - ModifierShortcut.handler(for:)
+  // MARK: - ModifierShortcut.action(for:)
 
-  @Test("ModifierShortcut.handler(for:) (with SHELL set)")
-  func handlerWithShell() async throws {
+  @Test("ModifierShortcut.action(for:) (with SHELL set)")
+  func actionWithShell() async throws {
     setenv("SHELL", "/bin/bash", 1)
 
     #expect(throws: Never.self) {
-      let handler = ModifierShortcut.handler(for: "true")
+      let handler = ModifierShortcut.action(for: "true")
 
       try handler()
     }
   }
 
-  @Test("ModifierShortcut.handler(for:) (with empty SHELL set)")
-  func handlerWithEmptyShell() async throws {
+  @Test("ModifierShortcut.action(for:) (with empty SHELL set)")
+  func actionWithEmptyShell() async throws {
     setenv("SHELL", "", 1)
 
     #expect(throws: Never.self) {
-      let handler = ModifierShortcut.handler(for: "true")
+      let handler = ModifierShortcut.action(for: "true")
 
       try handler()
     }
   }
 
-  @Test("ModifierShortcut.handler(for:) (with unset SHELL set)")
-  func handlerWithUnsetShell() async throws {
+  @Test("ModifierShortcut.action(for:) (with unset SHELL set)")
+  func actionWithUnsetShell() async throws {
     unsetenv("SHELL")
 
     #expect(throws: Never.self) {
-      let handler = ModifierShortcut.handler(for: "true")
+      let handler = ModifierShortcut.action(for: "true")
 
       try handler()
     }
   }
 
-  @Test("ModifierShortcut.handler(for:) (with invalid SHELL set)")
-  func handlerWithInvalidShell() async throws {
+  @Test("ModifierShortcut.action(for:) (with invalid SHELL set)")
+  func actionWithInvalidShell() async throws {
     setenv("SHELL", "/bin/invalid", 1)
 
     #expect(throws: Error.self) {
-      let handler = ModifierShortcut.handler(for: "true")
+      let handler = ModifierShortcut.action(for: "true")
 
       try handler()
     }
   }
 
-  @Test("ModifierShortcut.handler(for:) (with empty command)")
-  func handlerWithEmptyCommand() async throws {
+  @Test("ModifierShortcut.action(for:) (with empty command)")
+  func actionWithEmptyCommand() async throws {
     #expect(throws: Never.self) {
-      let handler = ModifierShortcut.handler(for: "")
+      let handler = ModifierShortcut.action(for: "")
 
       try handler()
     }

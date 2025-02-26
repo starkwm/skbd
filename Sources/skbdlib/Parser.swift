@@ -59,7 +59,7 @@ public class Parser {
       throw ParserError.expectedColonFollowedByCommand
     }
 
-    let handler = ModifierShortcut.handler(for: cmd)
+    let handler = ModifierShortcut.action(for: cmd)
 
     return ModifierShortcut(keyCode, modifierFlags, handler)
   }
