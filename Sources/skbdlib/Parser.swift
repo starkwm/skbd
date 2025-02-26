@@ -8,16 +8,15 @@ class Parser {
 
   private var isAtEnd: Bool { currToken?.type == .endOfStream }
 
-  private var hasLeader: Bool = false
-
   init(_ buffer: String) {
     lexer = Lexer(buffer)
 
     advance()
   }
 
-  func parse() throws -> [ModifierShortcut] {
-    var shortcuts = [ModifierShortcut]()
+  func parse() throws -> [Shortcut] {
+    var parsedLeaderShortcut = false
+    var shortcuts = [Shortcut]()
 
     while !isAtEnd {
       while check(type: .comment) {
@@ -27,14 +26,14 @@ class Parser {
       guard !isAtEnd else { break }
 
       if match(type: .leader) {
-        if hasLeader {
+        if parsedLeaderShortcut {
           throw ParserError.leaderKeyAlreadySet
         }
 
         shortcuts.append(try parseLeaderShortcut())
-        hasLeader = true
+        parsedLeaderShortcut = true
       } else if check(type: .modifier) {
-        shortcuts.append(try parseCommandShortcut())
+        shortcuts.append(try parseModifierShortcut())
       } else {
         throw ParserError.expectedModifierOrLeader
       }
@@ -43,16 +42,14 @@ class Parser {
     return shortcuts
   }
 
-  private func parseLeaderShortcut() throws -> ModifierShortcut {
+  private func parseLeaderShortcut() throws -> LeaderShortcut {
     let (modifierFlags, keyCode) = try parseModifiersAndKey()
-
-    var shortcut = ModifierShortcut(keyCode, modifierFlags)
-    shortcut.isLeader = true
+    let shortcut = LeaderShortcut(keyCode, modifierFlags)
 
     return shortcut
   }
 
-  private func parseCommandShortcut() throws -> ModifierShortcut {
+  private func parseModifierShortcut() throws -> ModifierShortcut {
     let (modifierFlags, keyCode) = try parseModifiersAndKey()
 
     guard match(type: .command), let cmd = prevToken?.text else {
