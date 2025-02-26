@@ -13,7 +13,7 @@ class ShortcutManagerTests {
   func shortcutEventHandler() async throws {
     var called = false
 
-    let shortcut = Shortcut(1, 456) { called = true }
+    let shortcut = ModifierShortcut(1, 456) { called = true }
 
     shortcutManager.register(shortcut: shortcut)
     let box = try #require(shortcutManager.box(for: shortcut))
@@ -30,7 +30,7 @@ class ShortcutManagerTests {
 
   @Test("ShortcutManager#register(shortcut:) (with valid shortcut)")
   func registerValidShortcut() async throws {
-    let shortcut = Shortcut(2, 456)
+    let shortcut = ModifierShortcut(2, 456)
 
     shortcutManager.register(shortcut: shortcut)
 
@@ -39,7 +39,7 @@ class ShortcutManagerTests {
 
   @Test("ShortcutManager#register(shortcut:) (with already registered shortcut)")
   func registerWithAlreadyRegisteredShortcut() async throws {
-    let shortcut = Shortcut(3, 456)
+    let shortcut = ModifierShortcut(3, 456)
 
     shortcutManager.register(shortcut: shortcut)
     shortcutManager.register(shortcut: shortcut)
@@ -49,7 +49,7 @@ class ShortcutManagerTests {
 
   @Test("ShortcutManager#register(shortcut:) (with shortcut missing keycode)")
   func registerWithShortcutMissingKeyCode() async throws {
-    var shortcut = Shortcut()
+    var shortcut = ModifierShortcut()
     shortcut.modifierFlags = 456
 
     shortcutManager.register(shortcut: shortcut)
@@ -59,7 +59,7 @@ class ShortcutManagerTests {
 
   @Test("ShortcutManager#register(shortcut:) (with shortcut missing modifier flags)")
   func registerWithShortcutMissingModifierFlags() async throws {
-    var shortcut = Shortcut()
+    var shortcut = ModifierShortcut()
     shortcut.keyCode = 5
 
     shortcutManager.register(shortcut: shortcut)
@@ -71,7 +71,7 @@ class ShortcutManagerTests {
   func registerWhenRegisterEventHotKeyFails() async throws {
     shortcutManager.registerEventHotKeyFunc = { (_, _, _, _, _, _) in OSStatus(eventHotKeyInvalidErr) }
 
-    let shortcut = Shortcut(6, 456)
+    let shortcut = ModifierShortcut(6, 456)
 
     shortcutManager.register(shortcut: shortcut)
 
@@ -82,7 +82,7 @@ class ShortcutManagerTests {
 
   @Test("ShortcutManager#unregister(shortcut:) (with registered shortcut)")
   func unregisterWithRegisteredShortcut() async throws {
-    let shortcut = Shortcut(7, 456)
+    let shortcut = ModifierShortcut(7, 456)
 
     shortcutManager.register(shortcut: shortcut)
 
@@ -95,7 +95,7 @@ class ShortcutManagerTests {
 
   @Test("ShortcutManager#unregister(shortcut:) (with unregistered shortcut)")
   func unregisterWithUnregisteredShortcut() async throws {
-    let shortcut = Shortcut(8, 456)
+    let shortcut = ModifierShortcut(8, 456)
 
     shortcutManager.unregister(shortcut: shortcut)
 
@@ -106,7 +106,7 @@ class ShortcutManagerTests {
 
   @Test("ShortcutManager#start() (when shortcuts registered)")
   func startWhenShortcutsRegistered() async throws {
-    let shortcut = Shortcut(9, 456)
+    let shortcut = ModifierShortcut(9, 456)
 
     shortcutManager.register(shortcut: shortcut)
 
@@ -120,7 +120,7 @@ class ShortcutManagerTests {
 
   @Test("ShortcutManager#start() (when already started)")
   func startWhenAlreadyStarted() async throws {
-    let shortcut = Shortcut(11, 456)
+    let shortcut = ModifierShortcut(11, 456)
 
     shortcutManager.register(shortcut: shortcut)
 
@@ -132,7 +132,7 @@ class ShortcutManagerTests {
 
   @Test("ShortcutManager#stop() (when shortcuts registered)")
   func stopWhenShortcutsRegistered() async throws {
-    let shortcut = Shortcut(12, 456)
+    let shortcut = ModifierShortcut(12, 456)
 
     shortcutManager.register(shortcut: shortcut)
 
@@ -149,8 +149,8 @@ class ShortcutManagerTests {
 
   @Test("ShortcutManager#reset() (when shortcuts registered)")
   func resetWhenShortcutsRegistered() async throws {
-    let shortcut1 = Shortcut(14, 456)
-    let shortcut2 = Shortcut(15, 654)
+    let shortcut1 = ModifierShortcut(14, 456)
+    let shortcut2 = ModifierShortcut(15, 654)
 
     shortcutManager.register(shortcut: shortcut1)
     shortcutManager.register(shortcut: shortcut2)
@@ -168,7 +168,7 @@ class ShortcutManagerTests {
 
   @Test("ShortcutManager#box(for:) (with registered shortcut)")
   func boxWithRegisteredShortcut() async throws {
-    let shortcut = Shortcut(16, 456)
+    let shortcut = ModifierShortcut(16, 456)
 
     shortcutManager.register(shortcut: shortcut)
 
@@ -177,7 +177,7 @@ class ShortcutManagerTests {
 
   @Test("ShortcutManager#box(for:) (with unregistered shortcut)")
   func boxWithUnregisteredShortcut() async throws {
-    let shortcut = Shortcut(17, 456)
+    let shortcut = ModifierShortcut(17, 456)
 
     #expect(shortcutManager.box(for: shortcut) == nil)
   }
@@ -188,7 +188,7 @@ class ShortcutManagerTests {
   func handleCarbonEventWithValidEvent() async throws {
     var called = false
 
-    let shortcut = Shortcut(18, 456) { called = true }
+    let shortcut = ModifierShortcut(18, 456) { called = true }
 
     shortcutManager.register(shortcut: shortcut)
     let box = try #require(shortcutManager.box(for: shortcut))
@@ -217,7 +217,7 @@ class ShortcutManagerTests {
 
   @Test("ShortcutManager#handleCarbonEvent() (with invalid signature)")
   func handleCarbonEventWithInvalidSignature() async throws {
-    let shortcut = Shortcut(21, 456)
+    let shortcut = ModifierShortcut(21, 456)
 
     shortcutManager.register(shortcut: shortcut)
     let box = try #require(shortcutManager.box(for: shortcut))
@@ -240,8 +240,8 @@ class ShortcutManagerTests {
   func handleCarbonEventWithBrokenShortcutHandler() async throws {
     setenv("SHELL", "/bin/invalid", 1)
 
-    let handler = Shortcut.handler(for: "true")
-    let shortcut = Shortcut(23, 456, handler)
+    let handler = ModifierShortcut.handler(for: "true")
+    let shortcut = ModifierShortcut(23, 456, handler)
 
     shortcutManager.register(shortcut: shortcut)
     let box = try #require(shortcutManager.box(for: shortcut))
