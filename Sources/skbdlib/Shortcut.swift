@@ -1,14 +1,14 @@
 import Foundation
 
-public typealias HandlerFunc = () throws -> Void
+public typealias Action = () throws -> Void
 
 protocol Shortcut {}
 
 extension Shortcut {
-  static func handler(for command: String) -> HandlerFunc {
+  static func handler(for command: String) -> Action {
     let shell = ProcessInfo.processInfo.environment["SHELL"].flatMap { $0.isEmpty ? nil : $0 } ?? "/bin/bash"
 
-    let handler: HandlerFunc = {
+    let handler: Action = {
       if command.isEmpty {
         return
       }
