@@ -62,12 +62,12 @@ public class ConfigManager {
 
     for shortcut in shortcuts {
       switch shortcut {
-      case let leaderShortcut as LeaderShortcut:
+      case _ as LeaderShortcut:
         // TODO: handle leader shortcut
         continue
       case let modifierShortcut as ModifierShortcut:
         shortcutManager.register(shortcut: modifierShortcut)
-      case let sequenceShortcut as SequenceShortcut:
+      case _ as SequenceShortcut:
         // TODO: handle sequence shortcuts
         continue
       default:
