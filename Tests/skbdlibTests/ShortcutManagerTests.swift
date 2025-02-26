@@ -47,26 +47,6 @@ class ShortcutManagerTests {
     #expect(shortcutManager.box(for: shortcut) != nil)
   }
 
-  @Test("ShortcutManager#register(shortcut:) (with shortcut missing keycode)")
-  func registerWithShortcutMissingKeyCode() async throws {
-    var shortcut = ModifierShortcut()
-    shortcut.modifierFlags = 456
-
-    shortcutManager.register(shortcut: shortcut)
-
-    #expect(shortcutManager.box(for: shortcut) == nil)
-  }
-
-  @Test("ShortcutManager#register(shortcut:) (with shortcut missing modifier flags)")
-  func registerWithShortcutMissingModifierFlags() async throws {
-    var shortcut = ModifierShortcut()
-    shortcut.keyCode = 5
-
-    shortcutManager.register(shortcut: shortcut)
-
-    #expect(shortcutManager.box(for: shortcut) == nil)
-  }
-
   @Test("ShortcutManager#register(shortcut:) (when RegisterEventHotKey fails)")
   func registerWhenRegisterEventHotKeyFails() async throws {
     shortcutManager.registerEventHotKeyFunc = { (_, _, _, _, _, _) in OSStatus(eventHotKeyInvalidErr) }

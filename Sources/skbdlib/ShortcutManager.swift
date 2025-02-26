@@ -32,17 +32,13 @@ class ShortcutManager {
       return
     }
 
-    guard let keyCode = shortcut.keyCode, let keyModifiers = shortcut.modifierFlags else {
-      return
-    }
-
     shortcutsCount += 1
 
     var eventHotKeyRef: EventHotKeyRef?
 
     let registerErr = registerEventHotKeyFunc(
-      keyCode,
-      keyModifiers,
+      shortcut.keyCode,
+      shortcut.modifierFlags,
       EventHotKeyID(signature: skbdEventHotKeySignature, id: shortcutsCount),
       GetEventDispatcherTarget(),
       0,

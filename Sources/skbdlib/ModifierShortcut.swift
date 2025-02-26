@@ -8,8 +8,8 @@ struct ModifierShortcut: Shortcut {
 
   var isLeader: Bool = false
 
-  var keyCode: UInt32?
-  var modifierFlags: UInt32?
+  var keyCode: UInt32
+  var modifierFlags: UInt32
 
   init(_ keyCode: UInt32, _ modifierFlags: UInt32) {
     self.keyCode = keyCode
