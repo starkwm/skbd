@@ -32,6 +32,8 @@ class Parser {
 
         shortcuts.append(try parseLeaderShortcut())
         parsedLeaderShortcut = true
+      } else if match(type: .keywordStart) {
+        shortcuts.append(try parseSequenceShortcut())
       } else if check(type: .modifier) {
         shortcuts.append(try parseModifierShortcut())
       } else {
@@ -47,6 +49,26 @@ class Parser {
     let shortcut = LeaderShortcut(keyCode, modifierFlags)
 
     return shortcut
+  }
+
+  private func parseSequenceShortcut() throws -> SequenceShortcut {
+    guard match(type: .leader) else {
+      throw ParserError.expectedLeaderKeyword
+    }
+
+    guard match(type: .keywordEnd) else {
+      throw ParserError.expectedKeywordEnd
+    }
+
+    let keyCodes = try parseKeySequence()
+
+    guard match(type: .command), let cmd = prevToken?.text else {
+      throw ParserError.expectedColonFollowedByCommand
+    }
+
+    let action = SequenceShortcut.action(for: cmd)
+
+    return SequenceShortcut(keyCodes, action)
   }
 
   private func parseModifierShortcut() throws -> ModifierShortcut {
@@ -91,6 +113,21 @@ class Parser {
     }
 
     return Modifier.flags(for: modifiers.compactMap { $0 })
+  }
+
+  private func parseKeySequence() throws -> [UInt32] {
+    var keyCodes: [UInt32] = []
+
+    while match(type: .key) {
+      let key = Key.code(for: prevToken!.text!)
+      keyCodes.append(key)
+    }
+
+    guard keyCodes.count > 0 else {
+      throw ParserError.expectedKey
+    }
+
+    return keyCodes
   }
 
   private func advance() {
