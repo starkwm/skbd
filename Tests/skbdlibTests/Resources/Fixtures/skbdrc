@@ -1,1 +1,5 @@
 ctrl - space: echo "Hello world"
+
+leader: cmd - space
+
+<leader> b s: echo "open browser"
