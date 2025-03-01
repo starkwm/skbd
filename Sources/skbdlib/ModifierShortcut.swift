@@ -1,15 +1,12 @@
-import Carbon
 import Foundation
 
-struct ModifierShortcut: Shortcut {
-  var action: Action!
-
+struct ModifierShortcut: HotKeyShortcut {
   let identifier = UUID()
-
-  var isLeader: Bool = false
 
   var keyCode: UInt32
   var modifierFlags: UInt32
+
+  var action: Action?
 
   init(_ keyCode: UInt32, _ modifierFlags: UInt32, _ action: @escaping Action) {
     self.keyCode = keyCode
