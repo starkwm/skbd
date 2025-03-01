@@ -1,7 +1,7 @@
 import Foundation
 
 struct SequenceShortcut: Shortcut {
-  var action: Action!
+  var action: Action?
 
   var keyCodes: [UInt32]?
 
