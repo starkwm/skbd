@@ -1,10 +1,9 @@
-import Carbon
 import Foundation
 
-struct LeaderShortcut: Shortcut {
-  var action: Action!
-
+struct LeaderShortcut: HotKeyShortcut {
   let identifier = UUID()
+
+  var action: Action?
 
   var keyCode: UInt32
   var modifierFlags: UInt32
