@@ -91,15 +91,4 @@ class ConfigManagerTests {
       #expect(configManager.start() == false)
     }
   }
-
-  // MARK: - ConfigManager#stop
-
-  @Test("ConfigManager#stop")
-  func stop() async throws {
-    let configManager = ConfigManager(configPath: URL(filePath: "/tmp/config"))
-
-    #expect(throws: Never.self) {
-      configManager.stop()
-    }
-  }
 }

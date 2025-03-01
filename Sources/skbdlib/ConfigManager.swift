@@ -25,10 +25,6 @@ public class ConfigManager {
     return shortcutManager.start()
   }
 
-  public func stop() {
-    shortcutManager.stop()
-  }
-
   private func parseConfig(filePath: URL) throws {
     var isDirectory: ObjCBool = false
 
