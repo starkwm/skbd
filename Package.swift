@@ -20,7 +20,10 @@ let package = Package(
       exclude: ["Version.swift.tmpl"]
     ),
     .target(
-      name: "skbdlib"
+      name: "skbdlib",
+      resources: [
+        .copy("Resources")
+      ]
     ),
     .testTarget(
       name: "skbdlibTests",
