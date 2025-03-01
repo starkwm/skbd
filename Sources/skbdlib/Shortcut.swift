@@ -2,7 +2,9 @@ import Foundation
 
 typealias Action = () throws -> Void
 
-protocol Shortcut {}
+protocol Shortcut {
+  var action: Action? { get }
+}
 
 extension Shortcut {
   static func action(for command: String) -> Action {
