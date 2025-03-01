@@ -115,12 +115,11 @@ class Parser {
     return Modifier.flags(for: modifiers.compactMap { $0 })
   }
 
-  private func parseKeySequence() throws -> [UInt32] {
-    var keyCodes: [UInt32] = []
+  private func parseKeySequence() throws -> [String] {
+    var keyCodes: [String] = []
 
     while match(type: .key) {
-      let key = Key.code(for: prevToken!.text!)
-      keyCodes.append(key)
+      keyCodes.append(prevToken!.text!)
     }
 
     guard keyCodes.count > 0 else {

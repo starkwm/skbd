@@ -111,20 +111,20 @@ struct ParserTests {
       let shortcuts = try Parser(input).parse()
 
       struct Expect {
-        var keys: [UInt32]
+        var keys: [String]
       }
 
       let expected = [
-        Expect(keys: [UInt32(kVK_ANSI_O), UInt32(kVK_ANSI_B), UInt32(kVK_ANSI_C)]),
-        Expect(keys: [UInt32(kVK_ANSI_O), UInt32(kVK_ANSI_B), UInt32(kVK_ANSI_S)]),
-        Expect(keys: [UInt32(kVK_ANSI_O), UInt32(kVK_ANSI_B), UInt32(kVK_ANSI_F)]),
+        Expect(keys: ["o", "b", "c"]),
+        Expect(keys: ["o", "b", "s"]),
+        Expect(keys: ["o", "b", "f"]),
       ]
 
       #expect(shortcuts.count == expected.count)
 
       for (idx, expect) in expected.enumerated() {
         if let sequenceShortcut = shortcuts[idx] as? SequenceShortcut {
-          #expect(sequenceShortcut.keyCodes == expect.keys)
+          #expect(sequenceShortcut.keys == expect.keys)
         }
       }
     }

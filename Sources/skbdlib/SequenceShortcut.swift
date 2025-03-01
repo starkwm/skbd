@@ -3,10 +3,10 @@ import Foundation
 struct SequenceShortcut: Shortcut {
   var action: Action?
 
-  var keyCodes: [UInt32]?
+  var keys: [String]
 
-  init(_ keyCodes: [UInt32], _ action: @escaping Action) {
-    self.keyCodes = keyCodes
+  init(_ keys: [String], _ action: @escaping Action) {
+    self.keys = keys
     self.action = action
   }
 }
