@@ -2,12 +2,12 @@ import Carbon
 
 let skbdEventHotKeySignature = "skbd".utf16.reduce(0) { ($0 << 8) + OSType($1) }
 
-func shortcutEventHandler(_: EventHandlerCallRef?, event: EventRef?, userData: UnsafeMutableRawPointer?) -> OSStatus {
-  let instance = Unmanaged<ShortcutManager>.fromOpaque(userData!).takeUnretainedValue()
+func hotKeyShortcutEventHandler(_: EventHandlerCallRef?, event: EventRef?, userData: UnsafeMutableRawPointer?) -> OSStatus {
+  let instance = Unmanaged<HotKeyShortcutManager>.fromOpaque(userData!).takeUnretainedValue()
   return instance.handleCarbonEvent(event)
 }
 
-class ShortcutManager {
+class HotKeyShortcutManager {
   struct ShortcutBox {
     let shortcut: HotKeyShortcut
     let eventHotKeyID: UInt32
@@ -76,7 +76,7 @@ class ShortcutManager {
 
     InstallEventHandler(
       GetEventDispatcherTarget(),
-      shortcutEventHandler,
+      hotKeyShortcutEventHandler,
       1,
       eventSpec,
       ptr,
