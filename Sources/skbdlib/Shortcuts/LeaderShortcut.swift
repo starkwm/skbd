@@ -1,9 +1,9 @@
 import Foundation
 
 struct LeaderShortcut: HotKeyShortcut {
-  let identifier = UUID()
-
   var action: Action?
+
+  let identifier = UUID()
 
   var keyCode: UInt32
   var modifierFlags: UInt32
