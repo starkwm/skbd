@@ -4,10 +4,10 @@ VERSION_FILE=Sources/skbd/Version.swift
 all: build
 
 format:
-	@swift-format format --in-place --recursive --parallel Sources Tests Package.swift
+	@swift format format --in-place --recursive --parallel Sources Tests Package.swift
 
 lint:
-	@swift-format lint --recursive Sources Tests Package.swift
+	@swift format lint --recursive Sources Tests Package.swift
 
 test:
 	@swift test --disable-xctest

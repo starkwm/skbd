@@ -2,7 +2,9 @@ import Carbon
 
 let skbdEventHotKeySignature = "skbd".utf16.reduce(0) { ($0 << 8) + OSType($1) }
 
-func hotKeyShortcutEventHandler(_: EventHandlerCallRef?, event: EventRef?, userData: UnsafeMutableRawPointer?) -> OSStatus {
+func hotKeyShortcutEventHandler(_: EventHandlerCallRef?, event: EventRef?, userData: UnsafeMutableRawPointer?)
+  -> OSStatus
+{
   let instance = Unmanaged<HotKeyShortcutManager>.fromOpaque(userData!).takeUnretainedValue()
   return instance.handleCarbonEvent(event)
 }
