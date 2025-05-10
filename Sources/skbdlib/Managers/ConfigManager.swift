@@ -2,11 +2,14 @@ import Foundation
 
 public class ConfigManager {
   private var hotKeyManager: HotKeyShortcutManager
+  private var sequenceManager: SequenceShortcutManager
 
   private var configPath: URL
 
   public init(configPath: URL) {
     self.hotKeyManager = HotKeyShortcutManager()
+    self.sequenceManager = SequenceShortcutManager()
+
     self.configPath = configPath
   }
 
@@ -19,6 +22,8 @@ public class ConfigManager {
     hotKeyManager.reset()
 
     try parseConfig(filePath: configPath)
+
+    try sequenceManager.setup()
   }
 
   public func start() -> Bool {
@@ -57,12 +62,12 @@ public class ConfigManager {
     let shortcuts = try parser.parse()
 
     for shortcut in shortcuts {
-      if shortcut is LeaderShortcut {
-        // TODO: handle leader shortcut
+      if let leaderShortcut = shortcut as? LeaderShortcut {
+        hotKeyManager.register(shortcut: leaderShortcut)
       } else if let modifierShortcut = shortcut as? ModifierShortcut {
         hotKeyManager.register(shortcut: modifierShortcut)
-      } else if shortcut is SequenceShortcut {
-        // TODO: handle sequence shortcuts
+      } else if let sequenceShortcut = shortcut as? SequenceShortcut {
+        sequenceManager.register(shortcut: sequenceShortcut)
       }
     }
   }
