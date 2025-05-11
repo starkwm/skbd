@@ -1,13 +1,12 @@
 import Foundation
 
 public class ConfigManager {
+  private var configPath: URL
   private var hotKeyManager: HotKeyShortcutManager
 
-  private var configPath: URL
-
-  public init(configPath: URL) {
-    self.hotKeyManager = HotKeyShortcutManager()
+  public init(configPath: URL, hotKeyManager: HotKeyShortcutManager) {
     self.configPath = configPath
+    self.hotKeyManager = hotKeyManager
   }
 
   deinit {

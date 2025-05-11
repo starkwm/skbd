@@ -13,7 +13,7 @@ class ConfigManagerTests {
     let config = try #require(Bundle.module.url(forResource: "Resources/Fixtures/skbdrc", withExtension: nil))
 
     #expect(throws: Never.self) {
-      let configManager = ConfigManager(configPath: config)
+      let configManager = ConfigManager(configPath: config, hotKeyManager: HotKeyShortcutManager())
       try configManager.load()
     }
   }
@@ -23,7 +23,7 @@ class ConfigManagerTests {
     let config = try #require(Bundle.module.url(forResource: "Resources/Fixtures/skbdrc.empty", withExtension: nil))
 
     #expect(throws: Never.self) {
-      let configManager = ConfigManager(configPath: config)
+      let configManager = ConfigManager(configPath: config, hotKeyManager: HotKeyShortcutManager())
       try configManager.load()
     }
   }
@@ -33,7 +33,7 @@ class ConfigManagerTests {
     let config = try #require(Bundle.module.url(forResource: "Resources/Fixtures/skbdrc.invalid", withExtension: nil))
 
     #expect(throws: ParserError.self) {
-      let configManager = ConfigManager(configPath: config)
+      let configManager = ConfigManager(configPath: config, hotKeyManager: HotKeyShortcutManager())
       try configManager.load()
     }
   }
@@ -43,7 +43,7 @@ class ConfigManagerTests {
     let config = try #require(Bundle.module.url(forResource: "Resources/Fixtures/skbd", withExtension: nil))
 
     #expect(throws: Never.self) {
-      let configManager = ConfigManager(configPath: config)
+      let configManager = ConfigManager(configPath: config, hotKeyManager: HotKeyShortcutManager())
       try configManager.load()
     }
   }
@@ -53,7 +53,7 @@ class ConfigManagerTests {
     let config = try #require(Bundle.module.url(forResource: "Resources/Fixtures/skbd.invalid", withExtension: nil))
 
     #expect(throws: ParserError.self) {
-      let configManager = ConfigManager(configPath: config)
+      let configManager = ConfigManager(configPath: config, hotKeyManager: HotKeyShortcutManager())
       try configManager.load()
     }
   }
@@ -61,7 +61,7 @@ class ConfigManagerTests {
   @Test("ConfigManager#read (with non-existient config path)")
   func readWithNoConfigPath() async throws {
     #expect(throws: ConfigError.configurationDoesNotExist) {
-      let configManager = ConfigManager(configPath: URL(fileURLWithPath: "/i/dont/exist"))
+      let configManager = ConfigManager(configPath: URL(fileURLWithPath: "/i/dont/exist"), hotKeyManager: HotKeyShortcutManager())
       try configManager.load()
     }
   }
@@ -73,7 +73,7 @@ class ConfigManagerTests {
     let config = try #require(Bundle.module.url(forResource: "Resources/Fixtures/skbdrc", withExtension: nil))
 
     #expect(throws: Never.self) {
-      let configManager = ConfigManager(configPath: config)
+      let configManager = ConfigManager(configPath: config, hotKeyManager: HotKeyShortcutManager())
       try configManager.load()
 
       #expect(configManager.start())
@@ -85,7 +85,7 @@ class ConfigManagerTests {
     let config = try #require(Bundle.module.url(forResource: "Resources/Fixtures/skbdrc.empty", withExtension: nil))
 
     #expect(throws: Never.self) {
-      let configManager = ConfigManager(configPath: config)
+      let configManager = ConfigManager(configPath: config, hotKeyManager: HotKeyShortcutManager())
       try configManager.load()
 
       #expect(configManager.start() == false)
