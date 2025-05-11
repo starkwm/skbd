@@ -9,7 +9,7 @@ func hotKeyShortcutEventHandler(_: EventHandlerCallRef?, event: EventRef?, userD
   return instance.handleCarbonEvent(event)
 }
 
-class HotKeyShortcutManager {
+public class HotKeyShortcutManager {
   struct ShortcutBox {
     let shortcut: HotKeyShortcut
     let eventHotKeyID: UInt32
@@ -23,6 +23,8 @@ class HotKeyShortcutManager {
   private var shortcutsCount: UInt32 = 0
 
   private var eventHandler: EventHandlerRef?
+
+  public init() {}
 
   deinit {
     stop()
