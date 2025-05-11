@@ -70,6 +70,11 @@ private let keyToCode: [String: Int] = [
   "forwardslash": kVK_ANSI_Slash,
 ]
 
+private let codeToKeys: [Int: [String]] = keyToCode.reduce(into: [:]) { result, element in
+  let (key, code) = element
+  result[code, default: []].append(key)
+}
+
 private let relocatableKeyCodes: [Int] = [
   kVK_ANSI_A, kVK_ANSI_B, kVK_ANSI_C, kVK_ANSI_D, kVK_ANSI_E,
   kVK_ANSI_F, kVK_ANSI_G, kVK_ANSI_H, kVK_ANSI_I, kVK_ANSI_J,
@@ -95,7 +100,7 @@ private let relocatableKeyCodes: [Int] = [
 ]
 
 enum Key {
-  private static let relocatable: [String: Int] = {
+  private static let relocatableKeyToCode: [String: Int] = {
     var keys = [String: Int]()
 
     if let data = getKeyboardLayoutData() {
@@ -128,16 +133,29 @@ enum Key {
     return keys
   }()
 
+  private static let relocatableCodeToKey: [Int: [String]] = relocatableKeyToCode.reduce(into: [:]) { result, element in
+    let (key, code) = element
+    result[code, default: []].append(key)
+  }
+
   static func valid(_ key: String) -> Bool {
-    relocatable.keys.contains(key.lowercased()) || keyToCode.keys.contains(key.lowercased())
+    relocatableKeyToCode.keys.contains(key.lowercased()) || keyToCode.keys.contains(key.lowercased())
   }
 
   static func code(for key: String) -> UInt32 {
-    if let keyCode = relocatable[key.lowercased()] {
+    if let keyCode = relocatableKeyToCode[key.lowercased()] {
       return UInt32(keyCode)
     }
 
     return UInt32(keyToCode[key.lowercased()] ?? 0)
+  }
+
+  static func keys(for code: UInt16) -> [String]? {
+    if let keys = relocatableCodeToKey[Int(code)] {
+      return keys
+    }
+
+    return codeToKeys[Int(code)]
   }
 
   private static func getKeyboardLayoutData() -> UnsafePointer<UCKeyboardLayout>? {
