@@ -10,8 +10,8 @@ public class ConfigManager {
   }
 
   deinit {
-    self.hotKeyManager.reset()
-    self.hotKeyManager.stop()
+    hotKeyManager.reset()
+    hotKeyManager.stop()
   }
 
   public func load() throws {
