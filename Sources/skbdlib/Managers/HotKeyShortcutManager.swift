@@ -103,7 +103,7 @@ public class HotKeyShortcutManager {
 
   func reset() {
     for box in shortcuts.values {
-      self.unregister(shortcut: box.shortcut)
+      unregister(shortcut: box.shortcut)
     }
   }
 
