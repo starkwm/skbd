@@ -1,7 +1,6 @@
 import AppKit
 import skbdlib
 
-var hotKeyManager: HotKeyShortcutManager!
 var config: ConfigManager!
 
 func main() -> Int32 {
@@ -30,8 +29,10 @@ func main() -> Int32 {
   }
 
   do {
-    hotKeyManager = HotKeyShortcutManager()
-    config = ConfigManager(configPath: arguments.config, hotKeyManager: hotKeyManager)
+    config = ConfigManager(
+      configPath: arguments.config,
+      hotKeyManager: HotKeyShortcutManager()
+    )
 
     try config.load()
 
