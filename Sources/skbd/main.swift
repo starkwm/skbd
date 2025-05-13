@@ -29,9 +29,14 @@ func main() -> Int32 {
   }
 
   do {
+    let sequenceManager = SequenceShortcutManager()
+    let window = Window(sequenceManager: sequenceManager)
+
     config = ConfigManager(
       configPath: arguments.config,
-      hotKeyManager: HotKeyShortcutManager()
+      hotKeyManager: HotKeyShortcutManager(),
+      sequenceManager: sequenceManager,
+      leaderAction: window.toggle
     )
 
     try config.load()
