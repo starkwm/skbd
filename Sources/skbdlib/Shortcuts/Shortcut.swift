@@ -1,6 +1,6 @@
 import Foundation
 
-typealias Action = () throws -> Void
+public typealias Action = () throws -> Void
 
 protocol Shortcut {
   var action: Action? { get }
