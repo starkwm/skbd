@@ -61,7 +61,8 @@ class ConfigManagerTests {
   @Test("ConfigManager#read (with non-existient config path)")
   func readWithNoConfigPath() async throws {
     #expect(throws: ConfigError.configurationDoesNotExist) {
-      let configManager = ConfigManager(configPath: URL(fileURLWithPath: "/i/dont/exist"), hotKeyManager: HotKeyShortcutManager())
+      let config = URL(fileURLWithPath: "/i/dont/exist")
+      let configManager = ConfigManager(configPath: config, hotKeyManager: HotKeyShortcutManager())
       try configManager.load()
     }
   }
