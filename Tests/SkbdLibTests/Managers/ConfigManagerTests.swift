@@ -13,7 +13,11 @@ class ConfigManagerTests {
     let config = try #require(Bundle.module.url(forResource: "Resources/Fixtures/skbdrc", withExtension: nil))
 
     #expect(throws: Never.self) {
-      let configManager = ConfigManager(configPath: config, hotKeyManager: HotKeyShortcutManager())
+      let configManager = ConfigManager(
+        configPath: config,
+        hotKeyManager: HotKeyShortcutManager(),
+        sequenceManager: SequenceShortcutManager()
+      )
       try configManager.load()
     }
   }
@@ -23,7 +27,11 @@ class ConfigManagerTests {
     let config = try #require(Bundle.module.url(forResource: "Resources/Fixtures/skbdrc.empty", withExtension: nil))
 
     #expect(throws: Never.self) {
-      let configManager = ConfigManager(configPath: config, hotKeyManager: HotKeyShortcutManager())
+      let configManager = ConfigManager(
+        configPath: config,
+        hotKeyManager: HotKeyShortcutManager(),
+        sequenceManager: SequenceShortcutManager()
+      )
       try configManager.load()
     }
   }
@@ -33,7 +41,11 @@ class ConfigManagerTests {
     let config = try #require(Bundle.module.url(forResource: "Resources/Fixtures/skbdrc.invalid", withExtension: nil))
 
     #expect(throws: ParserError.self) {
-      let configManager = ConfigManager(configPath: config, hotKeyManager: HotKeyShortcutManager())
+      let configManager = ConfigManager(
+        configPath: config,
+        hotKeyManager: HotKeyShortcutManager(),
+        sequenceManager: SequenceShortcutManager()
+      )
       try configManager.load()
     }
   }
@@ -43,7 +55,11 @@ class ConfigManagerTests {
     let config = try #require(Bundle.module.url(forResource: "Resources/Fixtures/skbd", withExtension: nil))
 
     #expect(throws: Never.self) {
-      let configManager = ConfigManager(configPath: config, hotKeyManager: HotKeyShortcutManager())
+      let configManager = ConfigManager(
+        configPath: config,
+        hotKeyManager: HotKeyShortcutManager(),
+        sequenceManager: SequenceShortcutManager()
+      )
       try configManager.load()
     }
   }
@@ -53,7 +69,11 @@ class ConfigManagerTests {
     let config = try #require(Bundle.module.url(forResource: "Resources/Fixtures/skbd.invalid", withExtension: nil))
 
     #expect(throws: ParserError.self) {
-      let configManager = ConfigManager(configPath: config, hotKeyManager: HotKeyShortcutManager())
+      let configManager = ConfigManager(
+        configPath: config,
+        hotKeyManager: HotKeyShortcutManager(),
+        sequenceManager: SequenceShortcutManager()
+      )
       try configManager.load()
     }
   }
@@ -62,7 +82,11 @@ class ConfigManagerTests {
   func readWithNoConfigPath() async throws {
     #expect(throws: ConfigError.configurationDoesNotExist) {
       let config = URL(fileURLWithPath: "/i/dont/exist")
-      let configManager = ConfigManager(configPath: config, hotKeyManager: HotKeyShortcutManager())
+      let configManager = ConfigManager(
+        configPath: config,
+        hotKeyManager: HotKeyShortcutManager(),
+        sequenceManager: SequenceShortcutManager()
+      )
       try configManager.load()
     }
   }
@@ -74,7 +98,11 @@ class ConfigManagerTests {
     let config = try #require(Bundle.module.url(forResource: "Resources/Fixtures/skbdrc", withExtension: nil))
 
     #expect(throws: Never.self) {
-      let configManager = ConfigManager(configPath: config, hotKeyManager: HotKeyShortcutManager())
+      let configManager = ConfigManager(
+        configPath: config,
+        hotKeyManager: HotKeyShortcutManager(),
+        sequenceManager: SequenceShortcutManager()
+      )
       try configManager.load()
 
       #expect(configManager.start())
@@ -86,7 +114,11 @@ class ConfigManagerTests {
     let config = try #require(Bundle.module.url(forResource: "Resources/Fixtures/skbdrc.empty", withExtension: nil))
 
     #expect(throws: Never.self) {
-      let configManager = ConfigManager(configPath: config, hotKeyManager: HotKeyShortcutManager())
+      let configManager = ConfigManager(
+        configPath: config,
+        hotKeyManager: HotKeyShortcutManager(),
+        sequenceManager: SequenceShortcutManager()
+      )
       try configManager.load()
 
       #expect(configManager.start() == false)
