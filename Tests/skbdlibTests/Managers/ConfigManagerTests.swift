@@ -4,7 +4,7 @@ import Testing
 
 @testable import skbdlib
 
-@Suite("ConfigManager")
+@Suite("ConfigManager", .serialized)
 class ConfigManagerTests {
   // MARK: - ConfigManager#read
 
