@@ -1,6 +1,6 @@
 import Testing
 
-@testable import skbdlib
+@testable import SkbdLib
 
 @Suite("TokenType")
 struct TokenTypeTests {

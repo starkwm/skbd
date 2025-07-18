@@ -1,7 +1,7 @@
 import Foundation
 import Testing
 
-@testable import skbdlib
+@testable import SkbdLib
 
 @Suite("LockFile", .serialized)
 class LockFileTests {

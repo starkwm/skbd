@@ -7,24 +7,27 @@ let package = Package(
   platforms: [
     .macOS(.v14)
   ],
+  products: [
+    .executable(name: "skbd", targets: ["Skbd"])
+  ],
   dependencies: [
     .package(url: "https://github.com/apple/swift-argument-parser", from: "1.0.0")
   ],
   targets: [
     .executableTarget(
-      name: "skbd",
+      name: "Skbd",
       dependencies: [
-        "skbdlib",
+        "SkbdLib",
         .product(name: "ArgumentParser", package: "swift-argument-parser"),
       ],
       exclude: ["Version.swift.tmpl"]
     ),
     .target(
-      name: "skbdlib"
+      name: "SkbdLib"
     ),
     .testTarget(
-      name: "skbdlibTests",
-      dependencies: ["skbdlib"],
+      name: "SkbdLibTests",
+      dependencies: ["SkbdLib"],
       resources: [
         .copy("Resources")
       ]

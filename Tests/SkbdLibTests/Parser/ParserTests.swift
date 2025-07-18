@@ -1,7 +1,7 @@
 import Carbon
 import Testing
 
-@testable import skbdlib
+@testable import SkbdLib
 
 @Suite("Parser")
 struct ParserTests {

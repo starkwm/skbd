@@ -2,7 +2,7 @@ import Carbon
 import Foundation
 import Testing
 
-@testable import skbdlib
+@testable import SkbdLib
 
 @Suite("ConfigManager", .serialized)
 class ConfigManagerTests {

@@ -1,5 +1,5 @@
 import AppKit
-import skbdlib
+import SkbdLib
 
 var config: ConfigManager!
 

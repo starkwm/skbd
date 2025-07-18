@@ -1,7 +1,7 @@
 import Carbon
 import Testing
 
-@testable import skbdlib
+@testable import SkbdLib
 
 @Suite("HotKeyShortcutManager", .serialized)
 class HotKeyShortcutManagerTests {
@@ -20,7 +20,7 @@ class HotKeyShortcutManagerTests {
 
     let event = createEventRef(signature: skbdEventHotKeySignature, id: box.eventHotKeyID)
     let userData = Unmanaged.passUnretained(shortcutManager).toOpaque()
-    let status = skbdlib.hotKeyShortcutEventHandler(nil, event: event, userData: userData)
+    let status = SkbdLib.hotKeyShortcutEventHandler(nil, event: event, userData: userData)
 
     #expect(status == noErr)
     #expect(called)
