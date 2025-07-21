@@ -31,7 +31,8 @@ func main() -> Int32 {
   do {
     config = ConfigManager(
       configPath: arguments.config,
-      hotKeyManager: HotKeyShortcutManager()
+      hotKeyManager: HotKeyShortcutManager(),
+      sequenceManager: SequenceShortcutManager()
     )
 
     try config.load()
