@@ -17,6 +17,7 @@ func main() -> Int32 {
       return EXIT_SUCCESS
     } catch {
       fputs("failed to read pid from lock file: \(error)\n", stderr)
+      fflush(stderr)
       return EXIT_FAILURE
     }
   }
@@ -25,6 +26,7 @@ func main() -> Int32 {
     try LockFile.acquire()
   } catch {
     fputs("failed to create lock file: \(error)\n", stderr)
+    fflush(stderr)
     return EXIT_FAILURE
   }
 
@@ -38,10 +40,12 @@ func main() -> Int32 {
 
     if !config.start() {
       fputs("failed to start configuration manager", stderr)
+      fflush(stderr)
       return EXIT_FAILURE
     }
   } catch {
     fputs("failed to read configuration: \(error)\n", stderr)
+    fflush(stderr)
     return EXIT_FAILURE
   }
 
