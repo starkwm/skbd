@@ -30,12 +30,12 @@ func main() -> Int32 {
     return EXIT_FAILURE
   }
 
-  do {
-    config = ConfigManager(
-      configPath: arguments.config,
-      hotKeyManager: HotKeyShortcutManager()
-    )
+  config = ConfigManager(
+    configPath: arguments.config,
+    hotKeyManager: HotKeyShortcutManager()
+  )
 
+  do {
     try config.load()
 
     if !config.start() {
@@ -49,22 +49,12 @@ func main() -> Int32 {
     return EXIT_FAILURE
   }
 
-  signal(SIGUSR1) { _ in
-    do {
-      fputs("received SIGUSR1 - reloading configuration...\n", stdout)
-      fflush(stdout)
-
-      try config.load()
-    } catch {
-      fputs("failed to reload configuration: \(error)\n", stderr)
-    }
-  }
-
   signal(SIGINT) { _ in
     fputs("received SIGINT - terminating...\n", stdout)
     fflush(stdout)
 
-    config = nil
+    config.stop()
+
     exit(EXIT_SUCCESS)
   }
 
