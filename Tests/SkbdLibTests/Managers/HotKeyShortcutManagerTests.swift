@@ -26,6 +26,49 @@ class HotKeyShortcutManagerTests {
     #expect(called)
   }
 
+  // MARK: - HotKeyShortcutManager#start
+
+  @Test("HotKeyShortcutManager#start() (when shortcuts registered)")
+  func startWhenShortcutsRegistered() async throws {
+    let shortcut = ModifierShortcut(9, 456) {}
+
+    shortcutManager.register(shortcut: shortcut)
+
+    #expect(shortcutManager.start())
+  }
+
+  @Test("HotKeyShortcutManager#start() (when no shortcuts registered)")
+  func startWhenNoShortcutsRegistered() async throws {
+    #expect(!shortcutManager.start())
+  }
+
+  @Test("HotKeyShortcutManager#start() (when already started)")
+  func startWhenAlreadyStarted() async throws {
+    let shortcut = ModifierShortcut(11, 456) {}
+
+    shortcutManager.register(shortcut: shortcut)
+
+    #expect(shortcutManager.start())
+    #expect(!shortcutManager.start())
+  }
+
+  // MARK: - HotKeyShortcutManager#stop
+
+  @Test("HotKeyShortcutManager#stop() (when shortcuts registered)")
+  func stopWhenShortcutsRegistered() async throws {
+    let shortcut = ModifierShortcut(12, 456) {}
+
+    shortcutManager.register(shortcut: shortcut)
+
+    #expect(shortcutManager.start())
+    #expect(shortcutManager.stop())
+  }
+
+  @Test("HotKeyShortcutManager.stop() (when not started)")
+  func stopWhenNotStarted() async throws {
+    #expect(!shortcutManager.stop())
+  }
+
   // MARK: - HotKeyShortcutManager#register
 
   @Test("HotKeyShortcutManager#register(shortcut:) (with valid shortcut)")
@@ -80,49 +123,6 @@ class HotKeyShortcutManagerTests {
     shortcutManager.unregister(shortcut: shortcut)
 
     #expect(shortcutManager.box(for: shortcut) == nil)
-  }
-
-  // MARK: - HotKeyShortcutManager#start
-
-  @Test("HotKeyShortcutManager#start() (when shortcuts registered)")
-  func startWhenShortcutsRegistered() async throws {
-    let shortcut = ModifierShortcut(9, 456) {}
-
-    shortcutManager.register(shortcut: shortcut)
-
-    #expect(shortcutManager.start())
-  }
-
-  @Test("HotKeyShortcutManager#start() (when no shortcuts registered)")
-  func startWhenNoShortcutsRegistered() async throws {
-    #expect(!shortcutManager.start())
-  }
-
-  @Test("HotKeyShortcutManager#start() (when already started)")
-  func startWhenAlreadyStarted() async throws {
-    let shortcut = ModifierShortcut(11, 456) {}
-
-    shortcutManager.register(shortcut: shortcut)
-
-    #expect(shortcutManager.start())
-    #expect(!shortcutManager.start())
-  }
-
-  // MARK: - HotKeyShortcutManager#stop
-
-  @Test("HotKeyShortcutManager#stop() (when shortcuts registered)")
-  func stopWhenShortcutsRegistered() async throws {
-    let shortcut = ModifierShortcut(12, 456) {}
-
-    shortcutManager.register(shortcut: shortcut)
-
-    #expect(shortcutManager.start())
-    #expect(shortcutManager.stop())
-  }
-
-  @Test("HotKeyShortcutManager.stop() (when not started)")
-  func stopWhenNotStarted() async throws {
-    #expect(!shortcutManager.stop())
   }
 
   // MARK: - HotKeyShortcutManager#reset

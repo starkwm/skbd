@@ -26,9 +26,38 @@ public class HotKeyShortcutManager {
 
   public init() {}
 
-  deinit {
-    stop()
-    reset()
+  public func start() -> Bool {
+    if shortcuts.count == 0 || eventHandler != nil {
+      return false
+    }
+
+    let ptr = Unmanaged.passUnretained(self).toOpaque()
+
+    let eventSpec = [
+      EventTypeSpec(eventClass: OSType(kEventClassKeyboard), eventKind: UInt32(kEventHotKeyPressed))
+    ]
+
+    InstallEventHandler(
+      GetEventDispatcherTarget(),
+      hotKeyShortcutEventHandler,
+      1,
+      eventSpec,
+      ptr,
+      &eventHandler
+    )
+
+    return true
+  }
+
+  @discardableResult
+  public func stop() -> Bool {
+    if eventHandler != nil {
+      RemoveEventHandler(eventHandler)
+      eventHandler = nil
+      return true
+    }
+
+    return false
   }
 
   func register(shortcut: HotKeyShortcut) {
@@ -65,40 +94,6 @@ public class HotKeyShortcutManager {
     UnregisterEventHotKey(box.eventHotKey)
 
     shortcuts.removeValue(forKey: box.eventHotKeyID)
-  }
-
-  func start() -> Bool {
-    if shortcuts.count == 0 || eventHandler != nil {
-      return false
-    }
-
-    let ptr = Unmanaged.passUnretained(self).toOpaque()
-
-    let eventSpec = [
-      EventTypeSpec(eventClass: OSType(kEventClassKeyboard), eventKind: UInt32(kEventHotKeyPressed))
-    ]
-
-    InstallEventHandler(
-      GetEventDispatcherTarget(),
-      hotKeyShortcutEventHandler,
-      1,
-      eventSpec,
-      ptr,
-      &eventHandler
-    )
-
-    return true
-  }
-
-  @discardableResult
-  func stop() -> Bool {
-    if eventHandler != nil {
-      RemoveEventHandler(eventHandler)
-      eventHandler = nil
-      return true
-    }
-
-    return false
   }
 
   func reset() {
