@@ -9,9 +9,6 @@ struct Arguments: ParsableArguments {
   )
   var config: URL = FileManager.default.homeDirectoryForCurrentUser.appending(path: ".config/skbd")
 
-  @Flag(name: .shortAndLong, help: "Reload the configuration file")
-  var reload = false
-
   @Flag(name: .shortAndLong, help: "Show version information")
   var version = false
 }

@@ -1,62 +1,70 @@
 import AppKit
 import SkbdLib
 
+@discardableResult
+func printError(_ message: String) -> Int32 {
+    fputs("\(message)\n", stderr)
+    fflush(stderr)
+    return EXIT_FAILURE
+}
+
+@discardableResult
+func printInfo(_ message: String) -> Int32 {
+    fputs("\(message)\n", stdout)
+    fflush(stdout)
+    return EXIT_SUCCESS
+}
+
+func setupLockFile() -> Bool {
+  do {
+    try LockFile.acquire()
+    return true
+  } catch {
+    printError("failed to create lock file: \(error)")
+    return false
+  }
+}
+
+func loadConfiguration() -> Bool {
+  let configManager = ConfigManager(
+    configPath: arguments.config,
+    hotKeyManager: hotKeyManager
+  )
+
+  do {
+    try configManager.load()
+    return true
+  } catch {
+    printError("failed to load configuration: \(error)")
+    return false
+  }
+}
+
+func setupSignalHandlers() {
+  signal(SIGINT) { _ in
+    printInfo("received SIGINT - terminating...")
+    hotKeyManager.stop()
+    exit(EXIT_SUCCESS)
+  }
+}
+
 let hotKeyManager = HotKeyShortcutManager()
 
 func main() -> Int32 {
   if arguments.version {
-    fputs("skbd version \(Version.current.value)\n", stdout)
-    fflush(stdout)
-    return EXIT_SUCCESS
+    return printInfo("skbd version \(Version.current.value)")
   }
 
-  if arguments.reload {
-    do {
-      let pid = try LockFile.readPID()
-      kill(pid, SIGUSR1)
-      return EXIT_SUCCESS
-    } catch {
-      fputs("failed to read pid from lock file: \(error)\n", stderr)
-      fflush(stderr)
-      return EXIT_FAILURE
-    }
-  }
-
-  do {
-    try LockFile.acquire()
-  } catch {
-    fputs("failed to create lock file: \(error)\n", stderr)
-    fflush(stderr)
-    return EXIT_FAILURE
-  }
-
-  let configManager = ConfigManager(configPath: arguments.config, hotKeyManager: hotKeyManager)
-
-  do {
-    try configManager.load()
-  } catch {
-    fputs("failed to load configuration: \(error)\n", stderr)
-    fflush(stderr)
-    return EXIT_FAILURE
-  }
+  guard setupLockFile() else { return EXIT_FAILURE }
+  guard loadConfiguration() else { return EXIT_FAILURE }
 
   guard hotKeyManager.start() else {
-    fputs("failed to start hot key manager", stderr)
-    fflush(stderr)
-    return EXIT_FAILURE
+    return printError("failed to start hot key manager")
   }
 
-  signal(SIGINT) { _ in
-    fputs("received SIGINT - terminating...\n", stdout)
-    fflush(stdout)
-
-    hotKeyManager.stop()
-
-    exit(EXIT_SUCCESS)
-  }
+  setupSignalHandlers()
 
   NSApplication.shared.run()
-
   return EXIT_SUCCESS
 }
 
