@@ -1,6 +1,10 @@
 import AppKit
 import SkbdLib
 
+let hotKeyManager = HotKeyShortcutManager()
+var configManager: ConfigManager!
+var hotReloadManager: HotReloadManager!
+
 @discardableResult
 func printError(_ message: String) -> Int32 {
     fputs("\(message)\n", stderr)
@@ -26,7 +30,7 @@ func setupLockFile() -> Bool {
 }
 
 func loadConfiguration() -> Bool {
-  let configManager = ConfigManager(
+  configManager = ConfigManager(
     configPath: arguments.config,
     hotKeyManager: hotKeyManager
   )
@@ -40,6 +44,25 @@ func loadConfiguration() -> Bool {
   }
 }
 
+func setupHotReload() -> Bool {
+  hotReloadManager = HotReloadManager(
+    path: arguments.config,
+    configManager: configManager
+  )
+
+  do {
+    guard try hotReloadManager.start() else {
+      printError("failed to start hot reload manager")
+      return false
+    }
+
+    return true
+  } catch {
+    printError("failed to start hot reload manager: \(error)")
+    return false
+  }
+}
+
 func setupSignalHandlers() {
   signal(SIGINT) { _ in
     printInfo("received SIGINT - terminating...")
@@ -48,8 +71,6 @@ func setupSignalHandlers() {
   }
 }
 
-let hotKeyManager = HotKeyShortcutManager()
-
 func main() -> Int32 {
   if arguments.version {
     return printInfo("skbd version \(Version.current.value)")
@@ -57,6 +78,7 @@ func main() -> Int32 {
 
   guard setupLockFile() else { return EXIT_FAILURE }
   guard loadConfiguration() else { return EXIT_FAILURE }
+  guard setupHotReload() else { return EXIT_FAILURE }
 
   guard hotKeyManager.start() else {
     return printError("failed to start hot key manager")
