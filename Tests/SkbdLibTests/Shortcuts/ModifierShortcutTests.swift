@@ -59,10 +59,7 @@ struct ModifierShortcutSerializedTests {
       try action()
     }
   }
-}
 
-@Suite("ModifierShortcut")
-struct ModifierShortcutTests {
   // MARK: - ModifierShortcut#identifier
 
   @Test("ModifierShortcut#identifier (identifiers are unique)")

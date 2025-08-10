@@ -3,14 +3,13 @@ import Testing
 
 @testable import SkbdLib
 
-@Suite("HotKeyShortcutManager", .serialized)
+@Suite("HotKeyShortcutManager")
 class HotKeyShortcutManagerTests {
-  let shortcutManager = HotKeyShortcutManager()
-
   // MARK: - hotKeyShortcutEventHandler
 
   @Test("hotKeyShortcutEventHandler() (processes event and calls shortcut handler)")
   func hotKeyShortcutEventHandler() async throws {
+    let shortcutManager = HotKeyShortcutManager()
     var called = false
 
     let shortcut = ModifierShortcut(1, 456) { called = true }
@@ -30,6 +29,7 @@ class HotKeyShortcutManagerTests {
 
   @Test("HotKeyShortcutManager#start() (when shortcuts registered)")
   func startWhenShortcutsRegistered() async throws {
+    let shortcutManager = HotKeyShortcutManager()
     let shortcut = ModifierShortcut(9, 456) {}
 
     shortcutManager.register(shortcut: shortcut)
@@ -39,11 +39,13 @@ class HotKeyShortcutManagerTests {
 
   @Test("HotKeyShortcutManager#start() (when no shortcuts registered)")
   func startWhenNoShortcutsRegistered() async throws {
+    let shortcutManager = HotKeyShortcutManager()
     #expect(!shortcutManager.start())
   }
 
   @Test("HotKeyShortcutManager#start() (when already started)")
   func startWhenAlreadyStarted() async throws {
+    let shortcutManager = HotKeyShortcutManager()
     let shortcut = ModifierShortcut(11, 456) {}
 
     shortcutManager.register(shortcut: shortcut)
@@ -56,6 +58,7 @@ class HotKeyShortcutManagerTests {
 
   @Test("HotKeyShortcutManager#stop() (when shortcuts registered)")
   func stopWhenShortcutsRegistered() async throws {
+    let shortcutManager = HotKeyShortcutManager()
     let shortcut = ModifierShortcut(12, 456) {}
 
     shortcutManager.register(shortcut: shortcut)
@@ -66,6 +69,7 @@ class HotKeyShortcutManagerTests {
 
   @Test("HotKeyShortcutManager.stop() (when not started)")
   func stopWhenNotStarted() async throws {
+    let shortcutManager = HotKeyShortcutManager()
     #expect(!shortcutManager.stop())
   }
 
@@ -73,6 +77,7 @@ class HotKeyShortcutManagerTests {
 
   @Test("HotKeyShortcutManager#register(shortcut:) (with valid shortcut)")
   func registerValidShortcut() async throws {
+    let shortcutManager = HotKeyShortcutManager()
     let shortcut = ModifierShortcut(2, 456) {}
 
     shortcutManager.register(shortcut: shortcut)
@@ -82,6 +87,7 @@ class HotKeyShortcutManagerTests {
 
   @Test("HotKeyShortcutManager#register(shortcut:) (with already registered shortcut)")
   func registerWithAlreadyRegisteredShortcut() async throws {
+    let shortcutManager = HotKeyShortcutManager()
     let shortcut = ModifierShortcut(3, 456) {}
 
     shortcutManager.register(shortcut: shortcut)
@@ -92,6 +98,7 @@ class HotKeyShortcutManagerTests {
 
   @Test("HotKeyShortcutManager#register(shortcut:) (when RegisterEventHotKey fails)")
   func registerWhenRegisterEventHotKeyFails() async throws {
+    let shortcutManager = HotKeyShortcutManager()
     shortcutManager.registerEventHotKeyFunc = { (_, _, _, _, _, _) in OSStatus(eventHotKeyInvalidErr) }
 
     let shortcut = ModifierShortcut(6, 456) {}
@@ -105,6 +112,7 @@ class HotKeyShortcutManagerTests {
 
   @Test("HotKeyShortcutManager#unregister(shortcut:) (with registered shortcut)")
   func unregisterWithRegisteredShortcut() async throws {
+    let shortcutManager = HotKeyShortcutManager()
     let shortcut = ModifierShortcut(7, 456) {}
 
     shortcutManager.register(shortcut: shortcut)
@@ -118,6 +126,7 @@ class HotKeyShortcutManagerTests {
 
   @Test("HotKeyShortcutManager#unregister(shortcut:) (with unregistered shortcut)")
   func unregisterWithUnregisteredShortcut() async throws {
+    let shortcutManager = HotKeyShortcutManager()
     let shortcut = ModifierShortcut(8, 456) {}
 
     shortcutManager.unregister(shortcut: shortcut)
@@ -129,6 +138,7 @@ class HotKeyShortcutManagerTests {
 
   @Test("HotKeyShortcutManager#reset() (when shortcuts registered)")
   func resetWhenShortcutsRegistered() async throws {
+    let shortcutManager = HotKeyShortcutManager()
     let shortcut1 = ModifierShortcut(14, 456) {}
     let shortcut2 = ModifierShortcut(15, 654) {}
 
@@ -148,6 +158,7 @@ class HotKeyShortcutManagerTests {
 
   @Test("HotKeyShortcutManager#box(for:) (with registered shortcut)")
   func boxWithRegisteredShortcut() async throws {
+    let shortcutManager = HotKeyShortcutManager()
     let shortcut = ModifierShortcut(16, 456) {}
 
     shortcutManager.register(shortcut: shortcut)
@@ -157,6 +168,7 @@ class HotKeyShortcutManagerTests {
 
   @Test("HotKeyShortcutManager#box(for:) (with unregistered shortcut)")
   func boxWithUnregisteredShortcut() async throws {
+    let shortcutManager = HotKeyShortcutManager()
     let shortcut = ModifierShortcut(17, 456) {}
 
     #expect(shortcutManager.box(for: shortcut) == nil)
@@ -166,6 +178,7 @@ class HotKeyShortcutManagerTests {
 
   @Test("HotKeyShortcutManager#handleCarbonEvent() (with valid event)")
   func handleCarbonEventWithValidEvent() async throws {
+    let shortcutManager = HotKeyShortcutManager()
     var called = false
 
     let shortcut = ModifierShortcut(18, 456) { called = true }
@@ -182,6 +195,7 @@ class HotKeyShortcutManagerTests {
 
   @Test("HotKeyShortcutManager#handleCarbonEvent() (with nil event)")
   func handleCarbonEventWithNilEvent() async throws {
+    let shortcutManager = HotKeyShortcutManager()
     let status = shortcutManager.handleCarbonEvent(nil)
 
     #expect(status == OSStatus(eventNotHandledErr))
@@ -189,6 +203,7 @@ class HotKeyShortcutManagerTests {
 
   @Test("HotKeyShortcutManager#handleCarbonEvent() (with no event parameter)")
   func handleCarbonEventWithNoEventParamter() async throws {
+    let shortcutManager = HotKeyShortcutManager()
     let event = createEventRefWithNoEventParameter()
     let status = shortcutManager.handleCarbonEvent(event)
 
@@ -197,6 +212,7 @@ class HotKeyShortcutManagerTests {
 
   @Test("HotKeyShortcutManager#handleCarbonEvent() (with invalid signature)")
   func handleCarbonEventWithInvalidSignature() async throws {
+    let shortcutManager = HotKeyShortcutManager()
     let shortcut = ModifierShortcut(21, 456) {}
 
     shortcutManager.register(shortcut: shortcut)
@@ -210,6 +226,7 @@ class HotKeyShortcutManagerTests {
 
   @Test("HotKeyShortcutManager#handleCarbonEvent() (with invalid shortcut ID)")
   func handleCarbonEventWithInvalidShortcutID() async throws {
+    let shortcutManager = HotKeyShortcutManager()
     let event = createEventRefWithInvalidEventHotKeyID()
     let status = shortcutManager.handleCarbonEvent(event)
 
@@ -218,6 +235,7 @@ class HotKeyShortcutManagerTests {
 
   @Test("HotKeyShortcutManager#handleCarbonEvent() (with broken shortcut handler)")
   func handleCarbonEventWithBrokenShortcutHandler() async throws {
+    let shortcutManager = HotKeyShortcutManager()
     setenv("SHELL", "/bin/invalid", 1)
 
     let action = ModifierShortcut.action(for: "true")
