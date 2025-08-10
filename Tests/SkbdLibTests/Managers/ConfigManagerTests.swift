@@ -6,10 +6,10 @@ import Testing
 
 @Suite("ConfigManager", .serialized)
 class ConfigManagerTests {
-  // MARK: - ConfigManager#read
+  // MARK: - ConfigManager#load
 
-  @Test("ConfigManager#read (with config file)")
-  func readWithConfigFile() async throws {
+  @Test("ConfigManager#load (with config file)")
+  func loadWithConfigFile() async throws {
     let config = try #require(Bundle.module.url(forResource: "Resources/Fixtures/skbdrc", withExtension: nil))
 
     #expect(throws: Never.self) {
@@ -18,8 +18,8 @@ class ConfigManagerTests {
     }
   }
 
-  @Test("ConfigManager#read (with empty config file)")
-  func readWithEmptyConfigFile() async throws {
+  @Test("ConfigManager#load (with empty config file)")
+  func loadWithEmptyConfigFile() async throws {
     let config = try #require(Bundle.module.url(forResource: "Resources/Fixtures/skbdrc.empty", withExtension: nil))
 
     #expect(throws: Never.self) {
@@ -28,8 +28,8 @@ class ConfigManagerTests {
     }
   }
 
-  @Test("ConfigManager#read (with invalid config file)")
-  func readWithInvalidConfigFile() async throws {
+  @Test("ConfigManager#load (with invalid config file)")
+  func loadWithInvalidConfigFile() async throws {
     let config = try #require(Bundle.module.url(forResource: "Resources/Fixtures/skbdrc.invalid", withExtension: nil))
 
     #expect(throws: ParserError.self) {
@@ -38,8 +38,8 @@ class ConfigManagerTests {
     }
   }
 
-  @Test("ConfigManager#read (with config directory)")
-  func readWithConfigDir() async throws {
+  @Test("ConfigManager#load (with config directory)")
+  func loadWithConfigDirectory() async throws {
     let config = try #require(Bundle.module.url(forResource: "Resources/Fixtures/skbd", withExtension: nil))
 
     #expect(throws: Never.self) {
@@ -48,8 +48,8 @@ class ConfigManagerTests {
     }
   }
 
-  @Test("ConfigManager#read (with invalid config file in directory)")
-  func readWithInvalidConfigDir() async throws {
+  @Test("ConfigManager#load (with invalid config file in directory)")
+  func loadWithInvalidConfigDirectory() async throws {
     let config = try #require(Bundle.module.url(forResource: "Resources/Fixtures/skbd.invalid", withExtension: nil))
 
     #expect(throws: ParserError.self) {
@@ -58,38 +58,13 @@ class ConfigManagerTests {
     }
   }
 
-  @Test("ConfigManager#read (with non-existient config path)")
-  func readWithNoConfigPath() async throws {
-    #expect(throws: ConfigError.configurationDoesNotExist) {
-      let config = URL(fileURLWithPath: "/i/dont/exist")
+  @Test("ConfigManager#load (with non-existient config path)")
+  func loadWithNoConfigPath() async throws {
+    let config = URL(fileURLWithPath: "/i/dont/exist")
+
+    #expect(throws: ConfigError.fileOrDirectoryDoesNotExist(path: config)) {
       let configManager = ConfigManager(configPath: config, hotKeyManager: HotKeyShortcutManager())
       try configManager.load()
-    }
-  }
-
-  // MARK: - ConfigManager#start
-
-  @Test("ConfigManager#start (with shortcuts)")
-  func startWithShortcuts() async throws {
-    let config = try #require(Bundle.module.url(forResource: "Resources/Fixtures/skbdrc", withExtension: nil))
-
-    #expect(throws: Never.self) {
-      let configManager = ConfigManager(configPath: config, hotKeyManager: HotKeyShortcutManager())
-      try configManager.load()
-
-      #expect(configManager.start())
-    }
-  }
-
-  @Test("ConfigManager#start (with no shortcuts)")
-  func startWithNoShortcuts() async throws {
-    let config = try #require(Bundle.module.url(forResource: "Resources/Fixtures/skbdrc.empty", withExtension: nil))
-
-    #expect(throws: Never.self) {
-      let configManager = ConfigManager(configPath: config, hotKeyManager: HotKeyShortcutManager())
-      try configManager.load()
-
-      #expect(configManager.start() == false)
     }
   }
 }

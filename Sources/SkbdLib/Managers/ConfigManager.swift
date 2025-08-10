@@ -1,67 +1,50 @@
 import Foundation
 
 public class ConfigManager {
-  private var configPath: URL
-  private var hotKeyManager: HotKeyShortcutManager
+  private let configPath: URL
+  private let hotKeyManager: HotKeyShortcutManager
 
   public init(configPath: URL, hotKeyManager: HotKeyShortcutManager) {
-    self.configPath = configPath
+    self.configPath = configPath.resolvingSymlinksInPath()
     self.hotKeyManager = hotKeyManager
-  }
-
-  deinit {
-    hotKeyManager.reset()
-    hotKeyManager.stop()
   }
 
   public func load() throws {
     hotKeyManager.reset()
 
-    try parseConfig(filePath: configPath)
-  }
-
-  public func start() -> Bool {
-    return hotKeyManager.start()
-  }
-
-  private func parseConfig(filePath: URL) throws {
     var isDirectory: ObjCBool = false
 
-    if !FileManager.default.fileExists(atPath: filePath.path, isDirectory: &isDirectory) {
-      throw ConfigError.configurationDoesNotExist
+    let exists = FileManager.default.fileExists(atPath: configPath.path(), isDirectory: &isDirectory)
+    guard exists else { throw ConfigError.fileOrDirectoryDoesNotExist(path: configPath) }
+
+    if !isDirectory.boolValue {
+      try parse(file: configPath)
+      return
     }
 
-    if isDirectory.boolValue {
-      try parseConfigDir(filePath: filePath)
-    } else {
-      try parseConfigFile(filePath: filePath)
-    }
-  }
-
-  private func parseConfigDir(filePath: URL) throws {
     let files = try FileManager.default.contentsOfDirectory(
-      at: filePath,
+      at: configPath,
       includingPropertiesForKeys: nil,
       options: .skipsHiddenFiles
     )
 
     for file in files {
-      try parseConfigFile(filePath: file)
+      try parse(file: file)
     }
   }
 
-  private func parseConfigFile(filePath: URL) throws {
-    let config = try String(contentsOf: filePath)
+  private func parse(file: URL) throws {
+    let config = try String(contentsOf: file.resolvingSymlinksInPath())
     let parser = Parser(config)
     let shortcuts = try parser.parse()
 
     for shortcut in shortcuts {
-      if shortcut is LeaderShortcut {
-        // TODO: handle leader shortcut
-      } else if let modifierShortcut = shortcut as? ModifierShortcut {
+      switch shortcut {
+      case let modifierShortcut as ModifierShortcut:
         hotKeyManager.register(shortcut: modifierShortcut)
-      } else if shortcut is SequenceShortcut {
-        // TODO: handle sequence shortcuts
+        break
+      default:
+        break
       }
     }
   }

@@ -1,7 +1,7 @@
 import AppKit
 import SkbdLib
 
-var config: ConfigManager!
+let hotKeyManager = HotKeyShortcutManager()
 
 func main() -> Int32 {
   if arguments.version {
@@ -30,41 +30,28 @@ func main() -> Int32 {
     return EXIT_FAILURE
   }
 
+  let configManager = ConfigManager(configPath: arguments.config, hotKeyManager: hotKeyManager)
+
   do {
-    config = ConfigManager(
-      configPath: arguments.config,
-      hotKeyManager: HotKeyShortcutManager()
-    )
-
-    try config.load()
-
-    if !config.start() {
-      fputs("failed to start configuration manager", stderr)
-      fflush(stderr)
-      return EXIT_FAILURE
-    }
+    try configManager.load()
   } catch {
-    fputs("failed to read configuration: \(error)\n", stderr)
+    fputs("failed to load configuration: \(error)\n", stderr)
     fflush(stderr)
     return EXIT_FAILURE
   }
 
-  signal(SIGUSR1) { _ in
-    do {
-      fputs("received SIGUSR1 - reloading configuration...\n", stdout)
-      fflush(stdout)
-
-      try config.load()
-    } catch {
-      fputs("failed to reload configuration: \(error)\n", stderr)
-    }
+  guard hotKeyManager.start() else {
+    fputs("failed to start hot key manager", stderr)
+    fflush(stderr)
+    return EXIT_FAILURE
   }
 
   signal(SIGINT) { _ in
     fputs("received SIGINT - terminating...\n", stdout)
     fflush(stdout)
 
-    config = nil
+    hotKeyManager.stop()
+
     exit(EXIT_SUCCESS)
   }
 
