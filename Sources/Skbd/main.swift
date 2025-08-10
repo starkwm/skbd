@@ -7,16 +7,16 @@ var hotReloadManager: HotReloadManager!
 
 @discardableResult
 func printError(_ message: String) -> Int32 {
-    fputs("\(message)\n", stderr)
-    fflush(stderr)
-    return EXIT_FAILURE
+  fputs("\(message)\n", stderr)
+  fflush(stderr)
+  return EXIT_FAILURE
 }
 
 @discardableResult
 func printInfo(_ message: String) -> Int32 {
-    fputs("\(message)\n", stdout)
-    fflush(stdout)
-    return EXIT_SUCCESS
+  fputs("\(message)\n", stdout)
+  fflush(stdout)
+  return EXIT_SUCCESS
 }
 
 func setupLockFile() -> Bool {

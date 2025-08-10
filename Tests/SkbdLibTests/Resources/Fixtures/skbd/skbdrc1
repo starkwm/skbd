@@ -1,11 +1,1 @@
 ctrl - space: echo "Hello World"
-
-leader: cmd - space
-
-<leader> o b c: echo "open browser1"
-<leader> o b f: echo "open browser2"
-<leader> o b s: echo "open browser3"
-
-<leader> d: echo "open discord"
-<leader> e: echo "open mail"
-<leader> m: echo "open messages"

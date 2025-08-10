@@ -65,71 +65,6 @@ struct ParserTests {
     }
   }
 
-  @Test("Parser#parse() (with leader shortcut)")
-  func parseWithLeaderShortcut() async throws {
-    let input = """
-          # this setting the leader key shortcut
-          leader: ctrl - space
-      """
-
-    #expect(throws: Never.self) {
-      let shortcuts = try Parser(input).parse()
-
-      struct Expect {
-        var key: UInt32
-        var modifiers: UInt32
-        var action: Bool
-      }
-
-      let expected = [
-        Expect(key: UInt32(kVK_Space), modifiers: UInt32(controlKey), action: false)
-      ]
-
-      #expect(shortcuts.count == expected.count)
-
-      for (idx, expect) in expected.enumerated() {
-        if let modifierShortcut = shortcuts[idx] as? LeaderShortcut {
-          #expect(modifierShortcut.keyCode == expect.key)
-          #expect(modifierShortcut.modifierFlags == expect.modifiers)
-          #expect((modifierShortcut.action != nil) == expect.action)
-        }
-      }
-    }
-  }
-
-  @Test("Parser#parse() (with sequence shortcuts in input)")
-  func parseWithSequenceShortcuts() async throws {
-    let input = """
-        <leader> o b c: echo "leader o b c"
-
-        <leader> o b s: echo "leader o b s"
-
-        <leader> o b f: echo "leader o b f"
-      """
-
-    #expect(throws: Never.self) {
-      let shortcuts = try Parser(input).parse()
-
-      struct Expect {
-        var keys: [String]
-      }
-
-      let expected = [
-        Expect(keys: ["o", "b", "c"]),
-        Expect(keys: ["o", "b", "s"]),
-        Expect(keys: ["o", "b", "f"]),
-      ]
-
-      #expect(shortcuts.count == expected.count)
-
-      for (idx, expect) in expected.enumerated() {
-        if let sequenceShortcut = shortcuts[idx] as? SequenceShortcut {
-          #expect(sequenceShortcut.keys == expect.keys)
-        }
-      }
-    }
-  }
-
   @Test("Parser#parse() (with comment in input)")
   func parseWithComment() async throws {
     #expect(throws: Never.self) {
@@ -143,20 +78,6 @@ struct ParserTests {
   func parseWithNoModifierOrLeader() async throws {
     #expect(throws: ParserError.expectedModifierOrLeader) {
       try Parser("space: open -a iTerm2.app").parse()
-    }
-  }
-
-  @Test("Parser#parse() (with missing key)")
-  func parseWithMissingKey() async throws {
-    #expect(throws: ParserError.expectedKey) {
-      try Parser("<leader> : true").parse()
-    }
-  }
-
-  @Test("Parser#parse() (with invalid key)")
-  func parseWithInvalidKey() async throws {
-    #expect(throws: ParserError.expectedKey) {
-      try Parser("<leader> >: true").parse()
     }
   }
 
@@ -185,39 +106,6 @@ struct ParserTests {
   func parseWithNoCommandAfterModifierShortcut() async throws {
     #expect(throws: ParserError.expectedColonFollowedByCommand) {
       try Parser("opt+ctrl-a+opt").parse()
-    }
-  }
-
-  @Test("Parser#parse() (with multiple set leader)")
-  func parseWithMultipleSetLeader() async throws {
-    #expect(throws: ParserError.leaderKeyAlreadySet) {
-      let input = """
-          leader: ctrl - space
-          leader: cmd - space
-        """
-
-      _ = try Parser(input).parse()
-    }
-  }
-
-  @Test("Parser#parse() (with invalid keyword)")
-  func parseWithInvalidKeyword() async throws {
-    #expect(throws: ParserError.expectedLeaderKeyword) {
-      try Parser("<foobar> a b c: true").parse()
-    }
-  }
-
-  @Test("Parser#parse() (with missing keyword end)")
-  func parseWithMissingKeywordEnd() async throws {
-    #expect(throws: ParserError.expectedKeywordEnd) {
-      try Parser("<leader a b c: true").parse()
-    }
-  }
-
-  @Test("Parser#parse() (with no command after sequence shortcut)")
-  func parseWithNoCommandAfterSequence() async throws {
-    #expect(throws: ParserError.expectedColonFollowedByCommand) {
-      try Parser("<leader> a b c").parse()
     }
   }
 }

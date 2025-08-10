@@ -15,7 +15,6 @@ class Parser {
   }
 
   func parse() throws -> [Shortcut] {
-    var parsedLeaderShortcut = false
     var shortcuts = [Shortcut]()
 
     while !isAtEnd {
@@ -25,16 +24,7 @@ class Parser {
 
       guard !isAtEnd else { break }
 
-      if match(type: .leader) {
-        if parsedLeaderShortcut {
-          throw ParserError.leaderKeyAlreadySet
-        }
-
-        shortcuts.append(try parseLeaderShortcut())
-        parsedLeaderShortcut = true
-      } else if match(type: .keywordStart) {
-        shortcuts.append(try parseSequenceShortcut())
-      } else if check(type: .modifier) {
+      if check(type: .modifier) {
         shortcuts.append(try parseModifierShortcut())
       } else {
         throw ParserError.expectedModifierOrLeader
@@ -42,33 +32,6 @@ class Parser {
     }
 
     return shortcuts
-  }
-
-  private func parseLeaderShortcut() throws -> LeaderShortcut {
-    let (modifierFlags, keyCode) = try parseModifiersAndKey()
-    let shortcut = LeaderShortcut(keyCode, modifierFlags)
-
-    return shortcut
-  }
-
-  private func parseSequenceShortcut() throws -> SequenceShortcut {
-    guard match(type: .leader) else {
-      throw ParserError.expectedLeaderKeyword
-    }
-
-    guard match(type: .keywordEnd) else {
-      throw ParserError.expectedKeywordEnd
-    }
-
-    let keyCodes = try parseKeySequence()
-
-    guard match(type: .command), let cmd = prevToken?.text else {
-      throw ParserError.expectedColonFollowedByCommand
-    }
-
-    let action = SequenceShortcut.action(for: cmd)
-
-    return SequenceShortcut(keyCodes, action)
   }
 
   private func parseModifierShortcut() throws -> ModifierShortcut {
@@ -113,20 +76,6 @@ class Parser {
     }
 
     return Modifier.flags(for: modifiers.compactMap { $0 })
-  }
-
-  private func parseKeySequence() throws -> [String] {
-    var keyCodes: [String] = []
-
-    while match(type: .key) {
-      keyCodes.append(prevToken!.text!)
-    }
-
-    guard keyCodes.count > 0 else {
-      throw ParserError.expectedKey
-    }
-
-    return keyCodes
   }
 
   private func advance() {
