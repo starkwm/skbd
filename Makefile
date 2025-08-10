@@ -1,5 +1,5 @@
-VERSION_TMPL=Sources/skbd/Version.swift.tmpl
-VERSION_FILE=Sources/skbd/Version.swift
+VERSION_TMPL=Sources/Skbd/Version.swift.tmpl
+VERSION_FILE=Sources/Skbd/Version.swift
 
 all: build
 
