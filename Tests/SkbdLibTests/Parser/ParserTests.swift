@@ -47,8 +47,16 @@ struct ParserTests {
         Expect(key: UInt32(kVK_Space), modifiers: UInt32(optionKey), action: true),
         Expect(key: UInt32(kVK_ANSI_A), modifiers: UInt32(cmdKey | shiftKey), action: true),
         Expect(key: UInt32(kVK_Return), modifiers: UInt32(controlKey | optionKey), action: true),
-        Expect(key: UInt32(kVK_Space), modifiers: UInt32(controlKey | optionKey | shiftKey), action: true),
-        Expect(key: UInt32(kVK_F1), modifiers: UInt32(controlKey | optionKey | cmdKey | shiftKey), action: true),
+        Expect(
+          key: UInt32(kVK_Space),
+          modifiers: UInt32(controlKey | optionKey | shiftKey),
+          action: true
+        ),
+        Expect(
+          key: UInt32(kVK_F1),
+          modifiers: UInt32(controlKey | optionKey | cmdKey | shiftKey),
+          action: true
+        ),
         Expect(key: UInt32(kVK_ANSI_5), modifiers: UInt32(controlKey | shiftKey), action: true),
         Expect(key: UInt32(kVK_ANSI_LeftBracket), modifiers: UInt32(optionKey), action: true),
       ]

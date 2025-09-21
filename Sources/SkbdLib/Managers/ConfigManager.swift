@@ -14,7 +14,10 @@ public class ConfigManager {
 
     var isDirectory: ObjCBool = false
 
-    let exists = FileManager.default.fileExists(atPath: configPath.path(), isDirectory: &isDirectory)
+    let exists = FileManager.default.fileExists(
+      atPath: configPath.path(),
+      isDirectory: &isDirectory
+    )
     guard exists else { throw ConfigError.fileOrDirectoryDoesNotExist(path: configPath) }
 
     if !isDirectory.boolValue {

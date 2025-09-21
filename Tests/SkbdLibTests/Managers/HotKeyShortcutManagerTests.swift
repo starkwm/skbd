@@ -92,7 +92,9 @@ class HotKeyShortcutManagerTests {
 
   @Test("HotKeyShortcutManager#register(shortcut:) (when RegisterEventHotKey fails)")
   func registerWhenRegisterEventHotKeyFails() async throws {
-    shortcutManager.registerEventHotKeyFunc = { (_, _, _, _, _, _) in OSStatus(eventHotKeyInvalidErr) }
+    shortcutManager.registerEventHotKeyFunc = { (_, _, _, _, _, _) in
+      OSStatus(eventHotKeyInvalidErr)
+    }
 
     let shortcut = ModifierShortcut(6, 456) {}
 

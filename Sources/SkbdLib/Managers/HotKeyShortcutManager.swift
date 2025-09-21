@@ -2,7 +2,11 @@ import Carbon
 
 let skbdEventHotKeySignature = "skbd".utf16.reduce(0) { ($0 << 8) + OSType($1) }
 
-func hotKeyShortcutEventHandler(_: EventHandlerCallRef?, event: EventRef?, userData: UnsafeMutableRawPointer?)
+func hotKeyShortcutEventHandler(
+  _: EventHandlerCallRef?,
+  event: EventRef?,
+  userData: UnsafeMutableRawPointer?
+)
   -> OSStatus
 {
   let instance = Unmanaged<HotKeyShortcutManager>.fromOpaque(userData!).takeUnretainedValue()
@@ -82,7 +86,11 @@ public class HotKeyShortcutManager {
       return
     }
 
-    let box = ShortcutBox(shortcut: shortcut, eventHotKeyID: shortcutsCount, eventHotKey: eventHotKey)
+    let box = ShortcutBox(
+      shortcut: shortcut,
+      eventHotKeyID: shortcutsCount,
+      eventHotKey: eventHotKey
+    )
     shortcuts[box.eventHotKeyID] = box
   }
 
@@ -131,7 +139,8 @@ public class HotKeyShortcutManager {
       return err
     }
 
-    guard eventHotKeyID.signature == skbdEventHotKeySignature, let shortcut = shortcuts[eventHotKeyID.id]?.shortcut
+    guard eventHotKeyID.signature == skbdEventHotKeySignature,
+      let shortcut = shortcuts[eventHotKeyID.id]?.shortcut
     else {
       return OSStatus(eventNotHandledErr)
     }

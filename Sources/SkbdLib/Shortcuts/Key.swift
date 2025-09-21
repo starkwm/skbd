@@ -133,13 +133,15 @@ enum Key {
     return keys
   }()
 
-  private static let relocatableCodeToKey: [Int: [String]] = relocatableKeyToCode.reduce(into: [:]) { result, element in
+  private static let relocatableCodeToKey: [Int: [String]] = relocatableKeyToCode.reduce(into: [:])
+  { result, element in
     let (key, code) = element
     result[code, default: []].append(key)
   }
 
   static func valid(_ key: String) -> Bool {
-    relocatableKeyToCode.keys.contains(key.lowercased()) || keyToCode.keys.contains(key.lowercased())
+    relocatableKeyToCode.keys.contains(key.lowercased())
+      || keyToCode.keys.contains(key.lowercased())
   }
 
   static func code(for key: String) -> UInt32 {

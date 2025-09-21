@@ -55,12 +55,18 @@ struct ModifierTests {
 
   @Test("Modifier.flags(for:) (with multiple modifier identifiers)")
   func flagsWithMultipleModifierIdentifiers() async throws {
-    #expect(Modifier.flags(for: ["shift", "ctrl", "alt", "cmd"]) == UInt32(shiftKey | controlKey | optionKey | cmdKey))
+    #expect(
+      Modifier.flags(for: ["shift", "ctrl", "alt", "cmd"])
+        == UInt32(shiftKey | controlKey | optionKey | cmdKey)
+    )
   }
 
   @Test("Modifier.flags(for:) (with mixed casing modifier identifiers)")
   func flagsWithMixedCasingModifierIdentifiers() async throws {
-    #expect(Modifier.flags(for: ["shift", "CTRL", "AlT", "cMd"]) == UInt32(shiftKey | controlKey | optionKey | cmdKey))
+    #expect(
+      Modifier.flags(for: ["shift", "CTRL", "AlT", "cMd"])
+        == UInt32(shiftKey | controlKey | optionKey | cmdKey)
+    )
   }
 
   @Test("Modifier.flags(for:) (with unknown modifier identifiers)")

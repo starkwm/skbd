@@ -10,7 +10,9 @@ class ConfigManagerTests {
 
   @Test("ConfigManager#load (with config file)")
   func loadWithConfigFile() async throws {
-    let config = try #require(Bundle.module.url(forResource: "Resources/Fixtures/skbdrc", withExtension: nil))
+    let config = try #require(
+      Bundle.module.url(forResource: "Resources/Fixtures/skbdrc", withExtension: nil)
+    )
 
     #expect(throws: Never.self) {
       let configManager = ConfigManager(configPath: config, hotKeyManager: HotKeyShortcutManager())
@@ -20,7 +22,9 @@ class ConfigManagerTests {
 
   @Test("ConfigManager#load (with empty config file)")
   func loadWithEmptyConfigFile() async throws {
-    let config = try #require(Bundle.module.url(forResource: "Resources/Fixtures/skbdrc.empty", withExtension: nil))
+    let config = try #require(
+      Bundle.module.url(forResource: "Resources/Fixtures/skbdrc.empty", withExtension: nil)
+    )
 
     #expect(throws: Never.self) {
       let configManager = ConfigManager(configPath: config, hotKeyManager: HotKeyShortcutManager())
@@ -30,7 +34,9 @@ class ConfigManagerTests {
 
   @Test("ConfigManager#load (with invalid config file)")
   func loadWithInvalidConfigFile() async throws {
-    let config = try #require(Bundle.module.url(forResource: "Resources/Fixtures/skbdrc.invalid", withExtension: nil))
+    let config = try #require(
+      Bundle.module.url(forResource: "Resources/Fixtures/skbdrc.invalid", withExtension: nil)
+    )
 
     #expect(throws: ParserError.self) {
       let configManager = ConfigManager(configPath: config, hotKeyManager: HotKeyShortcutManager())
@@ -40,7 +46,9 @@ class ConfigManagerTests {
 
   @Test("ConfigManager#load (with config directory)")
   func loadWithConfigDirectory() async throws {
-    let config = try #require(Bundle.module.url(forResource: "Resources/Fixtures/skbd", withExtension: nil))
+    let config = try #require(
+      Bundle.module.url(forResource: "Resources/Fixtures/skbd", withExtension: nil)
+    )
 
     #expect(throws: Never.self) {
       let configManager = ConfigManager(configPath: config, hotKeyManager: HotKeyShortcutManager())
@@ -50,7 +58,9 @@ class ConfigManagerTests {
 
   @Test("ConfigManager#load (with invalid config file in directory)")
   func loadWithInvalidConfigDirectory() async throws {
-    let config = try #require(Bundle.module.url(forResource: "Resources/Fixtures/skbd.invalid", withExtension: nil))
+    let config = try #require(
+      Bundle.module.url(forResource: "Resources/Fixtures/skbd.invalid", withExtension: nil)
+    )
 
     #expect(throws: ParserError.self) {
       let configManager = ConfigManager(configPath: config, hotKeyManager: HotKeyShortcutManager())
