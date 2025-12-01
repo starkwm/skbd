@@ -42,13 +42,8 @@ public class ConfigManager {
     let shortcuts = try parser.parse()
 
     for shortcut in shortcuts {
-      switch shortcut {
-      case let modifierShortcut as ModifierShortcut:
-        hotKeyManager.register(shortcut: modifierShortcut)
-        break
-      default:
-        break
-      }
+      guard let modifierShortcut = shortcut as? ModifierShortcut else { continue }
+      hotKeyManager.register(shortcut: modifierShortcut)
     }
   }
 }

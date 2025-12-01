@@ -91,10 +91,6 @@ class Lexer {
     advance()
     skipWhitespace()
 
-    if prevToken?.type == .leader {
-      return getToken(prevToken: prevToken)
-    }
-
     let cmd = readCommand()
     return Token(type: .command, text: cmd)
   }
@@ -141,8 +137,6 @@ class Lexer {
       return .key
     case _ where Modifier.valid(identifier):
       return .modifier
-    case "leader":
-      return .leader
     default:
       return .unknown
     }

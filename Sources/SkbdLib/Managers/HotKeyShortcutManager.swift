@@ -15,7 +15,7 @@ func hotKeyShortcutEventHandler(
 
 public class HotKeyShortcutManager {
   struct ShortcutBox {
-    let shortcut: HotKeyShortcut
+    let shortcut: ModifierShortcut
     let eventHotKeyID: UInt32
     let eventHotKey: EventHotKeyRef
   }
@@ -64,7 +64,7 @@ public class HotKeyShortcutManager {
     return false
   }
 
-  func register(shortcut: HotKeyShortcut) {
+  func register(shortcut: ModifierShortcut) {
     if shortcuts.values.contains(where: { $0.shortcut.identifier == shortcut.identifier }) {
       return
     }
@@ -94,7 +94,7 @@ public class HotKeyShortcutManager {
     shortcuts[box.eventHotKeyID] = box
   }
 
-  func unregister(shortcut: HotKeyShortcut) {
+  func unregister(shortcut: ModifierShortcut) {
     guard let box = box(for: shortcut) else {
       return
     }
@@ -110,7 +110,7 @@ public class HotKeyShortcutManager {
     }
   }
 
-  func box(for shortcut: HotKeyShortcut) -> ShortcutBox? {
+  func box(for shortcut: ModifierShortcut) -> ShortcutBox? {
     for box in shortcuts.values where box.shortcut.identifier == shortcut.identifier {
       return box
     }

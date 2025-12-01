@@ -1,6 +1,6 @@
 import Foundation
 
-struct ModifierShortcut: HotKeyShortcut {
+struct ModifierShortcut: Shortcut {
   var action: Action?
 
   let identifier = UUID()

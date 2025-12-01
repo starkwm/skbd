@@ -9,7 +9,6 @@ struct TokenTypeTests {
   @Test("TokenType#description")
   func description() async throws {
     let tests: [TokenType: String] = [
-      .leader: "TokenType {Leader}",
       .keywordStart: "TokenType {Keyword Start}",
       .keywordEnd: "TokenType {Keyword End}",
       .comment: "TokenType {Comment}",

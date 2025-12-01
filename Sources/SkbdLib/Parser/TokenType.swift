@@ -1,8 +1,6 @@
 enum TokenType {
   case comment
 
-  case leader
-
   case keywordStart
   case keywordEnd
 
@@ -22,8 +20,6 @@ extension TokenType: CustomStringConvertible {
     switch self {
     case .comment:
       return "TokenType {Comment}"
-    case .leader:
-      return "TokenType {Leader}"
     case .keywordStart:
       return "TokenType {Keyword Start}"
     case .keywordEnd:

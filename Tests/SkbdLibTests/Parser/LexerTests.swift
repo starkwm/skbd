@@ -9,8 +9,6 @@ struct LexerTests {
   @Test("Lexer#nextToken() (with valid input)")
   func nextTokenWithValidInput() async throws {
     let input = """
-          leader: ctrl - space
-
           # this if the first comment
           opt-space: open -a iTerm2.app
 
@@ -30,19 +28,9 @@ struct LexerTests {
 
           # this makes sure we allow - as a key
           cmd + shift + opt - -: echo "hyphen!"
-
-          # this is a leader key mapping with a single key
-          <leader> a: echo "Hello"
-
-          # this is a leader key mapping with a group key
-          <leader> b c: echo "Hello"
-
-          # this is a leader key mapping with a same group key
-          <leader> b d: echo "Hello"
       """
 
     let expected: [TokenType] = [
-      .leader, .modifier, .dash, .key,
       .comment,
       .modifier, .dash, .key, .command,
       .comment,
@@ -56,12 +44,6 @@ struct LexerTests {
       .modifier, .dash, .key, .command,
       .comment,
       .modifier, .plus, .modifier, .plus, .modifier, .dash, .dash, .command,
-      .comment,
-      .keywordStart, .leader, .keywordEnd, .key, .command,
-      .comment,
-      .keywordStart, .leader, .keywordEnd, .key, .key, .command,
-      .comment,
-      .keywordStart, .leader, .keywordEnd, .key, .key, .command,
     ]
 
     let lexer = Lexer(input)
