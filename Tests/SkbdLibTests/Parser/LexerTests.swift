@@ -19,7 +19,7 @@ struct LexerTests {
           cmd + shift - a : echo "Hello world"
 
           # this is another comment, followed by a multiline command
-          ctrl + opt - return : echo "foo bar"; \
+          ctrl + opt - return : echo "foo bar"; \\
               rm -fr /
 
           # this is a key mapping with a number
