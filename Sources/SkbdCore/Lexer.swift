@@ -112,7 +112,7 @@ class Lexer {
     return String(buffer[start..<position])
   }
 
-  private func readIdentifier() -> String? {
+  private func readIdentifier() -> String {
     let start = position
     advance()
 
