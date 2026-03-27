@@ -22,9 +22,6 @@ public class EventTapManager {
     if let runloopSource = runloopSource {
       CFRunLoopRemoveSource(CFRunLoopGetMain(), runloopSource, .commonModes)
     }
-
-    eventTap = nil
-    runloopSource = nil
   }
 
   public func begin() -> Result<Void, EventTapError> {
