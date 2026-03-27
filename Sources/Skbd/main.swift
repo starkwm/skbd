@@ -9,10 +9,9 @@ if arguments.version {
   exit(EXIT_SUCCESS)
 }
 
-var lock: FileLock! = FileLock()
-defer { lock = nil }
+var lock: FileLock? = FileLock()
 
-switch lock.acquire() {
+switch lock!.acquire() {
 case .success:
   break
 case .failure(.alreadyLocked):
@@ -25,7 +24,7 @@ case .failure(.failed(let reason)):
   exit(EXIT_FAILURE)
 }
 
-var parser: Parser!
+var parser: Parser?
 
 do {
   let input = try String(contentsOf: arguments.config, encoding: .utf8)
@@ -36,10 +35,9 @@ do {
   exit(EXIT_FAILURE)
 }
 
-var eventTap: EventTapManager!
-defer { eventTap = nil }
+var eventTap: EventTapManager?
 
-switch parser.parse() {
+switch parser!.parse() {
 case .success(let configuration):
   eventTap = EventTapManager(hotKeys: configuration.hotKeys, blockList: configuration.blockList)
 case .failure(let error):
@@ -48,7 +46,7 @@ case .failure(let error):
   exit(EXIT_FAILURE)
 }
 
-switch eventTap.begin() {
+switch eventTap!.begin() {
 case .success: break
 case .failure(let error):
   fputs("error starting the event tap: \(error)\n", stderr)

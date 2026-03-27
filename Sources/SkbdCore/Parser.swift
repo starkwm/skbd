@@ -1,10 +1,10 @@
 public class Parser {
   private let lexer: Lexer
 
-  private var currentToken: Token!
+  private var currentToken: Token?
   private var previousToken: Token?
 
-  private var atEnd: Bool { currentToken.type == .endOfStream }
+  private var atEnd: Bool { currentToken?.type == .endOfStream }
 
   init(with lexer: Lexer) {
     self.lexer = lexer
@@ -151,7 +151,7 @@ public class Parser {
 
   private func check(_ types: TokenType...) -> Bool {
     guard !atEnd else { return false }
-    return types.contains(currentToken.type)
+    return types.contains(currentToken?.type ?? .unknown)
   }
 
   private func match(_ type: TokenType) -> Bool {

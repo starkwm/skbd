@@ -11,7 +11,12 @@ struct EventTapManagerTests {
   func testProcessEventWithUnhandledType() throws {
     let manager = EventTapManager(hotKeys: [])
     let source = CGEventSource(stateID: .hidSystemState)
-    let event = CGEvent(mouseEventSource: source, mouseType: .leftMouseDown, mouseCursorPosition: .zero, mouseButton: .left)!
+    let event = CGEvent(
+      mouseEventSource: source,
+      mouseType: .leftMouseDown,
+      mouseCursorPosition: .zero,
+      mouseButton: .left
+    )!
 
     let result = manager.process(event: event, type: .leftMouseDown)
 
