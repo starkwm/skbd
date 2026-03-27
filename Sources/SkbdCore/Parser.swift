@@ -1,14 +1,14 @@
 public class Parser {
   private let lexer: Lexer
 
-  private var currentToken: Token?
+  private var currentToken: Token
   private var previousToken: Token?
 
-  private var atEnd: Bool { currentToken?.type == .endOfStream }
+  private var atEnd: Bool { currentToken.type == .endOfStream }
 
   init(with lexer: Lexer) {
     self.lexer = lexer
-    advance()
+    currentToken = lexer.getToken()
   }
 
   public convenience init(with buffer: String) {
@@ -74,7 +74,7 @@ public class Parser {
 
   private func parseBlocklist() throws -> [String] {
     advance()
-    let directive = previousToken!.text!
+    guard let directive = previousToken?.text else { throw ParserError.invalidDirective }
     guard directive == ".blocklist" else { throw ParserError.invalidDirective }
 
     guard match(.beginList) else { throw ParserError.expectedLeftBracketAfterDirective }
@@ -83,7 +83,7 @@ public class Parser {
 
     while !check(.endList) && !atEnd {
       guard match(.string) else { throw ParserError.expectedStringLiteral }
-      let processName = previousToken!.text!
+      guard let processName = previousToken?.text else { throw ParserError.expectedStringLiteral }
       blockList.append(processName)
     }
 
@@ -93,7 +93,7 @@ public class Parser {
   }
 
   private func parseModifier() throws -> ModifierFlags {
-    let modifier = previousToken!.text!
+    guard let modifier = previousToken?.text else { throw ParserError.invalidModifierLiteral }
     guard let value = ModifierFlags.get(modifier) else { throw ParserError.invalidModifierLiteral }
 
     var flags = ModifierFlags()
@@ -108,7 +108,7 @@ public class Parser {
   }
 
   private func parseKey() throws -> UInt32 {
-    let key = previousToken!.text!
+    guard let key = previousToken?.text else { throw ParserError.invalidKey }
 
     guard let keyCode = KeyCodes.keyCode(for: key) else {
       throw ParserError.invalidKey
@@ -118,13 +118,13 @@ public class Parser {
   }
 
   private func parseKeyHex() throws -> UInt32 {
-    let key = previousToken!.text!
+    guard let key = previousToken?.text else { throw ParserError.invalidKeyHex }
     guard let keyCode = UInt32(key, radix: 16) else { throw ParserError.invalidKeyHex }
     return keyCode
   }
 
   private func parseKeyLiteral() throws -> (UInt32, ModifierFlags) {
-    let key = previousToken!.text!
+    guard let key = previousToken?.text else { throw ParserError.invalidKeyLiteral }
 
     guard let (code, requiresFn) = KeyCodes.specialKeys[key] else {
       throw ParserError.invalidKeyLiteral
@@ -139,7 +139,7 @@ public class Parser {
   }
 
   private func parseCommand() throws -> String {
-    let command = previousToken!.text!
+    guard let command = previousToken?.text else { throw ParserError.invalidCommand }
     guard !command.isEmpty else { throw ParserError.invalidCommand }
     return command
   }
@@ -151,7 +151,7 @@ public class Parser {
 
   private func check(_ types: TokenType...) -> Bool {
     guard !atEnd else { return false }
-    return types.contains(currentToken?.type ?? .unknown)
+    return types.contains(currentToken.type)
   }
 
   private func match(_ type: TokenType) -> Bool {

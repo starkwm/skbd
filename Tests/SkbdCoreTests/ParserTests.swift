@@ -356,4 +356,60 @@ struct ParserTests {
       if case .failure(.expectedLeftBracketAfterDirective) = result { true } else { false }
     #expect(isExpectedFailure)
   }
+
+  @Test("parse key with nil text")
+  func parseKeyNilText() async throws {
+    let parser = Parser(with: FakeLexer(tokens: [Token(type: .key, text: nil)]))
+    let result = parser.parse()
+    let isExpectedFailure = if case .failure(.invalidKey) = result { true } else { false }
+    #expect(isExpectedFailure)
+  }
+
+  @Test("parse key hex with nil text")
+  func parseKeyHexNilText() async throws {
+    let parser = Parser(with: FakeLexer(tokens: [Token(type: .keyHex, text: nil)]))
+    let result = parser.parse()
+    let isExpectedFailure = if case .failure(.invalidKeyHex) = result { true } else { false }
+    #expect(isExpectedFailure)
+  }
+
+  @Test("parse key literal with nil text")
+  func parseKeyLiteralNilText() async throws {
+    let parser = Parser(with: FakeLexer(tokens: [Token(type: .literal, text: nil)]))
+    let result = parser.parse()
+    let isExpectedFailure = if case .failure(.invalidKeyLiteral) = result { true } else { false }
+    #expect(isExpectedFailure)
+  }
+
+  @Test("parse modifier with nil text")
+  func parseModifierNilText() async throws {
+    let parser = Parser(with: FakeLexer(tokens: [Token(type: .modifier, text: nil)]))
+    let result = parser.parse()
+    let isExpectedFailure = if case .failure(.invalidModifierLiteral) = result { true } else { false }
+    #expect(isExpectedFailure)
+  }
+
+  @Test("parse command with nil text")
+  func parseCommandNilText() async throws {
+    let parser = Parser(with: FakeLexer(tokens: [Token(type: .key, text: "a"), Token(type: .command, text: nil)]))
+    let result = parser.parse()
+    let isExpectedFailure = if case .failure(.invalidCommand) = result { true } else { false }
+    #expect(isExpectedFailure)
+  }
+
+  @Test("parse blocklist directive with nil text")
+  func parseBlocklistDirectiveNilText() async throws {
+    let parser = Parser(with: FakeLexer(tokens: [Token(type: .directive, text: nil), Token(type: .beginList), Token(type: .endList)]))
+    let result = parser.parse()
+    let isExpectedFailure = if case .failure(.invalidDirective) = result { true } else { false }
+    #expect(isExpectedFailure)
+  }
+
+  @Test("parse blocklist process name with nil text")
+  func parseBlocklistProcessNameNilText() async throws {
+    let parser = Parser(with: FakeLexer(tokens: [Token(type: .directive, text: ".blocklist"), Token(type: .beginList), Token(type: .string, text: nil), Token(type: .endList)]))
+    let result = parser.parse()
+    let isExpectedFailure = if case .failure(.expectedStringLiteral) = result { true } else { false }
+    #expect(isExpectedFailure)
+  }
 }
