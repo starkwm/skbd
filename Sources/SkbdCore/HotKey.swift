@@ -47,7 +47,13 @@ public struct HotKey {
     process.arguments = ["-c", command]
     process.standardOutput = FileHandle.nullDevice
     process.standardError = FileHandle.nullDevice
-    try? process.run()
+
+    do {
+      try process.run()
+    } catch {
+      fputs("error running command: \(error.localizedDescription)\n", stderr)
+      fflush(stderr)
+    }
 
     onExecute?()
 
