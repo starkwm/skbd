@@ -70,6 +70,8 @@ The `fn` modifier key, which is the "globe" key.
 
 The available key values are:
 
+- <kbd>a</kbd> to <kbd>z</kbd>
+- <kbd>0</kbd> to <kbd>9</kbd>
 - <kbd>return</kbd>
 - <kbd>tab</kbd>
 - <kbd>space</kbd>
@@ -106,42 +108,6 @@ The available key values are:
 - <kbd>f18</kbd>
 - <kbd>f19</kbd>
 - <kbd>f20</kbd>
-- <kbd>a</kbd>
-- <kbd>b</kbd>
-- <kbd>c</kbd>
-- <kbd>d</kbd>
-- <kbd>e</kbd>
-- <kbd>f</kbd>
-- <kbd>g</kbd>
-- <kbd>h</kbd>
-- <kbd>i</kbd>
-- <kbd>j</kbd>
-- <kbd>k</kbd>
-- <kbd>l</kbd>
-- <kbd>m</kbd>
-- <kbd>n</kbd>
-- <kbd>o</kbd>
-- <kbd>p</kbd>
-- <kbd>q</kbd>
-- <kbd>r</kbd>
-- <kbd>s</kbd>
-- <kbd>t</kbd>
-- <kbd>u</kbd>
-- <kbd>v</kbd>
-- <kbd>w</kbd>
-- <kbd>x</kbd>
-- <kbd>y</kbd>
-- <kbd>z</kbd>
-- <kbd>0</kbd>
-- <kbd>1</kbd>
-- <kbd>2</kbd>
-- <kbd>3</kbd>
-- <kbd>4</kbd>
-- <kbd>5</kbd>
-- <kbd>6</kbd>
-- <kbd>7</kbd>
-- <kbd>8</kbd>
-- <kbd>9</kbd>
 - <kbd>`</kbd>
 - <kbd>-</kbd>
 - <kbd>=</kbd>
