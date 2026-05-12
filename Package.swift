@@ -29,9 +29,5 @@ let package = Package(
       name: "SkbdCoreTests",
       dependencies: ["SkbdCore"],
     ),
-    .testTarget(
-      name: "SkbdTests",
-      dependencies: ["Skbd"],
-    ),
   ]
 )

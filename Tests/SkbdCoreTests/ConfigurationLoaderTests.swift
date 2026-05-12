@@ -1,7 +1,7 @@
 import Foundation
 import Testing
 
-@testable import Skbd
+@testable import SkbdCore
 
 @Suite("ConfigurationLoader")
 struct ConfigurationLoaderTests {
@@ -16,6 +16,21 @@ struct ConfigurationLoaderTests {
     let result = try ConfigurationLoader.load(from: file)
 
     #expect(result == "cmd - a: echo file")
+  }
+
+  @Test("load reads a symlinked file")
+  func loadSymlinkFile() throws {
+    let directory = try temporaryDirectory()
+    defer { try? FileManager.default.removeItem(at: directory) }
+
+    let file = directory.appendingPathComponent("target-skbdrc")
+    let link = directory.appendingPathComponent("skbdrc")
+    try "cmd - a: echo symlink".write(to: file, atomically: true, encoding: .utf8)
+    try FileManager.default.createSymbolicLink(at: link, withDestinationURL: file)
+
+    let result = try ConfigurationLoader.load(from: link)
+
+    #expect(result == "cmd - a: echo symlink")
   }
 
   @Test("load reads a directory in lexicographical order")
@@ -40,6 +55,26 @@ struct ConfigurationLoaderTests {
         cmd - b: echo second
         """
     )
+  }
+
+  @Test("regularFiles returns visible regular files in lexicographical order")
+  func regularFiles() throws {
+    let directory = try temporaryDirectory()
+    defer { try? FileManager.default.removeItem(at: directory) }
+
+    let zFile = directory.appendingPathComponent("20-second")
+    let aFile = directory.appendingPathComponent("10-first")
+    let hidden = directory.appendingPathComponent(".ignored")
+    let subdirectory = directory.appendingPathComponent("15-directory")
+
+    try "second".write(to: zFile, atomically: true, encoding: .utf8)
+    try "first".write(to: aFile, atomically: true, encoding: .utf8)
+    try "hidden".write(to: hidden, atomically: true, encoding: .utf8)
+    try FileManager.default.createDirectory(at: subdirectory, withIntermediateDirectories: true)
+
+    let result = try ConfigurationLoader.regularFiles(in: directory)
+
+    #expect(result.map(\.lastPathComponent) == ["10-first", "20-second"])
   }
 
   private func temporaryDirectory() throws -> URL {
