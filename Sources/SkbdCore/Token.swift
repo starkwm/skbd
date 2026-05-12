@@ -1,3 +1,8 @@
+struct Token {
+  var type: TokenType
+  var text: String?
+}
+
 enum TokenType {
   case modifier
   case key
@@ -13,9 +18,4 @@ enum TokenType {
   case string
   case unknown
   case endOfStream
-}
-
-struct Token {
-  var type: TokenType
-  var text: String?
 }

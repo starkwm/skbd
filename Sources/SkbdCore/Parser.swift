@@ -6,13 +6,13 @@ public class Parser {
 
   private var atEnd: Bool { currentToken.type == .endOfStream }
 
+  public convenience init(with buffer: String) {
+    self.init(with: Lexer(with: buffer))
+  }
+
   init(with lexer: Lexer) {
     self.lexer = lexer
     currentToken = lexer.getToken()
-  }
-
-  public convenience init(with buffer: String) {
-    self.init(with: Lexer(with: buffer))
   }
 
   public func parse() -> Result<Configuration, ParserError> {

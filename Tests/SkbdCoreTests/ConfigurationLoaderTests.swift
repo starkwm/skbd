@@ -5,7 +5,7 @@ import Testing
 
 @Suite("ConfigurationLoader")
 struct ConfigurationLoaderTests {
-  @Test("load reads a single file")
+  @Test("load(from:): single file")
   func loadFile() throws {
     let directory = try temporaryDirectory()
     defer { try? FileManager.default.removeItem(at: directory) }
@@ -18,7 +18,7 @@ struct ConfigurationLoaderTests {
     #expect(result == "cmd - a: echo file")
   }
 
-  @Test("load reads a symlinked file")
+  @Test("load(from:): symlinked file")
   func loadSymlinkFile() throws {
     let directory = try temporaryDirectory()
     defer { try? FileManager.default.removeItem(at: directory) }
@@ -33,7 +33,7 @@ struct ConfigurationLoaderTests {
     #expect(result == "cmd - a: echo symlink")
   }
 
-  @Test("load reads a directory in lexicographical order")
+  @Test("load(from:): directory in lexicographical order")
   func loadDirectory() throws {
     let directory = try temporaryDirectory()
     defer { try? FileManager.default.removeItem(at: directory) }
@@ -57,7 +57,7 @@ struct ConfigurationLoaderTests {
     )
   }
 
-  @Test("regularFiles returns visible regular files in lexicographical order")
+  @Test("regularFiles(in:): visible regular files in lexicographical order")
   func regularFiles() throws {
     let directory = try temporaryDirectory()
     defer { try? FileManager.default.removeItem(at: directory) }

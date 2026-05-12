@@ -7,7 +7,7 @@ import Testing
 
 @Suite("HotKeyTests")
 struct HotKeyTests {
-  @Test("from event with no modifiers")
+  @Test("from(event:): no modifiers")
   func fromEventWithNoModifiers() async throws {
     let event = CGEvent(keyboardEventSource: nil, virtualKey: CGKeyCode(0), keyDown: true)!
     event.flags = CGEventFlags()
@@ -18,7 +18,7 @@ struct HotKeyTests {
     #expect(hotKey.key == 0)
   }
 
-  @Test("from event with cmd modifier")
+  @Test("from(event:): cmd modifier")
   func fromEventWithCmdModifier() async throws {
     let event = CGEvent(keyboardEventSource: nil, virtualKey: CGKeyCode(0), keyDown: true)!
     event.flags = .maskCommand
@@ -29,7 +29,7 @@ struct HotKeyTests {
     #expect(hotKey.key == 0)
   }
 
-  @Test("from event with multiple modifiers")
+  @Test("from(event:): multiple modifiers")
   func fromEventWithMultipleModifiers() async throws {
     let event = CGEvent(keyboardEventSource: nil, virtualKey: CGKeyCode(0), keyDown: true)!
     event.flags = [.maskCommand, .maskShift]
@@ -40,7 +40,7 @@ struct HotKeyTests {
     #expect(hotKey.key == 0)
   }
 
-  @Test("from event with special key")
+  @Test("from(event:): special key")
   func fromEventWithSpecialKey() async throws {
     let event = CGEvent(keyboardEventSource: nil, virtualKey: CGKeyCode(36), keyDown: true)!
     event.flags = CGEventFlags()
@@ -51,7 +51,7 @@ struct HotKeyTests {
     #expect(hotKey.key == 36)
   }
 
-  @Test("from event with invalid keycode")
+  @Test("from(event:): invalid keycode")
   func fromEventWithInvalidKeycode() async throws {
     let event = CGEvent(keyboardEventSource: nil, virtualKey: CGKeyCode(999), keyDown: true)!
     event.flags = .maskCommand
@@ -62,7 +62,105 @@ struct HotKeyTests {
     #expect(hotKey.key == 999)
   }
 
-  @Test("equality with identical hotkeys")
+  @Test("execute(onExecute:): nil command")
+  func executeWithNilCommand() async throws {
+    let hotKey = HotKey(modifierFlags: .cmd, key: 0)
+    var executed = false
+
+    #expect(hotKey.command == nil)
+
+    hotKey.execute(onExecute: { executed = true })
+
+    #expect(executed == false)
+  }
+
+  @Test("execute(onExecute:): successful command")
+  func executeWithSuccessfulCommand() async throws {
+    let hotKey = HotKey(modifierFlags: .cmd, key: 0, command: "true")
+    var executed = false
+
+    hotKey.execute { executed = true }
+
+    #expect(executed)
+  }
+
+  @Test("execute(onExecute:): failing command")
+  func executeWithFailingCommand() async throws {
+    let hotKey = HotKey(modifierFlags: .cmd, key: 0, command: "false")
+    var executed = false
+
+    hotKey.execute { executed = true }
+
+    #expect(executed)
+  }
+
+  @Test("execute(onExecute:): SHELL unset falls back to /bin/bash")
+  func executeFallsBackToBashWhenShellUnset() async throws {
+    let originalShell = getenv("SHELL").map { String(cString: $0) }
+
+    unsetenv("SHELL")
+
+    defer {
+      if let original = originalShell {
+        setenv("SHELL", original, 1)
+      } else {
+        unsetenv("SHELL")
+      }
+    }
+
+    let hotKey = HotKey(modifierFlags: .cmd, key: 0, command: "true")
+    var executed = false
+
+    hotKey.execute { executed = true }
+
+    #expect(executed)
+  }
+
+  @Test("execute(onExecute:): SHELL empty falls back to /bin/bash")
+  func executeFallsBackToBashWhenShellEmpty() async throws {
+    let originalShell = getenv("SHELL").map { String(cString: $0) }
+
+    setenv("SHELL", "", 1)
+
+    defer {
+      if let original = originalShell {
+        setenv("SHELL", original, 1)
+      } else {
+        unsetenv("SHELL")
+      }
+    }
+
+    let hotKey = HotKey(modifierFlags: .cmd, key: 0, command: "true")
+    var executed = false
+
+    hotKey.execute { executed = true }
+
+    #expect(executed)
+  }
+
+  @Test("execute(onExecute:): passthrough returns passthrough")
+  func executeWithPassthroughReturnsPassthrough() async throws {
+    let hotKey = HotKey(modifierFlags: .cmd, key: 0, command: "true", passthrough: true)
+    var executed = false
+
+    let result = hotKey.execute { executed = true }
+
+    #expect(executed)
+    #expect(result == .passthrough)
+  }
+
+  @Test("execute(onExecute:): consumed returns consumed")
+  func executeWithoutPassthroughReturnsConsumed() async throws {
+    let hotKey = HotKey(modifierFlags: .cmd, key: 0, command: "true", passthrough: false)
+    var executed = false
+
+    let result = hotKey.execute { executed = true }
+
+    #expect(executed)
+    #expect(result == .consumed)
+  }
+
+  @Test("==: identical hotkeys")
   func equalityWithIdenticalHotkeys() async throws {
     let hk1 = HotKey(modifierFlags: .cmd, key: 0)
     let hk2 = HotKey(modifierFlags: .cmd, key: 0)
@@ -70,7 +168,7 @@ struct HotKeyTests {
     #expect(hk1 == hk2)
   }
 
-  @Test("inequality with different keys")
+  @Test("==: different keys")
   func inequalityWithDifferentKeys() async throws {
     let hk1 = HotKey(modifierFlags: .cmd, key: 0)
     let hk2 = HotKey(modifierFlags: .cmd, key: 1)
@@ -78,7 +176,7 @@ struct HotKeyTests {
     #expect(hk1 != hk2)
   }
 
-  @Test("inequality with different modifiers")
+  @Test("==: different modifiers")
   func inequalityWithDifferentModifiers() async throws {
     let hk1 = HotKey(modifierFlags: .cmd, key: 0)
     let hk2 = HotKey(modifierFlags: .alt, key: 0)
@@ -86,7 +184,7 @@ struct HotKeyTests {
     #expect(hk1 != hk2)
   }
 
-  @Test("equality with generic matching left/right modifiers")
+  @Test("==: generic modifier matches left and right modifiers")
   func equalityWithGenericMatchingLeftRightModifiers() async throws {
     let hk1 = HotKey(modifierFlags: .alt, key: 0)
     let hk2 = HotKey(modifierFlags: .lalt, key: 0)
@@ -96,7 +194,7 @@ struct HotKeyTests {
     #expect(hk1 == hk3)
   }
 
-  @Test("inequality with different left/right modifiers")
+  @Test("==: different left and right modifiers")
   func inequalityWithDifferentLeftRightModifiers() async throws {
     let hk1 = HotKey(modifierFlags: .lalt, key: 0)
     let hk2 = HotKey(modifierFlags: .ralt, key: 0)
@@ -104,7 +202,7 @@ struct HotKeyTests {
     #expect(hk1 != hk2)
   }
 
-  @Test("equality with multiple equivalent modifiers")
+  @Test("==: multiple equivalent modifiers")
   func equalityWithMultipleEquivalentModifiers() async throws {
     let hk1 = HotKey(modifierFlags: [.alt, .cmd], key: 0)
     let hk2 = HotKey(modifierFlags: [.lalt, .rcmd], key: 0)
@@ -112,7 +210,7 @@ struct HotKeyTests {
     #expect(hk1 == hk2)
   }
 
-  @Test("equality with fn modifier")
+  @Test("==: fn modifier")
   func equalityWithFnModifier() async throws {
     let hk1 = HotKey(modifierFlags: [.cmd, .fn], key: 0)
     let hk2 = HotKey(modifierFlags: [.cmd, .fn], key: 0)
@@ -120,7 +218,7 @@ struct HotKeyTests {
     #expect(hk1 == hk2)
   }
 
-  @Test("inequality with fn modifier difference")
+  @Test("==: fn modifier difference")
   func inequalityWithFnModifierDifference() async throws {
     let hk1 = HotKey(modifierFlags: [.cmd, .fn], key: 0)
     let hk2 = HotKey(modifierFlags: .cmd, key: 0)
@@ -128,7 +226,7 @@ struct HotKeyTests {
     #expect(hk1 != hk2)
   }
 
-  @Test("equality with empty modifiers")
+  @Test("==: empty modifiers")
   func equalityWithEmptyModifiers() async throws {
     let hk1 = HotKey(modifierFlags: [], key: 0)
     let hk2 = HotKey(modifierFlags: [], key: 0)
@@ -136,7 +234,7 @@ struct HotKeyTests {
     #expect(hk1 == hk2)
   }
 
-  @Test("description formatting")
+  @Test("description: formats modifiers and key")
   func descriptionFormatting() async throws {
     let testCases: [(HotKey, String)] = [
       (HotKey(modifierFlags: .cmd, key: 0), "<HotKey flags: <ModifierFlags cmd>, key: a>"),
@@ -176,103 +274,5 @@ struct HotKeyTests {
     for (hotKey, expectedDescription) in testCases {
       #expect(hotKey.description == expectedDescription)
     }
-  }
-
-  @Test("execute with nil command")
-  func executeWithNilCommand() async throws {
-    let hotKey = HotKey(modifierFlags: .cmd, key: 0)
-    var executed = false
-
-    #expect(hotKey.command == nil)
-
-    hotKey.execute(onExecute: { executed = true })
-
-    #expect(executed == false)
-  }
-
-  @Test("execute with successful command")
-  func executeWithSuccessfulCommand() async throws {
-    let hotKey = HotKey(modifierFlags: .cmd, key: 0, command: "true")
-    var executed = false
-
-    hotKey.execute { executed = true }
-
-    #expect(executed)
-  }
-
-  @Test("execute with failing command")
-  func executeWithFailingCommand() async throws {
-    let hotKey = HotKey(modifierFlags: .cmd, key: 0, command: "false")
-    var executed = false
-
-    hotKey.execute { executed = true }
-
-    #expect(executed)
-  }
-
-  @Test("execute falls back to /bin/bash when SHELL is unset")
-  func executeFallsBackToBashWhenShellUnset() async throws {
-    let originalShell = getenv("SHELL").map { String(cString: $0) }
-
-    unsetenv("SHELL")
-
-    defer {
-      if let original = originalShell {
-        setenv("SHELL", original, 1)
-      } else {
-        unsetenv("SHELL")
-      }
-    }
-
-    let hotKey = HotKey(modifierFlags: .cmd, key: 0, command: "true")
-    var executed = false
-
-    hotKey.execute { executed = true }
-
-    #expect(executed)
-  }
-
-  @Test("execute falls back to /bin/bash when SHELL is empty")
-  func executeFallsBackToBashWhenShellEmpty() async throws {
-    let originalShell = getenv("SHELL").map { String(cString: $0) }
-
-    setenv("SHELL", "", 1)
-
-    defer {
-      if let original = originalShell {
-        setenv("SHELL", original, 1)
-      } else {
-        unsetenv("SHELL")
-      }
-    }
-
-    let hotKey = HotKey(modifierFlags: .cmd, key: 0, command: "true")
-    var executed = false
-
-    hotKey.execute { executed = true }
-
-    #expect(executed)
-  }
-
-  @Test("execute with passthrough returns passthrough")
-  func executeWithPassthroughReturnsPassthrough() async throws {
-    let hotKey = HotKey(modifierFlags: .cmd, key: 0, command: "true", passthrough: true)
-    var executed = false
-
-    let result = hotKey.execute { executed = true }
-
-    #expect(executed)
-    #expect(result == .passthrough)
-  }
-
-  @Test("execute without passthrough returns consumed")
-  func executeWithoutPassthroughReturnsConsumed() async throws {
-    let hotKey = HotKey(modifierFlags: .cmd, key: 0, command: "true", passthrough: false)
-    var executed = false
-
-    let result = hotKey.execute { executed = true }
-
-    #expect(executed)
-    #expect(result == .consumed)
   }
 }

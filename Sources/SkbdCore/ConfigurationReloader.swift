@@ -1,35 +1,6 @@
 import Foundation
 
-public enum ConfigurationReloaderError: Error, CustomStringConvertible {
-  case loadFailed(Error)
-  case parseFailed(ParserError)
-
-  public var description: String {
-    switch self {
-    case .loadFailed(let error):
-      return "failed to load configuration: \(error.localizedDescription)"
-    case .parseFailed(let error):
-      return "error parsing the configuration file: \(error)"
-    }
-  }
-}
-
 public final class ConfigurationReloader: @unchecked Sendable {
-  private let url: URL
-  private let onReload: @Sendable (Configuration) -> Void
-  private let onError: @Sendable (String) -> Void
-  private var watcher: ConfigurationWatcher?
-
-  public init(
-    url: URL,
-    onReload: @escaping @Sendable (Configuration) -> Void,
-    onError: @escaping @Sendable (String) -> Void
-  ) {
-    self.url = url
-    self.onReload = onReload
-    self.onError = onError
-  }
-
   public static func loadConfiguration(from url: URL) throws -> Configuration {
     do {
       let input = try ConfigurationLoader.load(from: url)
@@ -46,6 +17,21 @@ public final class ConfigurationReloader: @unchecked Sendable {
     } catch {
       throw ConfigurationReloaderError.loadFailed(error)
     }
+  }
+
+  private let url: URL
+  private let onReload: @Sendable (Configuration) -> Void
+  private let onError: @Sendable (String) -> Void
+  private var watcher: ConfigurationWatcher?
+
+  public init(
+    url: URL,
+    onReload: @escaping @Sendable (Configuration) -> Void,
+    onError: @escaping @Sendable (String) -> Void
+  ) {
+    self.url = url
+    self.onReload = onReload
+    self.onError = onError
   }
 
   public func start() {
@@ -65,6 +51,20 @@ public final class ConfigurationReloader: @unchecked Sendable {
       onError(error.description)
     } catch {
       onError(error.localizedDescription)
+    }
+  }
+}
+
+public enum ConfigurationReloaderError: Error, CustomStringConvertible {
+  case loadFailed(Error)
+  case parseFailed(ParserError)
+
+  public var description: String {
+    switch self {
+    case .loadFailed(let error):
+      return "failed to load configuration: \(error.localizedDescription)"
+    case .parseFailed(let error):
+      return "error parsing the configuration file: \(error)"
     }
   }
 }

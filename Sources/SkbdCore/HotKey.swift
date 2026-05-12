@@ -1,11 +1,6 @@
 import Carbon
 import Foundation
 
-enum HotKeyResult {
-  case passthrough
-  case consumed
-}
-
 public struct HotKey {
   static func from(event: CGEvent) -> HotKey {
     return HotKey(
@@ -71,4 +66,9 @@ extension HotKey: CustomStringConvertible {
   public var description: String {
     "<HotKey flags: \(modifierFlags), key: \(KeyCodes.key(for: Int(key)))>"
   }
+}
+
+enum HotKeyResult {
+  case passthrough
+  case consumed
 }

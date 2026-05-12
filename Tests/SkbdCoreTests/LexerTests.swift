@@ -4,7 +4,7 @@ import Testing
 
 @Suite("Lexer")
 struct LexerTests {
-  @Test("getToken with empty buffer")
+  @Test("getToken(): empty buffer")
   func getTokenWithEmptyBuffer() async throws {
     let input = ""
 
@@ -14,7 +14,7 @@ struct LexerTests {
     #expect(tokens.isEmpty)
   }
 
-  @Test("getToken")
+  @Test("getToken(): full configuration")
   func getToken() async throws {
     let input = """
         # simple modifier and key literal with command
@@ -84,7 +84,7 @@ struct LexerTests {
     }
   }
 
-  @Test("getToken with digit EOL")
+  @Test("getToken(): digit at end of line")
   func getTokenWithDigitEOL() async throws {
     let input = "cmd - 0"
 
@@ -100,7 +100,7 @@ struct LexerTests {
     }
   }
 
-  @Test("getToken with unknown key")
+  @Test("getToken(): unknown key")
   func getTokenWithUnknownKey() async throws {
     let input = """
         cmd + rctrl - §: echo "unknown"
@@ -119,7 +119,7 @@ struct LexerTests {
     }
   }
 
-  @Test("getToken with unknown literal")
+  @Test("getToken(): unknown literal")
   func getTokenWithUnknownLiteral() async throws {
     let input = """
         cmd + rctrl - f100: echo "unknown"
