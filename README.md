@@ -23,6 +23,10 @@ If you build from source, you'll need to create a Launch Agent `.plist` file to 
 
 `skbd` can be configured using a single file, or a directory of multiple files. By default `~/.config/skbd/skbdrc` is used. If the configured path points to a directory, `skbd` loads all non-hidden regular files in that directory in lexicographical filename order. The path can be overridden using the `-c/--config` flag.
 
+The configuration is reloaded automatically while `skbd` is running. For a single file, changes to the file are picked up without restarting `skbd`. If the configured path is a symlink, `skbd` watches both the symlink location and the resolved target, so editing the target or repointing the symlink reloads the configuration. For a directory configuration, `skbd` reloads when files in the directory are edited, added, removed, or renamed.
+
+If a changed configuration cannot be loaded or parsed, `skbd` prints an error and keeps using the last valid configuration.
+
 You can declare key binds by specifying one or more modifier keys and the key to bind to a command.
 
     cmd + shift - k: open -a iTerm
