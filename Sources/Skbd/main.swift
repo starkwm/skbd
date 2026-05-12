@@ -24,38 +24,45 @@ case .failure(.failed(let reason)):
   exit(EXIT_FAILURE)
 }
 
-let parser: Parser
-
 do {
-  let input = try ConfigurationLoader.load(from: arguments.config)
-  parser = Parser(with: input)
+  let configuration = try ConfigurationReloader.loadConfiguration(from: arguments.config)
+  let eventTap = EventTapManager(
+    hotKeys: configuration.hotKeys,
+    blockList: configuration.blockList
+  )
+
+  switch eventTap.begin() {
+  case .success: break
+  case .failure(let error):
+    fputs("error starting the event tap: \(error)\n", stderr)
+    fflush(stderr)
+    exit(EXIT_FAILURE)
+  }
+
+  let reloader = ConfigurationReloader(
+    url: arguments.config,
+    onReload: { configuration in
+      eventTap.update(configuration: configuration)
+    },
+    onError: { message in
+      fputs("\(message)\n", stderr)
+      fflush(stderr)
+    }
+  )
+
+  reloader.start()
+
+  signal(SIGINT) { _ in
+    CFRunLoopStop(CFRunLoopGetMain())
+  }
+
+  CFRunLoopRun()
+} catch let error as ConfigurationReloaderError {
+  fputs("\(error.description)\n", stderr)
+  fflush(stderr)
+  exit(EXIT_FAILURE)
 } catch {
-  fputs("failed to load configuration: \(error.localizedDescription)\n", stderr)
+  fputs("\(error.localizedDescription)\n", stderr)
   fflush(stderr)
   exit(EXIT_FAILURE)
 }
-
-let eventTap: EventTapManager
-
-switch parser.parse() {
-case .success(let configuration):
-  eventTap = EventTapManager(hotKeys: configuration.hotKeys, blockList: configuration.blockList)
-case .failure(let error):
-  fputs("error parsing the configuration file: \(error)\n", stderr)
-  fflush(stderr)
-  exit(EXIT_FAILURE)
-}
-
-switch eventTap.begin() {
-case .success: break
-case .failure(let error):
-  fputs("error starting the event tap: \(error)\n", stderr)
-  fflush(stderr)
-  exit(EXIT_FAILURE)
-}
-
-signal(SIGINT) { _ in
-  CFRunLoopStop(CFRunLoopGetMain())
-}
-
-CFRunLoopRun()

@@ -1,7 +1,7 @@
 import AppKit
 import CoreGraphics
 
-public class EventTapManager {
+public class EventTapManager: @unchecked Sendable {
   private var eventTap: CFMachPort?
   private var runloopSource: CFRunLoopSource?
 
@@ -55,6 +55,11 @@ public class EventTapManager {
     CGEvent.tapEnable(tap: eventTap, enable: true)
 
     return .success(())
+  }
+
+  public func update(configuration: Configuration) {
+    hotKeys = configuration.hotKeys
+    blockList = configuration.blockList
   }
 
   func process(event: CGEvent, type: CGEventType) -> CGEvent? {
