@@ -50,8 +50,18 @@ class Lexer {
       token.type = .string
       token.text = readString()
     case ".":
-      token.text = readDirective()
-      token.type = .directive
+      if peek()?.isLetter == true {
+        token.text = readDirective()
+        token.type = .directive
+      } else {
+        token.type = .key
+        token.text = String(current)
+        advance()
+      }
+    case ",", "`", "=", "'", ";", "\\", "/":
+      token.type = .key
+      token.text = String(current)
+      advance()
     case _ where current.isNumber:
       if current == "0" && peek() == "x" {
         advance(by: 2)

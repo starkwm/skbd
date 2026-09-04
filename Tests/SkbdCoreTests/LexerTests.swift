@@ -100,6 +100,42 @@ struct LexerTests {
     }
   }
 
+  @Test("getToken(): comma and period keys")
+  func getTokenWithCommaAndPeriodKeys() async throws {
+    let input = """
+      cmd - ,: echo "comma"
+      cmd - .: echo "period"
+      """
+
+    let expected: [(TokenType, String?)] = [
+      (.modifier, "cmd"), (.dash, nil), (.key, ","), (.command, "echo \"comma\""),
+      (.modifier, "cmd"), (.dash, nil), (.key, "."), (.command, "echo \"period\""),
+    ]
+
+    let lexer = Lexer(with: input)
+
+    for (idx, token) in lexer.enumerated() {
+      #expect(expected[idx].0 == token.type)
+      #expect(expected[idx].1 == token.text)
+    }
+  }
+
+  @Test("getToken(): symbol keys")
+  func getTokenWithSymbolKeys() async throws {
+    let input = "` - = [ ] ' ; \\ /"
+    let expected: [(TokenType, String?)] = [
+      (.key, "`"), (.dash, nil), (.key, "="), (.beginList, nil), (.endList, nil),
+      (.key, "'"), (.key, ";"), (.key, "\\"), (.key, "/"),
+    ]
+
+    let lexer = Lexer(with: input)
+
+    for (idx, token) in lexer.enumerated() {
+      #expect(expected[idx].0 == token.type)
+      #expect(expected[idx].1 == token.text)
+    }
+  }
+
   @Test("getToken(): unknown key")
   func getTokenWithUnknownKey() async throws {
     let input = """

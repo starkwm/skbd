@@ -23,7 +23,7 @@ public class Parser {
         if check(.directive) {
           let blockList = try parseBlocklist()
           configuration.blockList = blockList
-        } else if check(.modifier, .key, .keyHex, .literal) {
+        } else if check(.modifier, .key, .keyHex, .literal, .dash, .beginList, .endList) {
           let hotKey = try parseHotKey()
           configuration.hotKeys.append(hotKey)
         } else {
@@ -58,6 +58,8 @@ public class Parser {
       let (key, modifierFlags) = try parseKeyLiteral()
       hotKey.key = key
       hotKey.modifierFlags.insert(modifierFlags)
+    } else if match(.dash, .beginList, .endList) {
+      hotKey.key = try parseSyntaxKey()
     } else {
       throw ParserError.invalidKeyLiteral
     }
@@ -140,6 +142,21 @@ public class Parser {
     return (UInt32(code), flags)
   }
 
+  private func parseSyntaxKey() throws -> UInt32 {
+    let key = switch previousToken?.type {
+    case .dash: "-"
+    case .beginList: "["
+    case .endList: "]"
+    default: throw ParserError.invalidKey
+    }
+
+    guard let keyCode = KeyCodes.keyCode(for: key) else {
+      throw ParserError.invalidKey
+    }
+
+    return UInt32(keyCode)
+  }
+
   private func parseCommand() throws -> String {
     guard let command = previousToken?.text else { throw ParserError.invalidCommand }
     guard !command.isEmpty else { throw ParserError.invalidCommand }
@@ -156,8 +173,8 @@ public class Parser {
     return types.contains(currentToken.type)
   }
 
-  private func match(_ type: TokenType) -> Bool {
-    guard check(type) else { return false }
+  private func match(_ types: TokenType...) -> Bool {
+    guard !atEnd && types.contains(currentToken.type) else { return false }
     advance()
     return true
   }
