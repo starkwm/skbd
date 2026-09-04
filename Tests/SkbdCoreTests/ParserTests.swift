@@ -61,6 +61,63 @@ struct ParserTests {
     #expect(configuration.hotKeys[2].command == "echo \"space hex\"")
   }
 
+  @Test("parse(): comma and period keys")
+  func parseCommaAndPeriodKeys() async throws {
+    let input = """
+      cmd - ,: echo "comma"
+      cmd - .: echo "period"
+      """
+
+    let parser = Parser(with: input)
+    let result = parser.parse()
+    let configuration = try result.get()
+
+    #expect(configuration.hotKeys.count == 2)
+    #expect(configuration.hotKeys[0].key == kVK_ANSI_Comma)
+    #expect(configuration.hotKeys[0].modifierFlags == .cmd)
+    #expect(configuration.hotKeys[0].command == "echo \"comma\"")
+    #expect(configuration.hotKeys[1].key == kVK_ANSI_Period)
+    #expect(configuration.hotKeys[1].modifierFlags == .cmd)
+    #expect(configuration.hotKeys[1].command == "echo \"period\"")
+  }
+
+  @Test("parse(): symbol keys")
+  func parseSymbolKeys() async throws {
+    let input = """
+      cmd - `: echo "backtick"
+      cmd - -: echo "minus"
+      cmd - =: echo "equal"
+      cmd - [: echo "left bracket"
+      cmd - ]: echo "right bracket"
+      cmd - ': echo "quote"
+      cmd - ;: echo "semicolon"
+      cmd - \\: echo "backslash"
+      cmd - /: echo "slash"
+      """
+
+    let parser = Parser(with: input)
+    let result = parser.parse()
+    let configuration = try result.get()
+
+    let expectedKeys = [
+      kVK_ANSI_Grave,
+      kVK_ANSI_Minus,
+      kVK_ANSI_Equal,
+      kVK_ANSI_LeftBracket,
+      kVK_ANSI_RightBracket,
+      kVK_ANSI_Quote,
+      kVK_ANSI_Semicolon,
+      kVK_ANSI_Backslash,
+      kVK_ANSI_Slash,
+    ]
+
+    #expect(configuration.hotKeys.count == expectedKeys.count)
+    for (hotKey, expectedKey) in zip(configuration.hotKeys, expectedKeys) {
+      #expect(hotKey.key == expectedKey)
+      #expect(hotKey.modifierFlags == .cmd)
+    }
+  }
+
   @Test("parse(): multiple modifiers")
   func parseMultipleModifiers() async throws {
     let input = """
