@@ -11,6 +11,7 @@ struct ConfigurationLoaderTests {
     defer { try? FileManager.default.removeItem(at: directory) }
 
     let file = directory.appendingPathComponent("skbdrc")
+
     try "cmd - a: echo file".write(to: file, atomically: true, encoding: .utf8)
 
     let result = try ConfigurationLoader.load(from: file)
@@ -25,6 +26,7 @@ struct ConfigurationLoaderTests {
 
     let file = directory.appendingPathComponent("target-skbdrc")
     let link = directory.appendingPathComponent("skbdrc")
+
     try "cmd - a: echo symlink".write(to: file, atomically: true, encoding: .utf8)
     try FileManager.default.createSymbolicLink(at: link, withDestinationURL: file)
 
@@ -79,7 +81,9 @@ struct ConfigurationLoaderTests {
 
   private func temporaryDirectory() throws -> URL {
     let url = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+
     try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
+
     return url
   }
 }

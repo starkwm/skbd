@@ -21,10 +21,12 @@ class Lexer {
       token.type = .endOfStream
     case "#":
       skipComment()
+
       return getToken()
     case ":":
       advance()
       skipWhitespace()
+
       token.type = .command
       token.text = readCommand()
     case "+":
@@ -34,6 +36,7 @@ class Lexer {
       if peek() == ">" {
         advance(by: 2)
         skipWhitespace()
+
         token.type = .arrow
         token.text = readCommand()
       } else {
@@ -65,6 +68,7 @@ class Lexer {
     case _ where current.isNumber:
       if current == "0" && peek() == "x" {
         advance(by: 2)
+
         token.type = .keyHex
         token.text = readKeyHex()
       } else {
@@ -93,6 +97,7 @@ class Lexer {
 
   private func peek() -> Character? {
     let nextIndex = buffer.index(after: position)
+
     return nextIndex < buffer.endIndex ? buffer[nextIndex] : "\0"
   }
 
@@ -124,6 +129,7 @@ class Lexer {
 
   private func readIdentifier() -> String {
     let start = position
+
     advance()
 
     while !atEnd && (current.isLetter || current.isNumber) {
@@ -145,6 +151,7 @@ class Lexer {
 
   private func readString() -> String {
     advance()
+
     let start = position
 
     while !atEnd && current != "\"" {
@@ -152,6 +159,7 @@ class Lexer {
     }
 
     let result = String(buffer[start..<position])
+
     if !atEnd {
       advance()
     }
@@ -201,6 +209,7 @@ struct LexerIterator: IteratorProtocol {
 
   mutating func next() -> Token? {
     let token = lexer.getToken()
+
     return token.type == .endOfStream ? nil : token
   }
 }

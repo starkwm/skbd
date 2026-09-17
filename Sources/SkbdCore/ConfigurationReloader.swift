@@ -46,6 +46,7 @@ public final class ConfigurationReloader: @unchecked Sendable {
   private func reload() {
     do {
       let configuration = try Self.loadConfiguration(from: url)
+
       onReload(configuration)
     } catch let error as ConfigurationReloaderError {
       onError(error.description)

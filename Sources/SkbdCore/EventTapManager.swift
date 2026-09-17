@@ -66,9 +66,11 @@ public class EventTapManager: @unchecked Sendable {
     switch type {
     case .tapDisabledByTimeout, .tapDisabledByUserInput:
       guard let eventTap = eventTap else { return event }
+
       CGEvent.tapEnable(tap: eventTap, enable: true)
     case .keyDown:
       let processName = NSWorkspace.shared.frontmostApplication?.localizedName
+
       if let processName, blockList.contains(processName) {
         return event
       }
@@ -81,6 +83,7 @@ public class EventTapManager: @unchecked Sendable {
       let result = hotkey.execute()
 
       if case .consumed = result { return nil }
+
       return event
     default:
       break

@@ -22,9 +22,11 @@ public class Parser {
       while !atEnd {
         if check(.directive) {
           let blockList = try parseBlocklist()
+
           configuration.blockList = blockList
         } else if check(.modifier, .key, .keyHex, .literal, .dash, .beginList, .endList) {
           let hotKey = try parseHotKey()
+
           configuration.hotKeys.append(hotKey)
         } else {
           throw ParserError.expectedModifierOrKey
@@ -56,6 +58,7 @@ public class Parser {
       hotKey.key = try parseKeyHex()
     } else if match(.literal) {
       let (key, modifierFlags) = try parseKeyLiteral()
+
       hotKey.key = key
       hotKey.modifierFlags.insert(modifierFlags)
     } else if match(.dash, .beginList, .endList) {
@@ -78,6 +81,7 @@ public class Parser {
 
   private func parseBlocklist() throws -> [String] {
     advance()
+
     guard let directive = previousToken?.text else { throw ParserError.invalidDirective }
     guard directive == ".blocklist" else { throw ParserError.invalidDirective }
 
@@ -88,6 +92,7 @@ public class Parser {
     while !check(.endList) && !atEnd {
       guard match(.string) else { throw ParserError.expectedStringLiteral }
       guard let processName = previousToken?.text else { throw ParserError.expectedStringLiteral }
+
       blockList.append(processName)
     }
 
@@ -124,6 +129,7 @@ public class Parser {
   private func parseKeyHex() throws -> UInt32 {
     guard let key = previousToken?.text else { throw ParserError.invalidKeyHex }
     guard let keyCode = UInt32(key, radix: 16) else { throw ParserError.invalidKeyHex }
+
     return keyCode
   }
 
@@ -135,6 +141,7 @@ public class Parser {
     }
 
     var flags = ModifierFlags()
+
     if requiresFn {
       flags.insert(.fn)
     }
@@ -143,12 +150,13 @@ public class Parser {
   }
 
   private func parseSyntaxKey() throws -> UInt32 {
-    let key = switch previousToken?.type {
-    case .dash: "-"
-    case .beginList: "["
-    case .endList: "]"
-    default: throw ParserError.invalidKey
-    }
+    let key =
+      switch previousToken?.type {
+      case .dash: "-"
+      case .beginList: "["
+      case .endList: "]"
+      default: throw ParserError.invalidKey
+      }
 
     guard let keyCode = KeyCodes.keyCode(for: key) else {
       throw ParserError.invalidKey
@@ -160,6 +168,7 @@ public class Parser {
   private func parseCommand() throws -> String {
     guard let command = previousToken?.text else { throw ParserError.invalidCommand }
     guard !command.isEmpty else { throw ParserError.invalidCommand }
+
     return command
   }
 
@@ -170,12 +179,15 @@ public class Parser {
 
   private func check(_ types: TokenType...) -> Bool {
     guard !atEnd else { return false }
+
     return types.contains(currentToken.type)
   }
 
   private func match(_ types: TokenType...) -> Bool {
     guard !atEnd && types.contains(currentToken.type) else { return false }
+
     advance()
+
     return true
   }
 }

@@ -35,6 +35,7 @@ final class ConfigurationWatcher: @unchecked Sendable {
     queue.sync {
       self.pendingChange?.cancel()
       self.pendingChange = nil
+
       self.cancelSources()
     }
   }
@@ -44,8 +45,10 @@ final class ConfigurationWatcher: @unchecked Sendable {
 
     let workItem = DispatchWorkItem { [weak self] in
       guard let self else { return }
+
       self.pendingChange = nil
       self.rebuildSources()
+
       let onChange = self.onChange
 
       DispatchQueue.main.async {
@@ -62,6 +65,7 @@ final class ConfigurationWatcher: @unchecked Sendable {
 
     for url in watchedURLs() {
       let descriptor = open(url.path, O_EVTONLY)
+
       guard descriptor >= 0 else { continue }
 
       let source = DispatchSource.makeFileSystemObjectSource(
@@ -121,7 +125,9 @@ final class ConfigurationWatcher: @unchecked Sendable {
 
     for url in urls {
       let path = url.standardizedFileURL.path
+
       guard seen.insert(path).inserted else { continue }
+
       result.append(url)
     }
 

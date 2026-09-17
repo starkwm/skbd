@@ -9,6 +9,7 @@ struct LexerTests {
     let input = ""
 
     let lexer = Lexer(with: input)
+
     let tokens = Array(lexer)
 
     #expect(tokens.isEmpty)
@@ -123,6 +124,7 @@ struct LexerTests {
   @Test("getToken(): symbol keys")
   func getTokenWithSymbolKeys() async throws {
     let input = "` - = [ ] ' ; \\ /"
+
     let expected: [(TokenType, String?)] = [
       (.key, "`"), (.dash, nil), (.key, "="), (.beginList, nil), (.endList, nil),
       (.key, "'"), (.key, ";"), (.key, "\\"), (.key, "/"),

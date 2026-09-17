@@ -12,6 +12,7 @@ struct EventTapManagerTests {
     let oldHotkey = HotKey(modifierFlags: [], key: 0, command: "false")
     let newHotkey = HotKey(modifierFlags: [], key: 1, command: "true")
     let manager = EventTapManager(hotKeys: [oldHotkey])
+
     let source = CGEventSource(stateID: .hidSystemState)
     let oldEvent = CGEvent(keyboardEventSource: source, virtualKey: 0, keyDown: true)!
     let newEvent = CGEvent(keyboardEventSource: source, virtualKey: 1, keyDown: true)!
@@ -25,6 +26,7 @@ struct EventTapManagerTests {
   @Test("process(event:type:): unhandled type")
   func testProcessEventWithUnhandledType() throws {
     let manager = EventTapManager(hotKeys: [])
+
     let source = CGEventSource(stateID: .hidSystemState)
     let event = CGEvent(
       mouseEventSource: source,
@@ -41,6 +43,7 @@ struct EventTapManagerTests {
   @Test("process(event:type:): keyDown without match")
   func testProcessEventKeyDownNoMatch() throws {
     let manager = EventTapManager(hotKeys: [])
+
     let source = CGEventSource(stateID: .hidSystemState)
     let event = CGEvent(keyboardEventSource: source, virtualKey: 0, keyDown: true)!
 
@@ -53,6 +56,7 @@ struct EventTapManagerTests {
   func testProcessEventKeyDownConsumeMatch() throws {
     let hotkey = HotKey(modifierFlags: [], key: 0, command: "true")
     let manager = EventTapManager(hotKeys: [hotkey])
+
     let source = CGEventSource(stateID: .hidSystemState)
     let event = CGEvent(keyboardEventSource: source, virtualKey: 0, keyDown: true)!
 
@@ -65,6 +69,7 @@ struct EventTapManagerTests {
   func testProcessEventKeyDownPassthroughMatch() throws {
     let hotkey = HotKey(modifierFlags: [], key: 0, command: "true", passthrough: true)
     let manager = EventTapManager(hotKeys: [hotkey])
+
     let source = CGEventSource(stateID: .hidSystemState)
     let event = CGEvent(keyboardEventSource: source, virtualKey: 0, keyDown: true)!
 

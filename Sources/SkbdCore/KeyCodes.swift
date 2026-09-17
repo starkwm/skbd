@@ -86,6 +86,7 @@ struct KeyCodes {
 
       if length > 0 {
         let key = String(utf16CodeUnits: &chars, count: length)
+
         keys[key.lowercased()] = keyCode
       }
     }
@@ -95,12 +96,15 @@ struct KeyCodes {
 
   private static let reverseKeys: [Int: String] = {
     var dict = [Int: String]()
+
     for (name, (code, _)) in specialKeys {
       dict[code] = name
     }
+
     for (name, code) in keymap {
       dict[code] = name
     }
+
     return dict
   }()
 

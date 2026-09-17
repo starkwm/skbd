@@ -23,6 +23,7 @@ public enum ConfigurationLoader {
       try entries
       .filter { entry in
         let values = try entry.resourceValues(forKeys: [.isRegularFileKey])
+
         return values.isRegularFile == true
       }
       .sorted { $0.lastPathComponent < $1.lastPathComponent }
