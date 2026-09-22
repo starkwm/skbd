@@ -3,7 +3,7 @@ import CoreGraphics
 
 public class EventTapManager: @unchecked Sendable {
   private var eventTap: CFMachPort?
-  private var runloopSource: CFRunLoopSource?
+  private var runLoopSource: CFRunLoopSource?
 
   private var hotKeys: [HotKey]
   private var blockList: [String]
@@ -14,26 +14,26 @@ public class EventTapManager: @unchecked Sendable {
   }
 
   deinit {
-    if let eventTap = eventTap {
+    if let eventTap {
       CGEvent.tapEnable(tap: eventTap, enable: false)
       CFMachPortInvalidate(eventTap)
     }
 
-    if let runloopSource = runloopSource {
-      CFRunLoopRemoveSource(CFRunLoopGetMain(), runloopSource, .commonModes)
+    if let runLoopSource {
+      CFRunLoopRemoveSource(CFRunLoopGetMain(), runLoopSource, .commonModes)
     }
   }
 
   public func begin() -> Result<Void, EventTapError> {
-    guard eventTap == nil, runloopSource == nil else { return .success(()) }
+    guard eventTap == nil, runLoopSource == nil else { return .success(()) }
 
     let callback: CGEventTapCallBack = { _, type, event, refcon in
-      guard let refcon = refcon else { return Unmanaged.passUnretained(event) }
+      guard let refcon else { return Unmanaged.passUnretained(event) }
 
       let manager = Unmanaged<EventTapManager>.fromOpaque(refcon).takeUnretainedValue()
       let result = manager.process(event: event, type: type)
 
-      guard let result = result else { return nil }
+      guard let result else { return nil }
 
       return Unmanaged.passUnretained(result)
     }
@@ -47,11 +47,11 @@ public class EventTapManager: @unchecked Sendable {
       userInfo: Unmanaged.passUnretained(self).toOpaque()
     )
 
-    guard let eventTap = eventTap else { return .failure(.creationFailed) }
+    guard let eventTap else { return .failure(.creationFailed) }
 
-    runloopSource = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, eventTap, 0)
+    runLoopSource = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, eventTap, 0)
 
-    CFRunLoopAddSource(CFRunLoopGetCurrent(), runloopSource, .commonModes)
+    CFRunLoopAddSource(CFRunLoopGetCurrent(), runLoopSource, .commonModes)
     CGEvent.tapEnable(tap: eventTap, enable: true)
 
     return .success(())
@@ -65,7 +65,7 @@ public class EventTapManager: @unchecked Sendable {
   func process(event: CGEvent, type: CGEventType) -> CGEvent? {
     switch type {
     case .tapDisabledByTimeout, .tapDisabledByUserInput:
-      guard let eventTap = eventTap else { return event }
+      guard let eventTap else { return event }
 
       CGEvent.tapEnable(tap: eventTap, enable: true)
     case .keyDown:
@@ -76,11 +76,11 @@ public class EventTapManager: @unchecked Sendable {
       }
 
       let eventHotKey = HotKey.from(event: event)
-      let hotkey = hotKeys.first { $0 == eventHotKey }
+      let hotKey = hotKeys.first { $0.matches(eventHotKey) }
 
-      guard let hotkey = hotkey else { return event }
+      guard let hotKey else { return event }
 
-      let result = hotkey.execute()
+      let result = hotKey.execute()
 
       if case .consumed = result { return nil }
 
