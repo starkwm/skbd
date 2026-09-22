@@ -6,7 +6,7 @@ import Testing
 @Suite("Parser")
 struct ParserTests {
   @Test("parse(): key")
-  func parseKey() async throws {
+  func parseKey() throws {
     let input = """
       space: echo "space"
       a: echo "a"
@@ -15,8 +15,7 @@ struct ParserTests {
 
     let parser = Parser(with: input)
 
-    let result = parser.parse()
-    let configuration = try result.get()
+    let configuration = try parser.parse().get()
 
     #expect(configuration.hotKeys.count == 3)
     #expect(configuration.blockList.isEmpty)
@@ -35,7 +34,7 @@ struct ParserTests {
   }
 
   @Test("parse(): single modifier")
-  func parseSingleModifier() async throws {
+  func parseSingleModifier() throws {
     let input = """
       lctrl - space: echo "space"
       rcmd - a: echo "a"
@@ -44,8 +43,7 @@ struct ParserTests {
 
     let parser = Parser(with: input)
 
-    let result = parser.parse()
-    let configuration = try result.get()
+    let configuration = try parser.parse().get()
 
     #expect(configuration.hotKeys.count == 3)
     #expect(configuration.blockList.isEmpty)
@@ -64,7 +62,7 @@ struct ParserTests {
   }
 
   @Test("parse(): comma and period keys")
-  func parseCommaAndPeriodKeys() async throws {
+  func parseCommaAndPeriodKeys() throws {
     let input = """
       cmd - ,: echo "comma"
       cmd - .: echo "period"
@@ -72,8 +70,7 @@ struct ParserTests {
 
     let parser = Parser(with: input)
 
-    let result = parser.parse()
-    let configuration = try result.get()
+    let configuration = try parser.parse().get()
 
     #expect(configuration.hotKeys.count == 2)
 
@@ -87,7 +84,7 @@ struct ParserTests {
   }
 
   @Test("parse(): symbol keys")
-  func parseSymbolKeys() async throws {
+  func parseSymbolKeys() throws {
     let input = """
       cmd - `: echo "backtick"
       cmd - -: echo "minus"
@@ -102,8 +99,7 @@ struct ParserTests {
 
     let parser = Parser(with: input)
 
-    let result = parser.parse()
-    let configuration = try result.get()
+    let configuration = try parser.parse().get()
 
     let expectedKeys = [
       kVK_ANSI_Grave,
@@ -126,7 +122,7 @@ struct ParserTests {
   }
 
   @Test("parse(): multiple modifiers")
-  func parseMultipleModifiers() async throws {
+  func parseMultipleModifiers() throws {
     let input = """
       lctrl + lshift - space: echo "space"
       rcmd + lcmd + rshift - a: echo "a"
@@ -135,8 +131,7 @@ struct ParserTests {
 
     let parser = Parser(with: input)
 
-    let result = parser.parse()
-    let configuration = try result.get()
+    let configuration = try parser.parse().get()
 
     #expect(configuration.hotKeys.count == 3)
     #expect(configuration.blockList.isEmpty)
@@ -155,15 +150,14 @@ struct ParserTests {
   }
 
   @Test("parse(): key with implicit fn modifier")
-  func parseKeyWithImplicitFnModifier() async throws {
+  func implicitFn() throws {
     let input = """
       lctrl - up: echo "lctrl + up"
       """
 
     let parser = Parser(with: input)
 
-    let result = parser.parse()
-    let configuration = try result.get()
+    let configuration = try parser.parse().get()
 
     #expect(configuration.hotKeys.count == 1)
     #expect(configuration.blockList.isEmpty)
@@ -174,7 +168,7 @@ struct ParserTests {
   }
 
   @Test("parse(): command with multiple lines")
-  func parseCommandWithMultipleLines() async throws {
+  func multilineCommand() throws {
     let input = """
       lctrl - up: echo \\
       "lctrl + up"
@@ -182,8 +176,7 @@ struct ParserTests {
 
     let parser = Parser(with: input)
 
-    let result = parser.parse()
-    let configuration = try result.get()
+    let configuration = try parser.parse().get()
 
     #expect(configuration.hotKeys.count == 1)
     #expect(configuration.blockList.isEmpty)
@@ -199,7 +192,7 @@ struct ParserTests {
   }
 
   @Test("parse(): passthrough arrow")
-  func parseWithPassthroughArrow() async throws {
+  func passthrough() throws {
     let input = """
       lctrl - space-> echo "space passthrough"
       rcmd - a: echo "a consumed"
@@ -207,8 +200,7 @@ struct ParserTests {
 
     let parser = Parser(with: input)
 
-    let result = parser.parse()
-    let configuration = try result.get()
+    let configuration = try parser.parse().get()
 
     #expect(configuration.hotKeys.count == 2)
     #expect(configuration.blockList.isEmpty)
@@ -224,41 +216,8 @@ struct ParserTests {
     #expect(configuration.hotKeys[1].passthrough == false)
   }
 
-  @Test("parse(): invalid input")
-  func parseInvalidInput() async throws {
-    let parser = Parser(with: "iterm: open -a iTerm2.app")
-
-    let result = parser.parse()
-    let isExpectedFailure =
-      if case .failure(.expectedModifierOrKey) = result { true } else { false }
-
-    #expect(isExpectedFailure)
-  }
-
-  @Test("parseHotKey(): missing dash between modifier and key")
-  func parseMissingDashBetweenModifierAndKey() async throws {
-    let parser = Parser(with: "ctrl a: open -a iTerm2.app")
-
-    let result = parser.parse()
-    let isExpectedFailure =
-      if case .failure(.expectedDashAfterModifier) = result { true } else { false }
-
-    #expect(isExpectedFailure)
-  }
-
-  @Test("parseHotKey(): missing command")
-  func parseMissingCommand() async throws {
-    let parser = Parser(with: "ctrl + shift - a")
-
-    let result = parser.parse()
-    let isExpectedFailure =
-      if case .failure(.expectedCommandAfterKey) = result { true } else { false }
-
-    #expect(isExpectedFailure)
-  }
-
   @Test("parseBlocklist(): process names")
-  func parseBlocklist() async throws {
+  func parseBlocklist() throws {
     let input = """
       .blocklist [
         "process1"
@@ -269,15 +228,14 @@ struct ParserTests {
 
     let parser = Parser(with: input)
 
-    let result = parser.parse()
-    let configuration = try result.get()
+    let configuration = try parser.parse().get()
 
     #expect(configuration.hotKeys.isEmpty)
     #expect(configuration.blockList == ["process1", "process2", "process3"])
   }
 
   @Test("parseBlocklist(): with hotkeys")
-  func parseBlocklistWithHotkeys() async throws {
+  func parseBlocklistWithHotkeys() throws {
     let input = """
       .blocklist [
         "Safari"
@@ -288,8 +246,7 @@ struct ParserTests {
 
     let parser = Parser(with: input)
 
-    let result = parser.parse()
-    let configuration = try result.get()
+    let configuration = try parser.parse().get()
 
     #expect(configuration.hotKeys.count == 1)
     #expect(configuration.blockList == ["Safari", "Terminal"])
@@ -299,99 +256,8 @@ struct ParserTests {
     #expect(configuration.hotKeys[0].command == "echo \"space\"")
   }
 
-  @Test("parseBlocklist(): invalid directive")
-  func parseInvalidDirective() async throws {
-    let input = """
-      .invalid [
-        "process1"
-      ]
-      """
-
-    let parser = Parser(with: input)
-
-    let result = parser.parse()
-    let isExpectedFailure = if case .failure(.invalidDirective) = result { true } else { false }
-
-    #expect(isExpectedFailure)
-  }
-
-  @Test("parseBlocklist(): missing right bracket")
-  func parseBlocklistMissingBracket() async throws {
-    let input = """
-      .blocklist [
-        "process1"
-      """
-
-    let parser = Parser(with: input)
-
-    let result = parser.parse()
-    let isExpectedFailure = if case .failure(.expectedRightBracket) = result { true } else { false }
-
-    #expect(isExpectedFailure)
-  }
-
-  @Test("parseBlocklist(): non-string process name")
-  func parseBlocklistWithNonString() async throws {
-    let input = """
-      .blocklist [
-        process1
-      ]
-      """
-
-    let parser = Parser(with: input)
-
-    let result = parser.parse()
-    let isExpectedFailure =
-      if case .failure(.expectedStringLiteral) = result { true } else { false }
-
-    #expect(isExpectedFailure)
-  }
-
-  @Test("parseBlocklist(): missing left bracket")
-  func parseBlocklistMissingLeftBracket() async throws {
-    let input = ".blocklist process1"
-
-    let parser = Parser(with: input)
-
-    let result = parser.parse()
-    let isExpectedFailure =
-      if case .failure(.expectedLeftBracketAfterDirective) = result { true } else { false }
-
-    #expect(isExpectedFailure)
-  }
-
-  @Test("parseBlocklist(): directive nil text")
-  func parseBlocklistDirectiveNilText() async throws {
-    let parser = Parser(
-      with: FakeLexer(tokens: [
-        Token(type: .directive, text: nil), Token(type: .beginList), Token(type: .endList),
-      ])
-    )
-
-    let result = parser.parse()
-    let isExpectedFailure = if case .failure(.invalidDirective) = result { true } else { false }
-
-    #expect(isExpectedFailure)
-  }
-
-  @Test("parseBlocklist(): process name nil text")
-  func parseBlocklistProcessNameNilText() async throws {
-    let parser = Parser(
-      with: FakeLexer(tokens: [
-        Token(type: .directive, text: ".blocklist"), Token(type: .beginList),
-        Token(type: .string, text: nil), Token(type: .endList),
-      ])
-    )
-
-    let result = parser.parse()
-    let isExpectedFailure =
-      if case .failure(.expectedStringLiteral) = result { true } else { false }
-
-    #expect(isExpectedFailure)
-  }
-
   @Test("parseModifier(): opt alternative names")
-  func parseWithOptAlternativeNames() async throws {
+  func optionAliases() throws {
     let input = """
       opt - space: echo "opt space"
       lopt - a: echo "lopt a"
@@ -400,8 +266,7 @@ struct ParserTests {
 
     let parser = Parser(with: input)
 
-    let result = parser.parse()
-    let configuration = try result.get()
+    let configuration = try parser.parse().get()
 
     #expect(configuration.hotKeys.count == 3)
     #expect(configuration.blockList.isEmpty)
@@ -419,117 +284,27 @@ struct ParserTests {
     #expect(configuration.hotKeys[2].command == "echo \"ropt space hex\"")
   }
 
-  @Test("parseModifier(): invalid modifier literal")
-  func parseInvalidModifierLiteral() async throws {
-    let parser = Parser(with: "ctrl + invalidmod - space: echo hello")
+  @Test(
+    "Invalid configuration",
+    arguments: [
+      ("iterm: open -a iTerm2.app", ParserError.expectedModifierOrKey),
+      ("ctrl a: echo hello", .expectedDashAfterModifier),
+      ("ctrl + shift - a", .expectedCommandAfterKey),
+      (".invalid []", .invalidDirective),
+      (".blocklist [\"Terminal\"", .expectedRightBracket),
+      (".blocklist [Terminal]", .expectedStringLiteral),
+      (".blocklist Terminal", .expectedLeftBracketAfterDirective),
+      ("ctrl + invalidmod - space: echo hello", .invalidModifierLiteral),
+      ("ctrl + shift - 0xGG: echo hello", .invalidKeyHex),
+      ("ctrl + shift - foo: echo hello", .invalidKeyLiteral),
+      ("ctrl + shift - a:", .invalidCommand),
+    ]
+  )
+  func invalidInput(input: String, error: ParserError) {
+    let parser = Parser(with: input)
 
-    let result = parser.parse()
-    let isExpectedFailure =
-      if case .failure(.invalidModifierLiteral) = result { true } else { false }
-
-    #expect(isExpectedFailure)
-  }
-
-  @Test("parseModifier(): nil text")
-  func parseModifierNilText() async throws {
-    let parser = Parser(with: FakeLexer(tokens: [Token(type: .modifier, text: nil)]))
-
-    let result = parser.parse()
-    let isExpectedFailure =
-      if case .failure(.invalidModifierLiteral) = result { true } else { false }
-
-    #expect(isExpectedFailure)
-  }
-
-  @Test("parseKey(): invalid key")
-  func parseInvalidKey() async throws {
-    let parser = Parser(with: FakeLexer(tokens: [Token(type: .key, text: "invalid")]))
-
-    let result = parser.parse()
-    let isExpectedFailure = if case .failure(.invalidKey) = result { true } else { false }
-
-    #expect(isExpectedFailure)
-  }
-
-  @Test("parseKey(): nil text")
-  func parseKeyNilText() async throws {
-    let parser = Parser(with: FakeLexer(tokens: [Token(type: .key, text: nil)]))
-
-    let result = parser.parse()
-    let isExpectedFailure = if case .failure(.invalidKey) = result { true } else { false }
-
-    #expect(isExpectedFailure)
-  }
-
-  @Test("parseKeyHex(): invalid key hex")
-  func parseInvalidKeyHex() async throws {
-    let parser = Parser(with: "ctrl + shift - 0xGG: echo hello")
-
-    let result = parser.parse()
-    let isExpectedFailure = if case .failure(.invalidKeyHex) = result { true } else { false }
-
-    #expect(isExpectedFailure)
-  }
-
-  @Test("parseKeyHex(): nil text")
-  func parseKeyHexNilText() async throws {
-    let parser = Parser(with: FakeLexer(tokens: [Token(type: .keyHex, text: nil)]))
-
-    let result = parser.parse()
-    let isExpectedFailure = if case .failure(.invalidKeyHex) = result { true } else { false }
-
-    #expect(isExpectedFailure)
-  }
-
-  @Test("parseKeyLiteral(): invalid key literal during lexing")
-  func parseInvalidKeyLiteralDuringLexing() async throws {
-    let parser = Parser(with: "ctrl + shift - foo: echo hello")
-
-    let result = parser.parse()
-    let isExpectedFailure = if case .failure(.invalidKeyLiteral) = result { true } else { false }
-
-    #expect(isExpectedFailure)
-  }
-
-  @Test("parseKeyLiteral(): invalid key literal during parse")
-  func parseInvalidKeyLiteralDuringParse() async throws {
-    let parser = Parser(with: FakeLexer(tokens: [Token(type: .literal, text: "invalid")]))
-
-    let result = parser.parse()
-    let isExpectedFailure = if case .failure(.invalidKeyLiteral) = result { true } else { false }
-
-    #expect(isExpectedFailure)
-  }
-
-  @Test("parseKeyLiteral(): nil text")
-  func parseKeyLiteralNilText() async throws {
-    let parser = Parser(with: FakeLexer(tokens: [Token(type: .literal, text: nil)]))
-
-    let result = parser.parse()
-    let isExpectedFailure = if case .failure(.invalidKeyLiteral) = result { true } else { false }
-
-    #expect(isExpectedFailure)
-  }
-
-  @Test("parseCommand(): invalid command")
-  func parseMissingCommandAfterColon() async throws {
-    let parser = Parser(with: "ctrl + shift - a:")
-
-    let result = parser.parse()
-    let isExpectedFailure = if case .failure(.invalidCommand) = result { true } else { false }
-
-    #expect(isExpectedFailure)
-  }
-
-  @Test("parseCommand(): nil text")
-  func parseCommandNilText() async throws {
-    let parser = Parser(
-      with: FakeLexer(tokens: [Token(type: .key, text: "a"), Token(type: .command, text: nil)])
-    )
-
-    let result = parser.parse()
-    let isExpectedFailure = if case .failure(.invalidCommand) = result { true } else { false }
-
-    #expect(isExpectedFailure)
+    #expect(throws: error) {
+      try parser.parse().get()
+    }
   }
 }

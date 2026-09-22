@@ -1,4 +1,4 @@
-public enum ParserError: Error {
+public enum ParserError: Error, Equatable {
   case expectedDashAfterModifier
   case expectedCommandAfterKey
   case expectedModifierOrKey
@@ -11,7 +11,6 @@ public enum ParserError: Error {
   case expectedRightBracket
   case expectedStringLiteral
   case invalidDirective
-  case unexpectedTokenInBlocklist
   case unexpectedError
 }
 
@@ -42,8 +41,6 @@ extension ParserError: CustomStringConvertible {
       return "expected string literal"
     case .invalidDirective:
       return "invalid directive"
-    case .unexpectedTokenInBlocklist:
-      return "unexpected token in blocklist"
     case .unexpectedError:
       return "unexpected parser error"
     }

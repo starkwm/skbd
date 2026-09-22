@@ -1,5 +1,5 @@
-class Lexer {
-  private var buffer: String
+final class Lexer {
+  private let buffer: String
   private var position: String.Index
   private var current: Character
 
@@ -14,15 +14,16 @@ class Lexer {
   func getToken() -> Token {
     skipWhitespace()
 
+    while current == "#" {
+      skipComment()
+      skipWhitespace()
+    }
+
     var token = Token(type: .unknown)
 
     switch current {
     case "\0":
       token.type = .endOfStream
-    case "#":
-      skipComment()
-
-      return getToken()
     case ":":
       advance()
       skipWhitespace()
@@ -53,7 +54,7 @@ class Lexer {
       token.type = .string
       token.text = readString()
     case ".":
-      if peek()?.isLetter == true {
+      if peek().isLetter {
         token.text = readDirective()
         token.type = .directive
       } else {
@@ -77,8 +78,10 @@ class Lexer {
         advance()
       }
     case _ where current.isLetter:
-      token.text = readIdentifier()
-      token.type = resolveTokenType(for: token.text!)
+      let identifier = readIdentifier()
+
+      token.text = identifier
+      token.type = tokenType(for: identifier)
     default:
       token.text = String(current)
       advance()
@@ -88,14 +91,11 @@ class Lexer {
   }
 
   private func advance(by n: Int = 1) {
-    let remaining = buffer.distance(from: position, to: buffer.endIndex)
-    let offset = Swift.min(n, remaining)
-
-    position = buffer.index(position, offsetBy: offset)
+    position = buffer.index(position, offsetBy: n, limitedBy: buffer.endIndex) ?? buffer.endIndex
     current = position < buffer.endIndex ? buffer[position] : "\0"
   }
 
-  private func peek() -> Character? {
+  private func peek() -> Character {
     let nextIndex = buffer.index(after: position)
 
     return nextIndex < buffer.endIndex ? buffer[nextIndex] : "\0"
@@ -177,16 +177,16 @@ class Lexer {
     return String(buffer[start..<position])
   }
 
-  private func resolveTokenType(for identifier: String) -> TokenType {
+  private func tokenType(for identifier: String) -> TokenType {
     if identifier.count == 1 {
       return .key
     }
 
-    if ModifierFlags.literals.contains(identifier) {
+    if ModifierFlags.get(identifier) != nil {
       return .modifier
     }
 
-    if KeyCodes.specialKeys.keys.contains(identifier) {
+    if KeyCodes.specialKeys[identifier] != nil {
       return .literal
     }
 
@@ -201,7 +201,7 @@ extension Lexer: Sequence {
 }
 
 struct LexerIterator: IteratorProtocol {
-  private var lexer: Lexer
+  private let lexer: Lexer
 
   init(with lexer: Lexer) {
     self.lexer = lexer

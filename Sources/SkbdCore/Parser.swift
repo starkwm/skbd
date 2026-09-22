@@ -1,18 +1,14 @@
 public class Parser {
   private let lexer: Lexer
 
-  private var currentToken: Token
-  private var previousToken: Token?
+  private var current: Token
+  private var previous: Token?
 
-  private var atEnd: Bool { currentToken.type == .endOfStream }
+  private var atEnd: Bool { current.type == .endOfStream }
 
-  public convenience init(with buffer: String) {
-    self.init(with: Lexer(with: buffer))
-  }
-
-  init(with lexer: Lexer) {
-    self.lexer = lexer
-    currentToken = lexer.getToken()
+  public init(with buffer: String) {
+    lexer = Lexer(with: buffer)
+    current = lexer.getToken()
   }
 
   public func parse() -> Result<Configuration, ParserError> {
@@ -21,13 +17,9 @@ public class Parser {
 
       while !atEnd {
         if check(.directive) {
-          let blockList = try parseBlocklist()
-
-          configuration.blockList = blockList
+          configuration.blockList = try parseBlocklist()
         } else if check(.modifier, .key, .keyHex, .literal, .dash, .beginList, .endList) {
-          let hotKey = try parseHotKey()
-
-          configuration.hotKeys.append(hotKey)
+          configuration.hotKeys.append(try parseHotKey())
         } else {
           throw ParserError.expectedModifierOrKey
         }
@@ -82,8 +74,7 @@ public class Parser {
   private func parseBlocklist() throws -> [String] {
     advance()
 
-    guard let directive = previousToken?.text else { throw ParserError.invalidDirective }
-    guard directive == ".blocklist" else { throw ParserError.invalidDirective }
+    guard previous?.text == ".blocklist" else { throw ParserError.invalidDirective }
 
     guard match(.beginList) else { throw ParserError.expectedLeftBracketAfterDirective }
 
@@ -91,7 +82,7 @@ public class Parser {
 
     while !check(.endList) && !atEnd {
       guard match(.string) else { throw ParserError.expectedStringLiteral }
-      guard let processName = previousToken?.text else { throw ParserError.expectedStringLiteral }
+      guard let processName = previous?.text else { throw ParserError.expectedStringLiteral }
 
       blockList.append(processName)
     }
@@ -102,11 +93,10 @@ public class Parser {
   }
 
   private func parseModifier() throws -> ModifierFlags {
-    guard let modifier = previousToken?.text else { throw ParserError.invalidModifierLiteral }
+    guard let modifier = previous?.text else { throw ParserError.invalidModifierLiteral }
     guard let value = ModifierFlags.get(modifier) else { throw ParserError.invalidModifierLiteral }
 
-    var flags = ModifierFlags()
-    flags.insert(value)
+    var flags = value
 
     if match(.plus) {
       advance()
@@ -117,7 +107,7 @@ public class Parser {
   }
 
   private func parseKey() throws -> UInt32 {
-    guard let key = previousToken?.text else { throw ParserError.invalidKey }
+    guard let key = previous?.text else { throw ParserError.invalidKey }
 
     guard let keyCode = KeyCodes.keyCode(for: key) else {
       throw ParserError.invalidKey
@@ -127,31 +117,25 @@ public class Parser {
   }
 
   private func parseKeyHex() throws -> UInt32 {
-    guard let key = previousToken?.text else { throw ParserError.invalidKeyHex }
+    guard let key = previous?.text else { throw ParserError.invalidKeyHex }
     guard let keyCode = UInt32(key, radix: 16) else { throw ParserError.invalidKeyHex }
 
     return keyCode
   }
 
   private func parseKeyLiteral() throws -> (UInt32, ModifierFlags) {
-    guard let key = previousToken?.text else { throw ParserError.invalidKeyLiteral }
+    guard let key = previous?.text else { throw ParserError.invalidKeyLiteral }
 
     guard let (code, requiresFn) = KeyCodes.specialKeys[key] else {
       throw ParserError.invalidKeyLiteral
     }
 
-    var flags = ModifierFlags()
-
-    if requiresFn {
-      flags.insert(.fn)
-    }
-
-    return (UInt32(code), flags)
+    return (UInt32(code), requiresFn ? .fn : [])
   }
 
   private func parseSyntaxKey() throws -> UInt32 {
     let key =
-      switch previousToken?.type {
+      switch previous?.type {
       case .dash: "-"
       case .beginList: "["
       case .endList: "]"
@@ -166,25 +150,26 @@ public class Parser {
   }
 
   private func parseCommand() throws -> String {
-    guard let command = previousToken?.text else { throw ParserError.invalidCommand }
-    guard !command.isEmpty else { throw ParserError.invalidCommand }
+    guard let command = previous?.text, !command.isEmpty else {
+      throw ParserError.invalidCommand
+    }
 
     return command
   }
 
   private func advance() {
-    previousToken = currentToken
-    currentToken = lexer.getToken()
+    previous = current
+    current = lexer.getToken()
   }
 
   private func check(_ types: TokenType...) -> Bool {
     guard !atEnd else { return false }
 
-    return types.contains(currentToken.type)
+    return types.contains(current.type)
   }
 
   private func match(_ types: TokenType...) -> Bool {
-    guard !atEnd && types.contains(currentToken.type) else { return false }
+    guard !atEnd && types.contains(current.type) else { return false }
 
     advance()
 
