@@ -12,8 +12,7 @@ public enum ConfigurationLoader {
   }
 
   public static func regularFiles(in url: URL) throws -> [URL] {
-    let fileManager = FileManager.default
-    let entries = try fileManager.contentsOfDirectory(
+    let entries = try FileManager.default.contentsOfDirectory(
       at: url,
       includingPropertiesForKeys: [.isRegularFileKey],
       options: [.skipsHiddenFiles]
@@ -30,8 +29,7 @@ public enum ConfigurationLoader {
   }
 
   private static func loadDirectory(at url: URL) throws -> String {
-    return
-      try regularFiles(in: url)
+    try regularFiles(in: url)
       .map { try String(contentsOf: $0, encoding: .utf8) }
       .joined(separator: "\n")
   }

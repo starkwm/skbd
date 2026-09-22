@@ -103,17 +103,12 @@ final class ConfigurationWatcher: @unchecked Sendable {
       return unique(urls)
     }
 
-    do {
-      let values = try resolvedURL.resourceValues(forKeys: [.isDirectoryKey])
+    urls.append(resolvedURL)
 
-      if values.isDirectory == true {
-        urls.append(resolvedURL)
-        urls.append(contentsOf: (try? ConfigurationLoader.regularFiles(in: resolvedURL)) ?? [])
-      } else {
-        urls.append(resolvedURL)
-      }
-    } catch {
-      urls.append(resolvedURL)
+    let values = try? resolvedURL.resourceValues(forKeys: [.isDirectoryKey])
+
+    if values?.isDirectory == true {
+      urls.append(contentsOf: (try? ConfigurationLoader.regularFiles(in: resolvedURL)) ?? [])
     }
 
     return unique(urls)
@@ -121,16 +116,7 @@ final class ConfigurationWatcher: @unchecked Sendable {
 
   private func unique(_ urls: [URL]) -> [URL] {
     var seen = Set<String>()
-    var result: [URL] = []
 
-    for url in urls {
-      let path = url.standardizedFileURL.path
-
-      guard seen.insert(path).inserted else { continue }
-
-      result.append(url)
-    }
-
-    return result
+    return urls.filter { seen.insert($0.standardizedFileURL.path).inserted }
   }
 }

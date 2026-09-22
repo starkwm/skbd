@@ -40,13 +40,15 @@ struct ConfigurationLoaderTests {
     let directory = try temporaryDirectory()
     defer { try? FileManager.default.removeItem(at: directory) }
 
-    let zFile = directory.appendingPathComponent("20-second")
-    let aFile = directory.appendingPathComponent("10-first")
+    let second = directory.appendingPathComponent("20-second")
+    let first = directory.appendingPathComponent("10-first")
     let hidden = directory.appendingPathComponent(".ignored")
+    let subdirectory = directory.appendingPathComponent("15-directory")
 
-    try "cmd - b: echo second".write(to: zFile, atomically: true, encoding: .utf8)
-    try "cmd - a: echo first".write(to: aFile, atomically: true, encoding: .utf8)
+    try "cmd - b: echo second".write(to: second, atomically: true, encoding: .utf8)
+    try "cmd - a: echo first".write(to: first, atomically: true, encoding: .utf8)
     try "should not load".write(to: hidden, atomically: true, encoding: .utf8)
+    try FileManager.default.createDirectory(at: subdirectory, withIntermediateDirectories: true)
 
     let result = try ConfigurationLoader.load(from: directory)
 
@@ -57,26 +59,6 @@ struct ConfigurationLoaderTests {
         cmd - b: echo second
         """
     )
-  }
-
-  @Test("regularFiles(in:): visible regular files in lexicographical order")
-  func regularFiles() throws {
-    let directory = try temporaryDirectory()
-    defer { try? FileManager.default.removeItem(at: directory) }
-
-    let zFile = directory.appendingPathComponent("20-second")
-    let aFile = directory.appendingPathComponent("10-first")
-    let hidden = directory.appendingPathComponent(".ignored")
-    let subdirectory = directory.appendingPathComponent("15-directory")
-
-    try "second".write(to: zFile, atomically: true, encoding: .utf8)
-    try "first".write(to: aFile, atomically: true, encoding: .utf8)
-    try "hidden".write(to: hidden, atomically: true, encoding: .utf8)
-    try FileManager.default.createDirectory(at: subdirectory, withIntermediateDirectories: true)
-
-    let result = try ConfigurationLoader.regularFiles(in: directory)
-
-    #expect(result.map(\.lastPathComponent) == ["10-first", "20-second"])
   }
 
   private func temporaryDirectory() throws -> URL {
