@@ -41,7 +41,7 @@ struct KeyCodes {
   ]
 
   // swift-format-ignore
-  static let layoutDependentValues = [
+  private static let characterCodes = [
     kVK_ANSI_A,            kVK_ANSI_B,           kVK_ANSI_C,
     kVK_ANSI_D,            kVK_ANSI_E,           kVK_ANSI_F,
     kVK_ANSI_G,            kVK_ANSI_H,           kVK_ANSI_I,
@@ -60,12 +60,12 @@ struct KeyCodes {
     kVK_ANSI_Slash,        kVK_ANSI_Period,      kVK_ISO_Section,
   ]
 
-  private static let keymap: [String: Int] = {
+  private static let keyMap: [String: Int] = {
     var keys = [String: Int]()
 
-    let data = getKeyboardLayoutData()
+    let data = keyboardLayout()
 
-    for keyCode in layoutDependentValues {
+    for keyCode in characterCodes {
       var deadKeyState = UInt32(0)
       let maxLength = 255
       var length = 0
@@ -95,28 +95,28 @@ struct KeyCodes {
   }()
 
   private static let reverseKeys: [Int: String] = {
-    var dict = [Int: String]()
+    var keys = [Int: String]()
 
     for (name, (code, _)) in specialKeys {
-      dict[code] = name
+      keys[code] = name
     }
 
-    for (name, code) in keymap {
-      dict[code] = name
+    for (name, code) in keyMap {
+      keys[code] = name
     }
 
-    return dict
+    return keys
   }()
 
   static func keyCode(for key: String) -> Int? {
-    specialKeys[key]?.0 ?? keymap[key]
+    specialKeys[key]?.0 ?? keyMap[key]
   }
 
   static func key(for code: Int) -> String {
     reverseKeys[code] ?? "unknown"
   }
 
-  private static func getKeyboardLayoutData() -> UnsafePointer<UCKeyboardLayout>? {
+  private static func keyboardLayout() -> UnsafePointer<UCKeyboardLayout>? {
     let source = TISCopyCurrentASCIICapableKeyboardLayoutInputSource().takeUnretainedValue()
     let dataRefPtr = TISGetInputSourceProperty(source, kTISPropertyUnicodeKeyLayoutData)
     let dataRef = unsafeBitCast(dataRefPtr, to: CFData?.self)

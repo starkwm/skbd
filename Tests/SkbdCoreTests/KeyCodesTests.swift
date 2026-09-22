@@ -1,12 +1,11 @@
-import Carbon
 import Testing
 
 @testable import SkbdCore
 
-@Suite("KeyCodesTests")
+@Suite("KeyCodes")
 struct KeyCodesTests {
   @Test("key(for:): unknown key code")
-  func keyWithUnknownKeyCode() async throws {
+  func unknownCode() {
     let result = KeyCodes.key(for: 123_456_789)
 
     #expect(result == "unknown")
