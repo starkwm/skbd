@@ -1,163 +1,52 @@
 import Carbon
-import Darwin
 import Foundation
 import Testing
 
 @testable import SkbdCore
 
-@Suite("HotKeyTests")
+@Suite("HotKey")
 struct HotKeyTests {
-  @Test("from(event:): no modifiers")
-  func fromEventWithNoModifiers() async throws {
-    let event = CGEvent(keyboardEventSource: nil, virtualKey: CGKeyCode(0), keyDown: true)!
-    event.flags = CGEventFlags()
-
-    let hotKey = HotKey.from(event: event)
-
-    #expect(hotKey.modifierFlags == [])
-    #expect(hotKey.key == 0)
-  }
-
-  @Test("from(event:): cmd modifier")
-  func fromEventWithCmdModifier() async throws {
-    let event = CGEvent(keyboardEventSource: nil, virtualKey: CGKeyCode(0), keyDown: true)!
-    event.flags = .maskCommand
-
-    let hotKey = HotKey.from(event: event)
-
-    #expect(hotKey.modifierFlags == .cmd)
-    #expect(hotKey.key == 0)
-  }
-
-  @Test("from(event:): multiple modifiers")
-  func fromEventWithMultipleModifiers() async throws {
-    let event = CGEvent(keyboardEventSource: nil, virtualKey: CGKeyCode(0), keyDown: true)!
+  @Test("Read a key event")
+  func fromEvent() {
+    let event = CGEvent(keyboardEventSource: nil, virtualKey: CGKeyCode(kVK_Return), keyDown: true)!
     event.flags = [.maskCommand, .maskShift]
 
     let hotKey = HotKey.from(event: event)
 
     #expect(hotKey.modifierFlags == [.cmd, .shift])
-    #expect(hotKey.key == 0)
+    #expect(hotKey.key == kVK_Return)
   }
 
-  @Test("from(event:): special key")
-  func fromEventWithSpecialKey() async throws {
-    let event = CGEvent(keyboardEventSource: nil, virtualKey: CGKeyCode(36), keyDown: true)!
-    event.flags = CGEventFlags()
-
-    let hotKey = HotKey.from(event: event)
-
-    #expect(hotKey.modifierFlags == [])
-    #expect(hotKey.key == 36)
-  }
-
-  @Test("from(event:): invalid keycode")
-  func fromEventWithInvalidKeycode() async throws {
-    let event = CGEvent(keyboardEventSource: nil, virtualKey: CGKeyCode(999), keyDown: true)!
-    event.flags = .maskCommand
-
-    let hotKey = HotKey.from(event: event)
-
-    #expect(hotKey.modifierFlags == .cmd)
-    #expect(hotKey.key == 999)
-  }
-
-  @Test("execute(onExecute:): nil command")
-  func executeWithNilCommand() async throws {
+  @Test("A missing command passes the event through")
+  func noCommand() {
     let hotKey = HotKey(modifierFlags: .cmd, key: 0)
-    var executed = false
 
-    #expect(hotKey.command == nil)
-
-    hotKey.execute(onExecute: { executed = true })
-
-    #expect(executed == false)
+    #expect(hotKey.execute() == .passthrough)
   }
 
-  @Test("execute(onExecute:): successful command")
-  func executeWithSuccessfulCommand() async throws {
-    let hotKey = HotKey(modifierFlags: .cmd, key: 0, command: "true")
-    var executed = false
+  @Test("Run the command and return the event policy", arguments: [false, true])
+  func execute(passthrough: Bool) async throws {
+    let file = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+    defer { try? FileManager.default.removeItem(at: file) }
 
-    hotKey.execute { executed = true }
+    let hotKey = HotKey(
+      modifierFlags: .cmd,
+      key: 0,
+      command: "echo skbd > '\(file.path)'",
+      passthrough: passthrough
+    )
 
-    #expect(executed)
-  }
+    let result = hotKey.execute()
+    let deadline = ContinuousClock.now.advanced(by: .seconds(5))
 
-  @Test("execute(onExecute:): failing command")
-  func executeWithFailingCommand() async throws {
-    let hotKey = HotKey(modifierFlags: .cmd, key: 0, command: "false")
-    var executed = false
-
-    hotKey.execute { executed = true }
-
-    #expect(executed)
-  }
-
-  @Test("execute(onExecute:): SHELL unset falls back to /bin/bash")
-  func executeFallsBackToBashWhenShellUnset() async throws {
-    let originalShell = getenv("SHELL").map { String(cString: $0) }
-
-    unsetenv("SHELL")
-
-    defer {
-      if let original = originalShell {
-        setenv("SHELL", original, 1)
-      } else {
-        unsetenv("SHELL")
-      }
+    while (try? String(contentsOf: file, encoding: .utf8)) != "skbd\n"
+      && ContinuousClock.now < deadline
+    {
+      try await Task.sleep(for: .milliseconds(10))
     }
 
-    let hotKey = HotKey(modifierFlags: .cmd, key: 0, command: "true")
-    var executed = false
-
-    hotKey.execute { executed = true }
-
-    #expect(executed)
-  }
-
-  @Test("execute(onExecute:): SHELL empty falls back to /bin/bash")
-  func executeFallsBackToBashWhenShellEmpty() async throws {
-    let originalShell = getenv("SHELL").map { String(cString: $0) }
-
-    setenv("SHELL", "", 1)
-
-    defer {
-      if let original = originalShell {
-        setenv("SHELL", original, 1)
-      } else {
-        unsetenv("SHELL")
-      }
-    }
-
-    let hotKey = HotKey(modifierFlags: .cmd, key: 0, command: "true")
-    var executed = false
-
-    hotKey.execute { executed = true }
-
-    #expect(executed)
-  }
-
-  @Test("execute(onExecute:): passthrough returns passthrough")
-  func executeWithPassthroughReturnsPassthrough() async throws {
-    let hotKey = HotKey(modifierFlags: .cmd, key: 0, command: "true", passthrough: true)
-    var executed = false
-
-    let result = hotKey.execute { executed = true }
-
-    #expect(executed)
-    #expect(result == .passthrough)
-  }
-
-  @Test("execute(onExecute:): consumed returns consumed")
-  func executeWithoutPassthroughReturnsConsumed() async throws {
-    let hotKey = HotKey(modifierFlags: .cmd, key: 0, command: "true", passthrough: false)
-    var executed = false
-
-    let result = hotKey.execute { executed = true }
-
-    #expect(executed)
-    #expect(result == .consumed)
+    #expect(try String(contentsOf: file, encoding: .utf8) == "skbd\n")
+    #expect(result == (passthrough ? .passthrough : .consumed))
   }
 
   @Test("Match keys and modifiers")

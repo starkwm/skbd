@@ -3,7 +3,7 @@ import Foundation
 
 public struct HotKey {
   static func from(event: CGEvent) -> HotKey {
-    return HotKey(
+    HotKey(
       modifierFlags: ModifierFlags.from(event.flags),
       key: UInt32(event.getIntegerValueField(.keyboardEventKeycode))
     )
@@ -11,9 +11,7 @@ public struct HotKey {
 
   var modifierFlags: ModifierFlags = []
   var key: UInt32 = 0
-
   var command: String?
-
   var passthrough: Bool = false
 
   init() {}
@@ -35,8 +33,8 @@ public struct HotKey {
   }
 
   @discardableResult
-  func execute(onExecute: (() -> Void)? = nil) -> HotKeyResult {
-    guard let command = command else { return .passthrough }
+  func execute() -> HotKeyResult {
+    guard let command else { return .passthrough }
 
     let shell =
       ProcessInfo.processInfo.environment["SHELL"].flatMap { $0.isEmpty ? nil : $0 } ?? "/bin/bash"
@@ -53,8 +51,6 @@ public struct HotKey {
       fputs("error running command: \(error.localizedDescription)\n", stderr)
       fflush(stderr)
     }
-
-    onExecute?()
 
     return passthrough ? .passthrough : .consumed
   }
