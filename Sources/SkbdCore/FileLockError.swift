@@ -1,4 +1,4 @@
-public enum FileLockError: Error {
+public enum FileLockError: Error, Equatable {
   case alreadyLocked
   case failed(reason: String)
 }
