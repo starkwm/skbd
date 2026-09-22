@@ -1,21 +1,19 @@
 import Foundation
 
 public final class ConfigurationReloader: @unchecked Sendable {
-  public static func loadConfiguration(from url: URL) throws -> Configuration {
-    do {
-      let input = try ConfigurationLoader.load(from: url)
-      let parser = Parser(with: input)
+  public static func load(from url: URL) throws -> Configuration {
+    let input: String
 
-      switch parser.parse() {
-      case .success(let configuration):
-        return configuration
-      case .failure(let error):
-        throw ConfigurationReloaderError.parseFailed(error)
-      }
-    } catch let error as ConfigurationReloaderError {
-      throw error
+    do {
+      input = try ConfigurationLoader.load(from: url)
     } catch {
       throw ConfigurationReloaderError.loadFailed(error)
+    }
+
+    do {
+      return try Parser(with: input).parse().get()
+    } catch {
+      throw ConfigurationReloaderError.parseFailed(error)
     }
   }
 
@@ -45,7 +43,7 @@ public final class ConfigurationReloader: @unchecked Sendable {
 
   private func reload() {
     do {
-      let configuration = try Self.loadConfiguration(from: url)
+      let configuration = try Self.load(from: url)
 
       onReload(configuration)
     } catch let error as ConfigurationReloaderError {

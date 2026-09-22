@@ -25,7 +25,7 @@ case .failure(.failed(let reason)):
 }
 
 do {
-  let configuration = try ConfigurationReloader.loadConfiguration(from: arguments.config)
+  let configuration = try ConfigurationReloader.load(from: arguments.config)
   let eventTap = EventTapManager(
     hotKeys: configuration.hotKeys,
     blockList: configuration.blockList

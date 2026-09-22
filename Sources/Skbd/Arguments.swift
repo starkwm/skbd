@@ -4,7 +4,7 @@ import Foundation
 struct Arguments: ParsableArguments {
   @Option(
     name: .shortAndLong,
-    help: ArgumentHelp("Path to a configuration file", valueName: "path"),
+    help: ArgumentHelp("Path to a configuration file or directory", valueName: "path"),
     transform: URL.init(fileURLWithPath:)
   )
   var config: URL = FileManager.default.homeDirectoryForCurrentUser.appending(
