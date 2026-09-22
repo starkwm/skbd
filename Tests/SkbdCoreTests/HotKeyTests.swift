@@ -160,119 +160,20 @@ struct HotKeyTests {
     #expect(result == .consumed)
   }
 
-  @Test("==: identical hotkeys")
-  func equalityWithIdenticalHotkeys() async throws {
-    let hk1 = HotKey(modifierFlags: .cmd, key: 0)
-    let hk2 = HotKey(modifierFlags: .cmd, key: 0)
+  @Test("Match keys and modifiers")
+  func matches() {
+    let binding = HotKey(modifierFlags: .cmd, key: 0)
 
-    #expect(hk1 == hk2)
+    #expect(binding.matches(HotKey(modifierFlags: .cmd, key: 0)))
+    #expect(binding.matches(HotKey(modifierFlags: .lcmd, key: 0)))
+    #expect(!binding.matches(HotKey(modifierFlags: .cmd, key: 1)))
+    #expect(!binding.matches(HotKey(modifierFlags: .alt, key: 0)))
   }
 
-  @Test("==: different keys")
-  func inequalityWithDifferentKeys() async throws {
-    let hk1 = HotKey(modifierFlags: .cmd, key: 0)
-    let hk2 = HotKey(modifierFlags: .cmd, key: 1)
+  @Test("Describe a shortcut")
+  func description() {
+    let hotKey = HotKey(modifierFlags: [.cmd, .shift], key: UInt32(kVK_Return))
 
-    #expect(hk1 != hk2)
-  }
-
-  @Test("==: different modifiers")
-  func inequalityWithDifferentModifiers() async throws {
-    let hk1 = HotKey(modifierFlags: .cmd, key: 0)
-    let hk2 = HotKey(modifierFlags: .alt, key: 0)
-
-    #expect(hk1 != hk2)
-  }
-
-  @Test("==: generic modifier matches left and right modifiers")
-  func equalityWithGenericMatchingLeftRightModifiers() async throws {
-    let hk1 = HotKey(modifierFlags: .alt, key: 0)
-    let hk2 = HotKey(modifierFlags: .lalt, key: 0)
-    let hk3 = HotKey(modifierFlags: .ralt, key: 0)
-
-    #expect(hk1 == hk2)
-    #expect(hk1 == hk3)
-  }
-
-  @Test("==: different left and right modifiers")
-  func inequalityWithDifferentLeftRightModifiers() async throws {
-    let hk1 = HotKey(modifierFlags: .lalt, key: 0)
-    let hk2 = HotKey(modifierFlags: .ralt, key: 0)
-
-    #expect(hk1 != hk2)
-  }
-
-  @Test("==: multiple equivalent modifiers")
-  func equalityWithMultipleEquivalentModifiers() async throws {
-    let hk1 = HotKey(modifierFlags: [.alt, .cmd], key: 0)
-    let hk2 = HotKey(modifierFlags: [.lalt, .rcmd], key: 0)
-
-    #expect(hk1 == hk2)
-  }
-
-  @Test("==: fn modifier")
-  func equalityWithFnModifier() async throws {
-    let hk1 = HotKey(modifierFlags: [.cmd, .fn], key: 0)
-    let hk2 = HotKey(modifierFlags: [.cmd, .fn], key: 0)
-
-    #expect(hk1 == hk2)
-  }
-
-  @Test("==: fn modifier difference")
-  func inequalityWithFnModifierDifference() async throws {
-    let hk1 = HotKey(modifierFlags: [.cmd, .fn], key: 0)
-    let hk2 = HotKey(modifierFlags: .cmd, key: 0)
-
-    #expect(hk1 != hk2)
-  }
-
-  @Test("==: empty modifiers")
-  func equalityWithEmptyModifiers() async throws {
-    let hk1 = HotKey(modifierFlags: [], key: 0)
-    let hk2 = HotKey(modifierFlags: [], key: 0)
-
-    #expect(hk1 == hk2)
-  }
-
-  @Test("description: formats modifiers and key")
-  func descriptionFormatting() async throws {
-    let testCases: [(HotKey, String)] = [
-      (HotKey(modifierFlags: .cmd, key: 0), "<HotKey flags: <ModifierFlags cmd>, key: a>"),
-      (HotKey(modifierFlags: .lcmd, key: 0), "<HotKey flags: <ModifierFlags lcmd>, key: a>"),
-      (HotKey(modifierFlags: .rcmd, key: 0), "<HotKey flags: <ModifierFlags rcmd>, key: a>"),
-      (HotKey(modifierFlags: .alt, key: 0), "<HotKey flags: <ModifierFlags alt>, key: a>"),
-      (HotKey(modifierFlags: .lalt, key: 0), "<HotKey flags: <ModifierFlags lalt>, key: a>"),
-      (HotKey(modifierFlags: .ralt, key: 0), "<HotKey flags: <ModifierFlags ralt>, key: a>"),
-      (HotKey(modifierFlags: .shift, key: 0), "<HotKey flags: <ModifierFlags shift>, key: a>"),
-      (HotKey(modifierFlags: .lshift, key: 0), "<HotKey flags: <ModifierFlags lshift>, key: a>"),
-      (HotKey(modifierFlags: .rshift, key: 0), "<HotKey flags: <ModifierFlags rshift>, key: a>"),
-      (HotKey(modifierFlags: .ctrl, key: 0), "<HotKey flags: <ModifierFlags ctrl>, key: a>"),
-      (HotKey(modifierFlags: .lctrl, key: 0), "<HotKey flags: <ModifierFlags lctrl>, key: a>"),
-      (HotKey(modifierFlags: .rctrl, key: 0), "<HotKey flags: <ModifierFlags rctrl>, key: a>"),
-      (HotKey(modifierFlags: .fn, key: 0), "<HotKey flags: <ModifierFlags fn>, key: a>"),
-      (
-        HotKey(modifierFlags: [.cmd, .shift], key: 0),
-        "<HotKey flags: <ModifierFlags cmd|shift>, key: a>"
-      ),
-      (
-        HotKey(modifierFlags: [.lcmd, .rshift], key: 0),
-        "<HotKey flags: <ModifierFlags lcmd|rshift>, key: a>"
-      ),
-      (
-        HotKey(modifierFlags: [.lalt, .rcmd, .rshift], key: 0),
-        "<HotKey flags: <ModifierFlags lalt|rcmd|rshift>, key: a>"
-      ),
-      (
-        HotKey(modifierFlags: [.cmd, .fn], key: 0),
-        "<HotKey flags: <ModifierFlags cmd|fn>, key: a>"
-      ),
-      (HotKey(modifierFlags: [], key: 0), "<HotKey flags: <ModifierFlags none>, key: a>"),
-      (HotKey(modifierFlags: .cmd, key: 36), "<HotKey flags: <ModifierFlags cmd>, key: return>"),
-      (HotKey(modifierFlags: .cmd, key: 999), "<HotKey flags: <ModifierFlags cmd>, key: unknown>"),
-    ]
-
-    for (hotKey, expectedDescription) in testCases {
-      #expect(hotKey.description == expectedDescription)
-    }
+    #expect(hotKey.description == "<HotKey flags: <ModifierFlags cmd|shift>, key: return>")
   }
 }

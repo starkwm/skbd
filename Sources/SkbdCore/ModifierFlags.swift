@@ -15,9 +15,7 @@ struct ModifierFlags: OptionSet, Hashable {
   static let rctrl = ModifierFlags(rawValue: 1 << 11)
   static let fn = ModifierFlags(rawValue: 1 << 12)
 
-  static let literals = allCases.map(\.0)
-
-  private static let allCases: [(String, ModifierFlags)] = [
+  private static let names: [(String, ModifierFlags)] = [
     ("alt", .alt), ("lalt", .lalt), ("ralt", .ralt),
     ("opt", .alt), ("lopt", .lalt), ("ropt", .ralt),
     ("cmd", .cmd), ("lcmd", .lcmd), ("rcmd", .rcmd),
@@ -28,7 +26,7 @@ struct ModifierFlags: OptionSet, Hashable {
     ("hyper", [.alt, .cmd, .ctrl, .shift]),
   ]
 
-  private static let values: [String: ModifierFlags] = Dictionary(uniqueKeysWithValues: allCases)
+  private static let values: [String: ModifierFlags] = Dictionary(uniqueKeysWithValues: names)
 
   static func get(_ literal: String) -> ModifierFlags? {
     values[literal]
@@ -46,24 +44,20 @@ struct ModifierFlags: OptionSet, Hashable {
     return result
   }
 
-  static func compare(_ lhs: ModifierFlags, _ rhs: ModifierFlags) -> Bool {
-    func contains(_ flags: ModifierFlags, _ flag: ModifierFlags) -> Bool {
-      (flags.rawValue & flag.rawValue) != 0
-    }
-
+  static func matches(_ lhs: ModifierFlags, _ rhs: ModifierFlags) -> Bool {
     func matches(_ generic: ModifierFlags, _ left: ModifierFlags, _ right: ModifierFlags) -> Bool {
-      contains(lhs, generic)
-        ? contains(rhs, left)
-          || contains(rhs, right)
-          || contains(rhs, generic)
-        : contains(lhs, left) == contains(rhs, left)
-          && contains(lhs, right) == contains(rhs, right)
-          && contains(lhs, generic) == contains(rhs, generic)
+      lhs.contains(generic)
+        ? rhs.contains(left)
+          || rhs.contains(right)
+          || rhs.contains(generic)
+        : lhs.contains(left) == rhs.contains(left)
+          && lhs.contains(right) == rhs.contains(right)
+          && lhs.contains(generic) == rhs.contains(generic)
     }
 
     return ModifierFlagsGroup.groups.allSatisfy { group in
       matches(group.generic, group.left, group.right)
-    } && contains(lhs, .fn) == contains(rhs, .fn)
+    } && lhs.contains(.fn) == rhs.contains(.fn)
   }
 
   let rawValue: UInt32
@@ -73,10 +67,10 @@ extension ModifierFlags: CustomStringConvertible {
   var description: String {
     guard !isEmpty else { return "<ModifierFlags none>" }
 
-    let excludedLiterals: Set<String> = ["meh", "hyper", "opt", "lopt", "ropt"]
+    let aliases: Set<String> = ["meh", "hyper", "opt", "lopt", "ropt"]
 
-    let flags = Self.allCases.compactMap { (name, flag) in
-      contains(flag) && !excludedLiterals.contains(name) ? name : nil
+    let flags = Self.names.compactMap { (name, flag) in
+      contains(flag) && !aliases.contains(name) ? name : nil
     }
 
     return "<ModifierFlags \(flags.joined(separator: "|"))>"

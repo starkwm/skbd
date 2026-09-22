@@ -6,21 +6,21 @@ import Testing
 @Suite("ModifierFlags")
 struct ModifierFlagsTests {
   @Test("get(_:): alternative names")
-  func getWithAlternativeNames() async throws {
+  func optionAliases() {
     #expect(ModifierFlags.get("opt") == .alt)
     #expect(ModifierFlags.get("lopt") == .lalt)
     #expect(ModifierFlags.get("ropt") == .ralt)
   }
 
   @Test("from(_:): no modifiers")
-  func fromWithNoModifiers() async throws {
+  func noModifiers() {
     let eventFlags = CGEventFlags()
 
     #expect(ModifierFlags.from(eventFlags) == ModifierFlags())
   }
 
   @Test("from(_:): single modifier")
-  func fromWithSingleModifiers() async throws {
+  func singleModifier() {
     var eventFlags = CGEventFlags()
     eventFlags.insert(.maskShift)
 
@@ -28,7 +28,7 @@ struct ModifierFlagsTests {
   }
 
   @Test("from(_:): fn modifier")
-  func fromWithFnModifier() async throws {
+  func fnModifier() {
     var eventFlags = CGEventFlags()
     eventFlags.insert(.maskSecondaryFn)
 
@@ -36,7 +36,7 @@ struct ModifierFlagsTests {
   }
 
   @Test("from(_:): multiple modifiers")
-  func fromWithMultipleModifiers() async throws {
+  func multipleModifiers() {
     var eventFlags = CGEventFlags()
     eventFlags.insert(.maskAlternate)
     eventFlags.insert(.maskCommand)
@@ -47,7 +47,7 @@ struct ModifierFlagsTests {
   }
 
   @Test("from(_:): left modifier")
-  func fromWithLeftModifiers() async throws {
+  func leftModifier() {
     var eventFlags = CGEventFlags(
       rawValue: UInt64(NX_DEVICELALTKEYMASK)
     )
@@ -57,7 +57,7 @@ struct ModifierFlagsTests {
   }
 
   @Test("from(_:): right modifier")
-  func fromWithRightModifiers() async throws {
+  func rightModifier() {
     var eventFlags = CGEventFlags(
       rawValue: UInt64(NX_DEVICERALTKEYMASK)
     )
@@ -67,7 +67,7 @@ struct ModifierFlagsTests {
   }
 
   @Test("from(_:): left and right modifiers")
-  func fromWithLeftAndRightModifiers() async throws {
+  func bothSides() {
     var eventFlags = CGEventFlags(
       rawValue: UInt64(NX_DEVICELALTKEYMASK | NX_DEVICERALTKEYMASK | NX_DEVICELCMDKEYMASK)
     )
@@ -77,8 +77,8 @@ struct ModifierFlagsTests {
     #expect(ModifierFlags.from(eventFlags) == [.lalt, .ralt, .lcmd])
   }
 
-  @Test("compare(_:_:): left and right modifiers")
-  func equalsWithLRModifiers() async throws {
+  @Test("matches(_:_:): left and right modifiers")
+  func matchingSides() {
     let mods: [(ModifierFlags, ModifierFlags)] = [
       (.lalt, .lalt),
       (.ralt, .ralt),
@@ -92,12 +92,12 @@ struct ModifierFlagsTests {
     ]
 
     for (lhs, rhs) in mods {
-      #expect(ModifierFlags.compare(lhs, rhs))
+      #expect(ModifierFlags.matches(lhs, rhs))
     }
   }
 
-  @Test("compare(_:_:): generic modifiers")
-  func equalsWithNonLRModifiers() async throws {
+  @Test("matches(_:_:): generic modifiers")
+  func genericModifiers() {
     let mods: [(ModifierFlags, ModifierFlags)] = [
       (.alt, .lalt),
       (.alt, .ralt),
@@ -115,12 +115,12 @@ struct ModifierFlagsTests {
     ]
 
     for (lhs, rhs) in mods {
-      #expect(ModifierFlags.compare(lhs, rhs))
+      #expect(ModifierFlags.matches(lhs, rhs))
     }
   }
 
-  @Test("compare(_:_:): generic modifier matches left and right modifiers")
-  func equalsWithGenericModifierMatchesLeftAndRightModifier() async throws {
+  @Test("matches(_:_:): generic modifier matches left and right modifiers")
+  func genericMatchesBothSides() {
     let mods: [(ModifierFlags, ModifierFlags)] = [
       (.alt, [.lalt, .ralt]),
       (.cmd, [.lcmd, .rcmd]),
@@ -129,12 +129,12 @@ struct ModifierFlagsTests {
     ]
 
     for (lhs, rhs) in mods {
-      #expect(ModifierFlags.compare(lhs, rhs))
+      #expect(ModifierFlags.matches(lhs, rhs))
     }
   }
 
-  @Test("compare(_:_:): multiple modifiers")
-  func equalsWithMultipleModifiers() async throws {
+  @Test("matches(_:_:): multiple modifiers")
+  func matchingCombinations() {
     let mods: [(ModifierFlags, ModifierFlags)] = [
       ([.lalt, .rcmd, .lctrl, .rshift], [.lalt, .rcmd, .lctrl, .rshift]),
       ([.alt, .cmd, .ctrl, .shift], [.lalt, .rcmd, .lctrl, .rshift]),
@@ -142,17 +142,34 @@ struct ModifierFlagsTests {
     ]
 
     for (lhs, rhs) in mods {
-      #expect(ModifierFlags.compare(lhs, rhs))
+      #expect(ModifierFlags.matches(lhs, rhs))
+    }
+  }
+
+  @Test("Reject different modifiers")
+  func mismatchedModifiers() {
+    let cases: [(ModifierFlags, ModifierFlags)] = [
+      (.lalt, .ralt),
+      (.lcmd, .cmd),
+      (.cmd, [.cmd, .shift]),
+      ([.cmd, .fn], .cmd),
+      (.cmd, [.cmd, .fn]),
+      ([], .cmd),
+      (.cmd, []),
+    ]
+
+    for (binding, event) in cases {
+      #expect(!ModifierFlags.matches(binding, event))
     }
   }
 
   @Test("description: no modifiers")
-  func descriptionWithNoModifiers() async throws {
+  func emptyDescription() {
     #expect(ModifierFlags().description == "<ModifierFlags none>")
   }
 
   @Test("description: single modifier")
-  func descriptionWithSingleModifiers() async throws {
+  func singleDescription() {
     let mods: [(ModifierFlags, String)] = [
       (.lalt, "<ModifierFlags lalt>"),
       (.ralt, "<ModifierFlags ralt>"),
@@ -171,7 +188,7 @@ struct ModifierFlagsTests {
   }
 
   @Test("description: multiple modifiers")
-  func descriptionWithMultipleModifiers() async throws {
+  func combinedDescription() {
     let mods: [(ModifierFlags, String)] = [
       ([.lalt, .ralt], "<ModifierFlags lalt|ralt>"),
       ([.shift, .ralt], "<ModifierFlags ralt|shift>"),
@@ -184,5 +201,4 @@ struct ModifierFlagsTests {
       #expect(modifiers.description == description)
     }
   }
-
 }

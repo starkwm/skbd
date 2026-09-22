@@ -30,6 +30,10 @@ public struct HotKey {
     self.passthrough = passthrough
   }
 
+  func matches(_ event: HotKey) -> Bool {
+    key == event.key && ModifierFlags.matches(modifierFlags, event.modifierFlags)
+  }
+
   @discardableResult
   func execute(onExecute: (() -> Void)? = nil) -> HotKeyResult {
     guard let command = command else { return .passthrough }
@@ -53,12 +57,6 @@ public struct HotKey {
     onExecute?()
 
     return passthrough ? .passthrough : .consumed
-  }
-}
-
-extension HotKey: Equatable {
-  public static func == (lhs: HotKey, rhs: HotKey) -> Bool {
-    return ModifierFlags.compare(lhs.modifierFlags, rhs.modifierFlags) && lhs.key == rhs.key
   }
 }
 
