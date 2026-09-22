@@ -5,7 +5,7 @@ import Testing
 @Suite("Lexer")
 struct LexerTests {
   @Test("getToken(): empty buffer")
-  func getTokenWithEmptyBuffer() async throws {
+  func emptyInput() {
     let input = ""
 
     let lexer = Lexer(with: input)
@@ -15,19 +15,29 @@ struct LexerTests {
     #expect(tokens.isEmpty)
   }
 
+  @Test("Skip consecutive comments")
+  func comments() {
+    let lexer = Lexer(with: String(repeating: "# comment\n", count: 10_000) + "a: echo hello")
+
+    let tokens = Array(lexer)
+
+    #expect(tokens.map(\.type) == [.key, .command])
+    #expect(tokens.map(\.text) == ["a", "echo hello"])
+  }
+
   @Test("getToken(): full configuration")
-  func getToken() async throws {
+  func configuration() {
     let input = """
         # simple modifier and key literal with command
         alt-space: open -a iTerm2.app
 
         # multiline comment
-        # simple multiple modifer and key with command
+        # multiple modifiers and key with command
         cmd + shift - a : echo "Hello world"
 
         # multiline command
         ctrl + lalt - return : echo "foo bar"; \\
-            rm -fr /
+            echo "continued"
 
         # meh modifier
         meh - a: echo "meh"
@@ -35,7 +45,7 @@ struct LexerTests {
         # hyper modifier
         hyper - b: echo "hyper"
 
-        # this is a key mapping with a number
+        # number key
         rcmd + ralt - 5: cat ~/.config/skbd/skbdrc | pbcopy
 
         # hex keycode
@@ -61,7 +71,7 @@ struct LexerTests {
         .command,
         """
         echo "foo bar"; \\
-              rm -fr /
+              echo "continued"
         """
       ),
       (.modifier, "meh"), (.dash, nil), (.key, "a"),
@@ -79,14 +89,14 @@ struct LexerTests {
 
     let lexer = Lexer(with: input)
 
-    for (idx, token) in lexer.enumerated() {
-      #expect(expected[idx].0 == token.type)
-      #expect(expected[idx].1 == token.text)
-    }
+    let tokens = Array(lexer)
+
+    #expect(tokens.map(\.type) == expected.map(\.0))
+    #expect(tokens.map(\.text) == expected.map(\.1))
   }
 
   @Test("getToken(): digit at end of line")
-  func getTokenWithDigitEOL() async throws {
+  func trailingDigit() {
     let input = "cmd - 0"
 
     let expected: [(TokenType, String?)] = [
@@ -95,14 +105,14 @@ struct LexerTests {
 
     let lexer = Lexer(with: input)
 
-    for (idx, token) in lexer.enumerated() {
-      #expect(expected[idx].0 == token.type)
-      #expect(expected[idx].1 == token.text)
-    }
+    let tokens = Array(lexer)
+
+    #expect(tokens.map(\.type) == expected.map(\.0))
+    #expect(tokens.map(\.text) == expected.map(\.1))
   }
 
   @Test("getToken(): comma and period keys")
-  func getTokenWithCommaAndPeriodKeys() async throws {
+  func commaAndPeriod() {
     let input = """
       cmd - ,: echo "comma"
       cmd - .: echo "period"
@@ -115,14 +125,14 @@ struct LexerTests {
 
     let lexer = Lexer(with: input)
 
-    for (idx, token) in lexer.enumerated() {
-      #expect(expected[idx].0 == token.type)
-      #expect(expected[idx].1 == token.text)
-    }
+    let tokens = Array(lexer)
+
+    #expect(tokens.map(\.type) == expected.map(\.0))
+    #expect(tokens.map(\.text) == expected.map(\.1))
   }
 
   @Test("getToken(): symbol keys")
-  func getTokenWithSymbolKeys() async throws {
+  func symbols() {
     let input = "` - = [ ] ' ; \\ /"
 
     let expected: [(TokenType, String?)] = [
@@ -132,14 +142,14 @@ struct LexerTests {
 
     let lexer = Lexer(with: input)
 
-    for (idx, token) in lexer.enumerated() {
-      #expect(expected[idx].0 == token.type)
-      #expect(expected[idx].1 == token.text)
-    }
+    let tokens = Array(lexer)
+
+    #expect(tokens.map(\.type) == expected.map(\.0))
+    #expect(tokens.map(\.text) == expected.map(\.1))
   }
 
   @Test("getToken(): unknown key")
-  func getTokenWithUnknownKey() async throws {
+  func unknownKey() {
     let input = """
         cmd + rctrl - §: echo "unknown"
       """
@@ -151,14 +161,14 @@ struct LexerTests {
 
     let lexer = Lexer(with: input)
 
-    for (idx, token) in lexer.enumerated() {
-      #expect(expected[idx].0 == token.type)
-      #expect(expected[idx].1 == token.text)
-    }
+    let tokens = Array(lexer)
+
+    #expect(tokens.map(\.type) == expected.map(\.0))
+    #expect(tokens.map(\.text) == expected.map(\.1))
   }
 
   @Test("getToken(): unknown literal")
-  func getTokenWithUnknownLiteral() async throws {
+  func unknownName() {
     let input = """
         cmd + rctrl - f100: echo "unknown"
       """
@@ -170,9 +180,9 @@ struct LexerTests {
 
     let lexer = Lexer(with: input)
 
-    for (idx, token) in lexer.enumerated() {
-      #expect(expected[idx].0 == token.type)
-      #expect(expected[idx].1 == token.text)
-    }
+    let tokens = Array(lexer)
+
+    #expect(tokens.map(\.type) == expected.map(\.0))
+    #expect(tokens.map(\.text) == expected.map(\.1))
   }
 }
