@@ -19,8 +19,7 @@ let package = Package(
       dependencies: [
         "SkbdCore",
         .product(name: "ArgumentParser", package: "swift-argument-parser"),
-      ],
-      exclude: ["Version.swift.tmpl"]
+      ]
     ),
     .target(
       name: "SkbdCore"
