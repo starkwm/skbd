@@ -30,7 +30,7 @@ cmd + shift - k -> open -a iTerm
 
 Commands run with the shell named by `$SHELL`, falling back to `/bin/bash` when the variable is unset or empty. `skbd` passes the command to that shell with `-c` and discards the command's standard output and standard error. Redirect output in the command if you need a log.
 
-The command can start on the line after `:`. End each continued command line with `\`:
+The command can start on the line after `:` or `->` if that line is indented. An unindented line is read as the next declaration, so the binding is rejected for having no command. End each continued command line with `\`:
 
 ```text
 ctrl + shift - return:

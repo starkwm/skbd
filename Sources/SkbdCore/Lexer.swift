@@ -28,20 +28,18 @@ final class Lexer {
     switch current {
     case ":":
       advance()
-      skipWhitespace()
 
       token.type = .command
-      token.text = readCommand()
+      token.text = readCommandAfterSeparator()
     case "+":
       token.type = .plus
       advance()
     case "-":
       if peek() == ">" {
         advance(by: 2)
-        skipWhitespace()
 
         token.type = .arrow
-        token.text = readCommand()
+        token.text = readCommandAfterSeparator()
       } else {
         token.type = .dash
         advance()
@@ -127,6 +125,25 @@ final class Lexer {
     }
 
     return String(buffer[start..<position])
+  }
+
+  private func readCommandAfterSeparator() -> String {
+    while !atEnd && current.isWhitespace && !current.isNewline {
+      advance()
+    }
+
+    guard !atEnd && current.isNewline else {
+      return readCommand()
+    }
+
+    var indented = false
+
+    while !atEnd && current.isWhitespace {
+      indented = !current.isNewline
+      advance()
+    }
+
+    return indented ? readCommand() : ""
   }
 
   private func readIdentifier() -> String {
