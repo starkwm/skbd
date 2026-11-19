@@ -15,6 +15,16 @@ struct LexerTests {
     #expect(tokens.isEmpty)
   }
 
+  @Test("getToken(): embedded NUL does not end the stream")
+  func embeddedNull() {
+    let lexer = Lexer(with: "a: echo a\n\u{0}b: echo b")
+
+    let tokens = Array(lexer)
+
+    #expect(tokens.map(\.type) == [.key, .command, .unknown, .key, .command])
+    #expect(tokens.map(\.text) == ["a", "echo a", "\u{0}", "b", "echo b"])
+  }
+
   @Test("Skip consecutive comments")
   func comments() {
     let lexer = Lexer(with: String(repeating: "# comment\n", count: 10_000) + "a: echo hello")

@@ -6,12 +6,19 @@ public class Parser {
 
   private var atEnd: Bool { current.type == .endOfStream }
 
+  private let containsNullCharacter: Bool
+
   public init(with buffer: String) {
+    containsNullCharacter = buffer.unicodeScalars.contains("\0")
     lexer = Lexer(with: buffer)
     current = lexer.getToken()
   }
 
   public func parse() -> Result<Configuration, ParserError> {
+    guard !containsNullCharacter else {
+      return .failure(.unexpectedNullCharacter)
+    }
+
     do {
       var configuration = Configuration()
 
