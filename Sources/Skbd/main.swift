@@ -35,6 +35,7 @@ do {
   case .success: break
   case .failure(let error):
     fputs("error starting the event tap: \(error)\n", stderr)
+    fputs("\(AccessibilityPermission.guidance())\n", stderr)
     fflush(stderr)
     exit(EXIT_FAILURE)
   }
