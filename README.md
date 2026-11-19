@@ -19,13 +19,15 @@ Create `~/.config/skbd/skbdrc` with a binding:
 cmd + shift - k: open -a Terminal
 ```
 
+Grant Accessibility permission before starting `skbd`. On macOS 27.3 or later, use the System & App Protection Override pane and re-add the executable after each upgrade or rebuild. See [Grant Accessibility permission](docs/getting-started.md#grant-accessibility-permission).
+
 Start the daemon now and at login:
 
 ```sh
 brew services start skbd@2
 ```
 
-See [getting started](docs/getting-started.md) for permissions and source builds, or the [configuration guide](docs/configuration.md) for file loading and automatic reloads.
+See [getting started](docs/getting-started.md) for source builds or the [configuration guide](docs/configuration.md) for file loading and automatic reloads.
 
 ## Documentation
 

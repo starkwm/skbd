@@ -49,6 +49,20 @@ cmd + shift - k: open -a Terminal
 
 The configuration must exist before starting `skbd`. See [configuration](configuration.md) for directory configurations, automatic reloads, and application block lists, and [key bindings](key-bindings.md) for the syntax reference.
 
+## Grant Accessibility permission
+
+On macOS 27.3 or later, try adding `skbd` in System Settings > Privacy & Security > System & App Protection Override.
+
+1. Find the resolved path to the executable. For Homebrew, run `realpath "$(which skbd)"` to get the versioned path in the Cellar. For a source build, run `realpath .build/debug/skbd` from the repository root.
+2. Click **+** in System & App Protection Override. In the file picker, press Command-Shift-G, paste the resolved path, and select the executable.
+3. Start or restart `skbd`.
+
+After upgrading or rebuilding `skbd`, remove the old entry and repeat these steps with the current executable.
+
+On earlier versions of macOS, enable `skbd` in System Settings > Privacy & Security > Accessibility, then start or restart it. See [Apple's instructions for granting access](https://support.apple.com/en-au/guide/mac-help/mh43185/mac).
+
+If startup reports `failed to create event tap`, use the pane and executable path in the error to check the permission.
+
 ## Run skbd
 
 Start a Homebrew installation now and at login:
@@ -62,8 +76,6 @@ For a source build, run the development binary in the foreground:
 ```sh
 .build/debug/skbd
 ```
-
-Enable Accessibility permission in System Settings > Privacy & Security > Accessibility. See [Apple's instructions for granting access](https://support.apple.com/en-au/guide/mac-help/mh43185/mac). Restart `skbd` after granting permission. If startup reports `failed to create event tap`, check this permission.
 
 For Homebrew installations, restart or stop the service with:
 
