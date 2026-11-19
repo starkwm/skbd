@@ -191,6 +191,39 @@ struct ParserTests {
     )
   }
 
+  @Test("parse(): indented command on the following line")
+  func commandOnFollowingLine() throws {
+    let input = """
+      cmd - a:
+
+          echo \\
+            "a"
+      cmd - b ->
+      \techo "b"
+      .blocklist ["Finder"]
+      """
+
+    let parser = Parser(with: input)
+
+    let configuration = try parser.parse().get()
+
+    #expect(configuration.hotKeys.count == 2)
+    #expect(configuration.blockList == ["Finder"])
+
+    #expect(configuration.hotKeys[0].key == kVK_ANSI_A)
+    #expect(
+      configuration.hotKeys[0].command == """
+        echo \\
+              "a"
+        """
+    )
+    #expect(configuration.hotKeys[0].passthrough == false)
+
+    #expect(configuration.hotKeys[1].key == kVK_ANSI_B)
+    #expect(configuration.hotKeys[1].command == "echo \"b\"")
+    #expect(configuration.hotKeys[1].passthrough == true)
+  }
+
   @Test("parse(): passthrough arrow")
   func passthrough() throws {
     let input = """
@@ -298,6 +331,9 @@ struct ParserTests {
       ("ctrl + shift - 0xGG: echo hello", .invalidKeyHex),
       ("ctrl + shift - foo: echo hello", .invalidKeyLiteral),
       ("ctrl + shift - a:", .invalidCommand),
+      ("cmd - a:\n.blocklist [\"Finder\"]", .invalidCommand),
+      ("cmd - a:\ncmd - b: echo b", .invalidCommand),
+      ("cmd - a ->\n\ncmd - b: echo b", .invalidCommand),
       ("a: echo a\n\u{0}.blocklist [\"Finder\"]", .unexpectedNullCharacter),
       ("a: echo a\n\u{0}b: echo b", .unexpectedNullCharacter),
       ("a: echo \u{0}a", .unexpectedNullCharacter),
