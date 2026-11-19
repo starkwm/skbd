@@ -11,6 +11,7 @@ public enum ParserError: Error, Equatable {
   case expectedRightBracket
   case expectedStringLiteral
   case invalidDirective
+  case unexpectedNullCharacter
   case unexpectedError
 }
 
@@ -41,6 +42,8 @@ extension ParserError: CustomStringConvertible {
       return "expected string literal"
     case .invalidDirective:
       return "invalid directive"
+    case .unexpectedNullCharacter:
+      return "unexpected NUL character"
     case .unexpectedError:
       return "unexpected parser error"
     }

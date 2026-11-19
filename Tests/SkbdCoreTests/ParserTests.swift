@@ -298,6 +298,9 @@ struct ParserTests {
       ("ctrl + shift - 0xGG: echo hello", .invalidKeyHex),
       ("ctrl + shift - foo: echo hello", .invalidKeyLiteral),
       ("ctrl + shift - a:", .invalidCommand),
+      ("a: echo a\n\u{0}.blocklist [\"Finder\"]", .unexpectedNullCharacter),
+      ("a: echo a\n\u{0}b: echo b", .unexpectedNullCharacter),
+      ("a: echo \u{0}a", .unexpectedNullCharacter),
     ]
   )
   func invalidInput(input: String, error: ParserError) {

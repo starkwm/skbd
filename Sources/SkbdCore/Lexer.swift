@@ -19,11 +19,13 @@ final class Lexer {
       skipWhitespace()
     }
 
+    if atEnd {
+      return Token(type: .endOfStream)
+    }
+
     var token = Token(type: .unknown)
 
     switch current {
-    case "\0":
-      token.type = .endOfStream
     case ":":
       advance()
       skipWhitespace()
