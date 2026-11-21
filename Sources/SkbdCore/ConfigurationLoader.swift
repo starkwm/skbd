@@ -2,13 +2,14 @@ import Foundation
 
 public enum ConfigurationLoader {
   public static func load(from url: URL) throws -> String {
-    let values = try url.resourceValues(forKeys: [.isDirectoryKey])
+    let resolvedURL = url.resolvingSymlinksInPath()
+    let values = try resolvedURL.resourceValues(forKeys: [.isDirectoryKey])
 
     if values.isDirectory == true {
-      return try loadDirectory(at: url)
+      return try loadDirectory(at: resolvedURL)
     }
 
-    return try String(contentsOf: url, encoding: .utf8)
+    return try String(contentsOf: resolvedURL, encoding: .utf8)
   }
 
   public static func regularFiles(in url: URL) throws -> [URL] {

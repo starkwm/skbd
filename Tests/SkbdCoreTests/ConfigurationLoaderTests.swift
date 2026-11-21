@@ -61,6 +61,53 @@ struct ConfigurationLoaderTests {
     )
   }
 
+  @Test("load(from:): symlinked directory matches the resolved directory")
+  func loadSymlinkDirectory() throws {
+    let root = try temporaryDirectory()
+    defer { try? FileManager.default.removeItem(at: root) }
+
+    let directory = root.appendingPathComponent("fragments")
+    let link = root.appendingPathComponent("skbd")
+
+    try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+    try "cmd - b: echo second".write(
+      to: directory.appendingPathComponent("20-second"),
+      atomically: true,
+      encoding: .utf8
+    )
+    try "cmd - a: echo first".write(
+      to: directory.appendingPathComponent("10-first"),
+      atomically: true,
+      encoding: .utf8
+    )
+    try FileManager.default.createSymbolicLink(at: link, withDestinationURL: directory)
+
+    let direct = try ConfigurationLoader.load(from: directory)
+    let linked = try ConfigurationLoader.load(from: link)
+
+    #expect(direct == "cmd - a: echo first\ncmd - b: echo second")
+    #expect(linked == direct)
+  }
+
+  @Test("load(from:): broken symlink reports a missing file")
+  func loadBrokenSymlink() throws {
+    let directory = try temporaryDirectory()
+    defer { try? FileManager.default.removeItem(at: directory) }
+
+    let link = directory.appendingPathComponent("skbdrc")
+
+    try FileManager.default.createSymbolicLink(
+      at: link,
+      withDestinationURL: directory.appendingPathComponent("missing")
+    )
+
+    let error = #expect(throws: CocoaError.self) {
+      try ConfigurationLoader.load(from: link)
+    }
+
+    #expect(error?.code == .fileReadNoSuchFile)
+  }
+
   private func temporaryDirectory() throws -> URL {
     let url = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
 
