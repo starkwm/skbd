@@ -5,6 +5,7 @@ import Foundation
 final class ConfigurationWatcher: @unchecked Sendable {
   private let url: URL
   private let queue = DispatchQueue(label: "skbd.configuration-watcher")
+  private let queueKey = DispatchSpecificKey<Void>()
   private let debounceInterval: DispatchTimeInterval
   private let onChange: @Sendable () -> Void
 
@@ -19,6 +20,8 @@ final class ConfigurationWatcher: @unchecked Sendable {
     self.url = url
     self.debounceInterval = debounceInterval
     self.onChange = onChange
+
+    queue.setSpecific(key: queueKey, value: ())
   }
 
   deinit {
@@ -26,18 +29,25 @@ final class ConfigurationWatcher: @unchecked Sendable {
   }
 
   func start() {
-    queue.async {
-      self.rebuildSources()
+    queue.async { [weak self] in
+      self?.rebuildSources()
     }
   }
 
   func stop() {
-    queue.sync {
-      self.pendingChange?.cancel()
-      self.pendingChange = nil
-
-      self.cancelSources()
+    // The last release can happen on the watcher queue, so deinit must not re-enter it.
+    if DispatchQueue.getSpecific(key: queueKey) != nil {
+      cancelPendingWork()
+    } else {
+      queue.sync(execute: cancelPendingWork)
     }
+  }
+
+  private func cancelPendingWork() {
+    pendingChange?.cancel()
+    pendingChange = nil
+
+    cancelSources()
   }
 
   private func scheduleChange() {
