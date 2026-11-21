@@ -3,6 +3,8 @@ import Dispatch
 import Foundation
 
 final class ConfigurationWatcher: @unchecked Sendable {
+  private static let maxSymlinkHops = 32
+
   private let url: URL
   private let queue = DispatchQueue(label: "skbd.configuration-watcher")
   private let queueKey = DispatchSpecificKey<Void>()
@@ -106,22 +108,51 @@ final class ConfigurationWatcher: @unchecked Sendable {
   }
 
   private func watchedURLs() -> [URL] {
-    var urls = [url.deletingLastPathComponent().standardizedFileURL]
-    let resolvedURL = url.resolvingSymlinksInPath().standardizedFileURL
+    var urls: [URL] = []
+    var current = url.standardizedFileURL
 
-    guard FileManager.default.fileExists(atPath: resolvedURL.path) else {
+    // Follow symlinks one hop at a time so each link's directory stays watched, even when
+    // its target is missing, and recreating the target triggers a rebuild.
+    for _ in 0..<Self.maxSymlinkHops {
+      urls.append(nearestExistingAncestor(of: current.deletingLastPathComponent()))
+
+      guard
+        let destination = try? FileManager.default.destinationOfSymbolicLink(atPath: current.path)
+      else {
+        break
+      }
+
+      current =
+        URL(fileURLWithPath: destination, relativeTo: current.deletingLastPathComponent())
+        .absoluteURL
+        .standardizedFileURL
+    }
+
+    guard FileManager.default.fileExists(atPath: current.path) else {
       return unique(urls)
     }
 
-    urls.append(resolvedURL)
+    urls.append(current)
 
-    let values = try? resolvedURL.resourceValues(forKeys: [.isDirectoryKey])
+    let values = try? current.resourceValues(forKeys: [.isDirectoryKey])
 
     if values?.isDirectory == true {
-      urls.append(contentsOf: (try? ConfigurationLoader.regularFiles(in: resolvedURL)) ?? [])
+      urls.append(contentsOf: (try? ConfigurationLoader.regularFiles(in: current)) ?? [])
     }
 
     return unique(urls)
+  }
+
+  // A removed directory cannot be watched, so watch the closest ancestor that still exists
+  // and rebuild the more specific watches when the path is recreated.
+  private func nearestExistingAncestor(of url: URL) -> URL {
+    var current = url.standardizedFileURL
+
+    while !FileManager.default.fileExists(atPath: current.path), current.path != "/" {
+      current = current.deletingLastPathComponent()
+    }
+
+    return current
   }
 
   private func unique(_ urls: [URL]) -> [URL] {
