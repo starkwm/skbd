@@ -2,6 +2,13 @@ import Carbon
 import Foundation
 
 public struct HotKey {
+  // Commands launch on a serial queue so the event tap callback returns without waiting on
+  // process creation, and commands still start in the order their shortcuts were pressed.
+  private static let launchQueue = DispatchQueue(
+    label: "skbd.command-launcher",
+    qos: .userInitiated
+  )
+
   static func from(event: CGEvent) -> HotKey {
     HotKey(
       modifierFlags: ModifierFlags.from(event.flags),
@@ -36,6 +43,14 @@ public struct HotKey {
   func execute() -> HotKeyResult {
     guard let command else { return .passthrough }
 
+    Self.launchQueue.async {
+      Self.launch(command)
+    }
+
+    return passthrough ? .passthrough : .consumed
+  }
+
+  private static func launch(_ command: String) {
     let shell =
       ProcessInfo.processInfo.environment["SHELL"].flatMap { $0.isEmpty ? nil : $0 } ?? "/bin/bash"
 
@@ -51,8 +66,6 @@ public struct HotKey {
       fputs("error running command: \(error.localizedDescription)\n", stderr)
       fflush(stderr)
     }
-
-    return passthrough ? .passthrough : .consumed
   }
 }
 
