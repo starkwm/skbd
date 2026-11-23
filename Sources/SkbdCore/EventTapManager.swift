@@ -67,6 +67,10 @@ public class EventTapManager: @unchecked Sendable {
     case .tapDisabledByTimeout, .tapDisabledByUserInput:
       guard let eventTap else { return event }
 
+      let reason = type == .tapDisabledByTimeout ? "timeout" : "user input"
+      fputs("event tap disabled by \(reason), re-enabling\n", stderr)
+      fflush(stderr)
+
       CGEvent.tapEnable(tap: eventTap, enable: true)
     case .keyDown:
       let processName = NSWorkspace.shared.frontmostApplication?.localizedName
