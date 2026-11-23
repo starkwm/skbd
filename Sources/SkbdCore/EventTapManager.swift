@@ -73,16 +73,12 @@ public class EventTapManager: @unchecked Sendable {
 
       CGEvent.tapEnable(tap: eventTap, enable: true)
     case .keyDown:
-      let processName = NSWorkspace.shared.frontmostApplication?.localizedName
-
-      if let processName, blockList.contains(processName) {
-        return event
-      }
-
       let eventHotKey = HotKey.from(event: event)
       let hotKey = hotKeys.first { $0.matches(eventHotKey) }
 
       guard let hotKey else { return event }
+
+      if isFrontmostApplicationBlocked() { return event }
 
       let result = hotKey.execute()
 
@@ -94,5 +90,17 @@ public class EventTapManager: @unchecked Sendable {
     }
 
     return event
+  }
+
+  // Looking up the frontmost application is a call to another process, so only make it for
+  // key presses that match a shortcut and only when something is blocked.
+  private func isFrontmostApplicationBlocked() -> Bool {
+    guard !blockList.isEmpty else { return false }
+
+    guard let processName = NSWorkspace.shared.frontmostApplication?.localizedName else {
+      return false
+    }
+
+    return blockList.contains(processName)
   }
 }
