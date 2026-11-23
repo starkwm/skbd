@@ -53,6 +53,13 @@ do {
 
   reloader.start()
 
+  let secureInputMonitor = SecureInputMonitor { message in
+    fputs("\(message)\n", stderr)
+    fflush(stderr)
+  }
+
+  secureInputMonitor.start()
+
   signal(SIGINT) { _ in
     CFRunLoopStop(CFRunLoopGetMain())
   }
