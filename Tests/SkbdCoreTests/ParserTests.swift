@@ -317,6 +317,17 @@ struct ParserTests {
     #expect(configuration.hotKeys[2].command == "echo \"ropt space hex\"")
   }
 
+  @Test("Rejects a single letter absent from the active keyboard layout")
+  func unmappedKey() throws {
+    let letters = "abcdefghijklmnopqrstuvwxyzαβγδεζηθικλμνξοπρστυφχψω"
+    let key = try #require(letters.first { KeyCodes.keyCode(for: String($0)) == nil })
+    let parser = Parser(with: "\(key): echo unmapped")
+
+    #expect(throws: ParserError.invalidKey) {
+      try parser.parse().get()
+    }
+  }
+
   @Test(
     "Invalid configuration",
     arguments: [
