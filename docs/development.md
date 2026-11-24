@@ -13,6 +13,8 @@ make lint     # Check Swift formatting
 make clean    # Remove build products
 ```
 
+To run one suite, use `make test TEST_ARGS='--filter ParserTests'`.
+
 See [getting started](getting-started.md) for build requirements, output locations, and running the daemon.
 
 ## Code and tests

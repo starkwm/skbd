@@ -1,3 +1,5 @@
+TEST_ARGS ?=
+
 build:
 	@swift build
 
@@ -8,10 +10,10 @@ format:
 	@swift format -i -r -p Sources Tests Package.swift
 
 lint:
-	@swift format lint -r -p Sources Tests Package.swift
+	@swift format lint --strict -r -p Sources Tests Package.swift
 
 test:
-	@swift test --parallel --disable-xctest
+	@swift test --parallel --disable-xctest $(TEST_ARGS)
 
 clean:
 	@swift package clean
