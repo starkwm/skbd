@@ -11,7 +11,7 @@ struct EventTapManagerTests {
   func updateHotKeys() {
     let oldHotKey = HotKey(modifierFlags: [], key: 0, command: "false")
     let newHotKey = HotKey(modifierFlags: [], key: 1, command: "true")
-    let manager = EventTapManager(hotKeys: [oldHotKey])
+    let manager = EventTapManager(configuration: Configuration(hotKeys: [oldHotKey]))
 
     let source = CGEventSource(stateID: .hidSystemState)
     let oldEvent = CGEvent(keyboardEventSource: source, virtualKey: 0, keyDown: true)!
@@ -27,7 +27,7 @@ struct EventTapManagerTests {
 
   @Test("process(event:type:): unhandled type")
   func unhandledEvent() {
-    let manager = EventTapManager(hotKeys: [])
+    let manager = EventTapManager(configuration: Configuration())
 
     let source = CGEventSource(stateID: .hidSystemState)
     let event = CGEvent(
@@ -44,7 +44,7 @@ struct EventTapManagerTests {
 
   @Test("process(event:type:): keyDown without match")
   func unmatchedKey() {
-    let manager = EventTapManager(hotKeys: [])
+    let manager = EventTapManager(configuration: Configuration())
 
     let source = CGEventSource(stateID: .hidSystemState)
     let event = CGEvent(keyboardEventSource: source, virtualKey: 0, keyDown: true)!
@@ -58,7 +58,7 @@ struct EventTapManagerTests {
   @Test("process(event:type:): keyDown consumed match")
   func consumedKey() {
     let hotKey = HotKey(modifierFlags: [], key: 0, command: "true")
-    let manager = EventTapManager(hotKeys: [hotKey])
+    let manager = EventTapManager(configuration: Configuration(hotKeys: [hotKey]))
 
     let source = CGEventSource(stateID: .hidSystemState)
     let event = CGEvent(keyboardEventSource: source, virtualKey: 0, keyDown: true)!
@@ -72,7 +72,7 @@ struct EventTapManagerTests {
   @Test("process(event:type:): keyDown passthrough match")
   func passthroughKey() {
     let hotKey = HotKey(modifierFlags: [], key: 0, command: "true", passthrough: true)
-    let manager = EventTapManager(hotKeys: [hotKey])
+    let manager = EventTapManager(configuration: Configuration(hotKeys: [hotKey]))
 
     let source = CGEventSource(stateID: .hidSystemState)
     let event = CGEvent(keyboardEventSource: source, virtualKey: 0, keyDown: true)!

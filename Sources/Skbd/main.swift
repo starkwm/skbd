@@ -5,7 +5,7 @@ import SkbdCore
 let arguments = Arguments.parseOrExit()
 
 if arguments.version {
-  print("skbd \(Version.current.value)")
+  print("skbd \(Version.current)")
   exit(EXIT_SUCCESS)
 }
 
@@ -26,10 +26,7 @@ case .failure(.failed(let reason)):
 
 do {
   let configuration = try ConfigurationReloader.load(from: arguments.config)
-  let eventTap = EventTapManager(
-    hotKeys: configuration.hotKeys,
-    blockList: configuration.blockList
-  )
+  let eventTap = EventTapManager(configuration: configuration)
 
   switch eventTap.begin() {
   case .success: break

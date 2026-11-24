@@ -212,23 +212,3 @@ final class Lexer {
     return .unknown
   }
 }
-
-extension Lexer: Sequence {
-  func makeIterator() -> LexerIterator {
-    LexerIterator(with: self)
-  }
-}
-
-struct LexerIterator: IteratorProtocol {
-  private let lexer: Lexer
-
-  init(with lexer: Lexer) {
-    self.lexer = lexer
-  }
-
-  mutating func next() -> Token? {
-    let token = lexer.getToken()
-
-    return token.type == .endOfStream ? nil : token
-  }
-}

@@ -5,12 +5,10 @@ public class EventTapManager: @unchecked Sendable {
   private var eventTap: CFMachPort?
   private var runLoopSource: CFRunLoopSource?
 
-  private var hotKeys: [HotKey]
-  private var blockList: [String]
+  private var configuration: Configuration
 
-  public init(hotKeys: [HotKey], blockList: [String] = []) {
-    self.hotKeys = hotKeys
-    self.blockList = blockList
+  public init(configuration: Configuration) {
+    self.configuration = configuration
   }
 
   deinit {
@@ -58,8 +56,7 @@ public class EventTapManager: @unchecked Sendable {
   }
 
   public func update(configuration: Configuration) {
-    hotKeys = configuration.hotKeys
-    blockList = configuration.blockList
+    self.configuration = configuration
   }
 
   func process(event: CGEvent, type: CGEventType) -> CGEvent? {
@@ -74,7 +71,7 @@ public class EventTapManager: @unchecked Sendable {
       CGEvent.tapEnable(tap: eventTap, enable: true)
     case .keyDown:
       let eventHotKey = HotKey.from(event: event)
-      let hotKey = hotKeys.first { $0.matches(eventHotKey) }
+      let hotKey = configuration.hotKeys.first { $0.matches(eventHotKey) }
 
       guard let hotKey else { return event }
 
@@ -95,12 +92,25 @@ public class EventTapManager: @unchecked Sendable {
   // Looking up the frontmost application is a call to another process, so only make it for
   // key presses that match a shortcut and only when something is blocked.
   private func isFrontmostApplicationBlocked() -> Bool {
-    guard !blockList.isEmpty else { return false }
+    guard !configuration.blockList.isEmpty else { return false }
 
     guard let processName = NSWorkspace.shared.frontmostApplication?.localizedName else {
       return false
     }
 
-    return blockList.contains(processName)
+    return configuration.blockList.contains(processName)
+  }
+}
+
+public enum EventTapError: Error, LocalizedError {
+  case creationFailed
+}
+
+extension EventTapError: CustomStringConvertible {
+  public var description: String {
+    switch self {
+    case .creationFailed:
+      return "failed to create event tap"
+    }
   }
 }

@@ -8,18 +8,14 @@ struct LexerTests {
   func emptyInput() {
     let input = ""
 
-    let lexer = Lexer(with: input)
-
-    let tokens = Array(lexer)
+    let tokens = readTokens(from: input)
 
     #expect(tokens.isEmpty)
   }
 
   @Test("getToken(): embedded NUL does not end the stream")
   func embeddedNull() {
-    let lexer = Lexer(with: "a: echo a\n\u{0}b: echo b")
-
-    let tokens = Array(lexer)
+    let tokens = readTokens(from: "a: echo a\n\u{0}b: echo b")
 
     #expect(tokens.map(\.type) == [.key, .command, .unknown, .key, .command])
     #expect(tokens.map(\.text) == ["a", "echo a", "\u{0}", "b", "echo b"])
@@ -27,9 +23,7 @@ struct LexerTests {
 
   @Test("Skip consecutive comments")
   func comments() {
-    let lexer = Lexer(with: String(repeating: "# comment\n", count: 10_000) + "a: echo hello")
-
-    let tokens = Array(lexer)
+    let tokens = readTokens(from: String(repeating: "# comment\n", count: 10_000) + "a: echo hello")
 
     #expect(tokens.map(\.type) == [.key, .command])
     #expect(tokens.map(\.text) == ["a", "echo hello"])
@@ -97,9 +91,7 @@ struct LexerTests {
       (.string, "Finder"), (.endList, nil),
     ]
 
-    let lexer = Lexer(with: input)
-
-    let tokens = Array(lexer)
+    let tokens = readTokens(from: input)
 
     #expect(tokens.map(\.type) == expected.map(\.0))
     #expect(tokens.map(\.text) == expected.map(\.1))
@@ -113,9 +105,7 @@ struct LexerTests {
       (.modifier, "cmd"), (.dash, nil), (.key, "0"),
     ]
 
-    let lexer = Lexer(with: input)
-
-    let tokens = Array(lexer)
+    let tokens = readTokens(from: input)
 
     #expect(tokens.map(\.type) == expected.map(\.0))
     #expect(tokens.map(\.text) == expected.map(\.1))
@@ -133,9 +123,7 @@ struct LexerTests {
       (.modifier, "cmd"), (.dash, nil), (.key, "."), (.command, "echo \"period\""),
     ]
 
-    let lexer = Lexer(with: input)
-
-    let tokens = Array(lexer)
+    let tokens = readTokens(from: input)
 
     #expect(tokens.map(\.type) == expected.map(\.0))
     #expect(tokens.map(\.text) == expected.map(\.1))
@@ -150,9 +138,7 @@ struct LexerTests {
       (.key, "'"), (.key, ";"), (.key, "\\"), (.key, "/"),
     ]
 
-    let lexer = Lexer(with: input)
-
-    let tokens = Array(lexer)
+    let tokens = readTokens(from: input)
 
     #expect(tokens.map(\.type) == expected.map(\.0))
     #expect(tokens.map(\.text) == expected.map(\.1))
@@ -169,9 +155,7 @@ struct LexerTests {
       (.command, "echo \"unknown\""),
     ]
 
-    let lexer = Lexer(with: input)
-
-    let tokens = Array(lexer)
+    let tokens = readTokens(from: input)
 
     #expect(tokens.map(\.type) == expected.map(\.0))
     #expect(tokens.map(\.text) == expected.map(\.1))
@@ -188,11 +172,21 @@ struct LexerTests {
       (.command, "echo \"unknown\""),
     ]
 
-    let lexer = Lexer(with: input)
-
-    let tokens = Array(lexer)
+    let tokens = readTokens(from: input)
 
     #expect(tokens.map(\.type) == expected.map(\.0))
     #expect(tokens.map(\.text) == expected.map(\.1))
+  }
+
+  private func readTokens(from input: String) -> [Token] {
+    let lexer = Lexer(with: input)
+    var tokens: [Token] = []
+
+    while true {
+      let token = lexer.getToken()
+      guard token.type != .endOfStream else { return tokens }
+
+      tokens.append(token)
+    }
   }
 }
