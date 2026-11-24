@@ -50,11 +50,20 @@ do {
 
   reloader.start()
 
-  signal(SIGINT) { _ in
-    CFRunLoopStop(CFRunLoopGetMain())
+  let terminationSignalSources = [SIGINT, SIGTERM].map { signalNumber in
+    signal(signalNumber, SIG_IGN)
+
+    let source = DispatchSource.makeSignalSource(signal: signalNumber, queue: .main)
+    source.setEventHandler {
+      CFRunLoopStop(CFRunLoopGetMain())
+    }
+    source.resume()
+    return source
   }
 
-  CFRunLoopRun()
+  withExtendedLifetime((terminationSignalSources, reloader)) {
+    CFRunLoopRun()
+  }
 } catch let error as ConfigurationReloaderError {
   fputs("\(error.description)\n", stderr)
   fflush(stderr)
